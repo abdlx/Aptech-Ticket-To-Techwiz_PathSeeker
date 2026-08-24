@@ -1,120 +1,76 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useEffect, useState } from 'react'
+import AppShell from './components/AppShell'
+import NaviAssistant from './components/NaviAssistant'
+import { AuthPage, OnboardingPage, WelcomePage } from './pages/PublicPages'
+import {
+  CareerBankPage,
+  CareerDetailPage,
+  DashboardPage,
+  FeedbackPage,
+  ProfilePage,
+  QuizPage,
+  RecommendationsPage,
+  ResourcesPage,
+  SavedPage,
+  StoriesPage,
+} from './pages/UserPages'
+import AdminPage from './pages/AdminPages'
 import './App.css'
 
+function readLocation() {
+  const params = new URLSearchParams(window.location.search)
+  return { screen: params.get('screen') || 'welcome', careerId: params.get('career') || 'ux-designer' }
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const initial = readLocation()
+  const [screen, setScreen] = useState(initial.screen)
+  const [careerId, setCareerId] = useState(initial.careerId)
+  const [voiceOpen, setVoiceOpen] = useState(false)
+  const [mobileMenu, setMobileMenu] = useState(false)
+
+  useEffect(() => {
+    const onPopState = () => {
+      const next = readLocation()
+      setScreen(next.screen)
+      setCareerId(next.careerId)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  const navigate = (nextScreen, nextCareer) => {
+    const params = new URLSearchParams()
+    params.set('screen', nextScreen)
+    if (nextCareer) params.set('career', nextCareer)
+    window.history.pushState({}, '', `?${params.toString()}`)
+    setScreen(nextScreen)
+    if (nextCareer) setCareerId(nextCareer)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  let page
+  if (screen === 'dashboard') page = <DashboardPage navigate={navigate} onVoice={() => setVoiceOpen(true)} />
+  else if (screen === 'quiz') page = <QuizPage navigate={navigate} onVoice={() => setVoiceOpen(true)} />
+  else if (screen === 'recommendations') page = <RecommendationsPage navigate={navigate} onVoice={() => setVoiceOpen(true)} />
+  else if (screen === 'careers') page = <CareerBankPage navigate={navigate} />
+  else if (screen === 'career-detail') page = <CareerDetailPage navigate={navigate} careerId={careerId} />
+  else if (screen === 'resources') page = <ResourcesPage />
+  else if (screen === 'saved') page = <SavedPage navigate={navigate} />
+  else if (screen === 'stories') page = <StoriesPage />
+  else if (screen === 'profile') page = <ProfilePage />
+  else if (screen === 'feedback') page = <FeedbackPage navigate={navigate} />
+  else page = <DashboardPage navigate={navigate} onVoice={() => setVoiceOpen(true)} />
+
+  if (screen.startsWith('admin')) return <AdminPage screen={screen} navigate={navigate} />
+  if (screen === 'welcome') return <><WelcomePage navigate={navigate} onVoice={() => setVoiceOpen(true)} /><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context="getting started" /></>
+  if (screen === 'signup' || screen === 'login') return <AuthPage navigate={navigate} mode={screen} />
+  if (screen === 'onboarding') return <OnboardingPage navigate={navigate} />
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <AppShell screen={screen} navigate={navigate} onVoice={() => setVoiceOpen(true)} mobileMenu={mobileMenu} setMobileMenu={setMobileMenu}>{page}</AppShell>
+      <NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context={screen.replace('-', ' ')} />
     </>
   )
 }
