@@ -4,7 +4,7 @@ import { navItems } from '../data'
 export function Brand({ compact = false }) {
   return (
     <div className={`brand ${compact ? 'brand-compact' : ''}`}>
-      <span className="brand-mark"><Icon name="compass" size={22} /></span>
+      <span className="brand-mark"><img src="/PathSeeker-Icon.svg" alt="" aria-hidden="true" /></span>
       {!compact && <span>Path<span>Seeker</span></span>}
     </div>
   )
