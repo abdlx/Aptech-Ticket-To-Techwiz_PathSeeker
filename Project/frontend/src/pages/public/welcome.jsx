@@ -12,7 +12,7 @@ export default function WelcomePage({ navigate, onVoice }) {
       <main className="welcome-main">
         <section className="welcome-copy">
           <span className="eyebrow"><Icon name="sparkles" size={15} /> Your future, made clearer</span>
-          <h1>Find the work that<br /><em>feels like you.</em></h1>
+          <h1><span>Find the work that</span><em>feels like you.</em></h1>
           <p>Discover careers that match your interests, strengths, and goals—then get a practical plan to move forward.</p>
           <div className="welcome-actions"><button className="button primary" onClick={() => navigate('signup')}>Start my career quiz <Icon name="arrow" /></button><button className="button soft" onClick={onVoice}><Icon name="mic" /> Ask Navi</button></div>
           <div className="social-proof"><div className="avatar-stack"><span>AR</span><span>DK</span><span>FN</span><span>+2k</span></div><p><strong>4.9 out of 5</strong><br />from career explorers</p></div>

@@ -22,16 +22,16 @@
   --shadow: 0 20px 50px rgba(42, 58, 47, .08);
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: #f6f7f3; }
-button, input, select, textarea { font: inherit; }
+* { box-sizing: border-box; min-width: 0; }
+html { max-width: 100%; overflow-x: clip; scroll-behavior: smooth; }
+body { width: 100%; max-width: 100%; margin: 0; min-width: 320px; min-height: 100vh; overflow-x: clip; background: #f6f7f3; }
+button, input, select, textarea { max-width: 100%; font: inherit; }
 button { cursor: pointer; }
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgba(98, 143, 114, .28); outline-offset: 2px; }
 img { display: block; max-width: 100%; }
-h1, h2, h3, p { margin-top: 0; }
+h1, h2, h3, p { margin-top: 0; overflow-wrap: anywhere; }
 h1, h2, h3, .brand { font-family: 'Manrope', 'Segoe UI', sans-serif; }
-#root { min-height: 100vh; }
+#root { width: 100%; max-width: 100%; min-height: 100vh; overflow-x: clip; }
 ::selection { background: #cfe0d2; }
 
 @media (max-width: 720px) {

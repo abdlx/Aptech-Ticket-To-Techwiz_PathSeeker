@@ -55,18 +55,26 @@
 }
 
 @media (max-width: 720px) {
-  .extended-head { align-items:start;flex-direction:column; }.extended-head h1 { font-size:30px; }.extended-head > div:last-child { width:100%; }
-  .flow-auth { padding:15px; }.flow-auth > header .brand { font-size:20px; }.flow-auth > main { width:100%;min-height:calc(100vh - 80px); }.flow-auth-card { padding:27px 20px; }.flow-auth-card h1 { font-size:29px; }.otp-row { gap:5px; }.otp-row input { height:52px;font-size:20px; }
+  .extended-head { align-items:start;flex-direction:column; }.extended-head h1 { font-size:30px; }.extended-head > div:last-child { width:100%;flex-wrap:wrap; }.extended-head > div:last-child .button { flex:1 1 150px; }
+  .flow-auth { width:100%;padding:15px; }.flow-auth > header .brand { font-size:20px; }.flow-auth > main { width:100%;min-height:calc(100vh - 80px);grid-template-columns:minmax(0,1fr); }.flow-auth-card { width:100%;padding:27px 20px; }.flow-auth-card h1 { font-size:29px; }.otp-row { gap:5px; }.otp-row input { height:52px;font-size:20px; }
   .history-summary,.quick-links-row,.result-detail-grid,.recent-grid,.saved-filter-grid,.help-topic-grid,.admin-help-grid,.analytics-detail-grid { grid-template-columns:1fr; }
   .attempt-list article { grid-template-columns:40px 1fr; }.attempt-list article .button { grid-column:2;justify-self:start; }
   .result-detail-hero { padding:26px 20px;grid-template-columns:1fr; }.result-detail-hero h1 { font-size:34px; }.result-detail-hero img { height:200px; }
   .privacy-note { align-items:start;flex-wrap:wrap; }.privacy-note button { margin-left:48px; }
-  .comparison-note { padding:20px;grid-template-columns:100px 1fr; }.comparison-note img { width:100px;height:130px; }
-  .inline-editor form { grid-template-columns:1fr; }.inline-editor .check-row,.inline-editor form > div { grid-column:auto; }
+  .compare-table { max-width:100%;overscroll-behavior-inline:contain; }.compare-head,.compare-row { min-width:760px; }.comparison-note { padding:20px;grid-template-columns:100px minmax(0,1fr); }.comparison-note img { width:100px;height:130px; }
+  .inline-editor { padding:20px; }.inline-editor form { grid-template-columns:1fr; }.inline-editor .check-row,.inline-editor form > div { grid-column:auto; }
   .media-stage { min-height:300px; }.media-copy h1 { font-size:27px; }.media-controls { gap:7px;font-size:10px; }
-  .document-sheet { min-height:760px;padding:35px 24px; }.document-sheet h1 { font-size:31px; }.document-brand { margin-bottom:40px; }.worksheet-grid { grid-template-columns:1fr; }.document-sheet footer { left:24px;right:24px; }.document-sidebar { overflow:auto;white-space:nowrap; }
+  .document-sheet { min-height:760px;padding:35px 24px; }.document-sheet h1 { font-size:31px; }.document-brand { margin-bottom:40px; }.worksheet-grid { grid-template-columns:1fr; }.document-sheet footer { left:24px;right:24px; }.document-sidebar { max-width:100%;overflow:auto;white-space:nowrap; }
   .story-detail-hero { padding:28px 22px;grid-template-columns:1fr; }.story-detail-hero h1 { font-size:31px; }.story-portrait { width:120px;height:120px;margin-top:25px;font-size:30px; }.story-article,.story-timeline,.story-form { padding:22px; }
-  .help-hero { padding:35px 20px; }.help-hero h1 { font-size:34px; }.contact-strip { align-items:start;flex-wrap:wrap; }.contact-strip img { width:90px;height:90px; }.contact-strip .button { width:100%;margin-left:0; }
+  .help-hero { padding:35px 20px; }.help-hero h1 { font-size:34px; }.help-hero input { width:100%; }.contact-strip { align-items:start;flex-wrap:wrap; }.contact-strip img { width:90px;height:90px; }.contact-strip .button { width:100%;margin-left:0; }
   .admin-mobile-menu { display:grid; }.admin-editor-form { padding:19px; }.admin-settings-layout { grid-template-columns:1fr; }.admin-settings-layout .settings-nav { display:flex;overflow:auto; }.admin-settings-layout .settings-nav button { min-width:max-content; }.admin-roadmap-row { grid-template-columns:28px 1fr 28px; }.admin-roadmap-row input:nth-of-type(2) { display:none; }.range-row { grid-template-columns:120px 1fr 38px; }.topic-table > div:not(.admin-section-head) { grid-template-columns:1fr;gap:4px; }
   .admin-mobile-nav { height:66px;padding:0 8px;display:flex;gap:4px;position:fixed;left:8px;right:8px;bottom:8px;z-index:25;overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.97);box-shadow:0 14px 35px rgba(20,40,30,.2); }.admin-mobile-nav button { min-width:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#78857f;font-size:7px;font-weight:800; }.admin-mobile-nav button.active { color:var(--green-dark);background:var(--green-soft);border-radius:12px; }.admin-content { padding-bottom:100px!important; }
+}
+
+@media (max-width: 480px) {
+  .extended-head h1 { font-size:27px; }.extended-head > div:last-child { flex-direction:column; }.extended-head > div:last-child .button { width:100%; }
+  .flow-auth { padding:10px; }.flow-auth > header { gap:10px; }.flow-auth-card { padding:24px 16px; }.flow-auth-card h1 { font-size:26px; }.otp-row { gap:4px; }.otp-row input { height:46px;border-radius:9px;font-size:18px; }
+  .notification-list > button { padding:15px 12px;grid-template-columns:40px minmax(0,1fr) 8px;gap:10px; }.notification-kind { width:38px;height:38px; }.attempt-list { padding-inline:16px; }
+  .result-detail-hero,.story-detail-hero,.help-hero { border-radius:18px; }.comparison-note { grid-template-columns:1fr;text-align:center; }.comparison-note img { margin:auto; }.media-controls { padding-inline:10px; }.transcript-card,.rating-card,.related-card { padding:17px; }.transcript-lines p { grid-template-columns:42px minmax(0,1fr);padding-inline:8px; }.document-sheet { min-height:0;padding:28px 18px; }.document-sheet footer { margin-top:35px;position:static;gap:10px;flex-wrap:wrap; }.story-article blockquote { padding:18px;font-size:17px; }.form-actions { gap:8px;flex-wrap:wrap; }.form-actions .button { flex:1 1 120px; }
+  .admin-roadmap-row { grid-template-columns:25px minmax(0,1fr) 25px; }.range-row { grid-template-columns:90px minmax(0,1fr) 32px; }.response-panel > div { grid-template-columns:100px minmax(0,1fr) 30px; }.admin-profile-summary dl div { align-items:start;gap:10px; }.admin-profile-summary dd { text-align:right;overflow-wrap:anywhere; }
 }
