@@ -26,7 +26,7 @@ function App() {
   const initial = readLocation()
   const [screen, setScreen] = useState(initial.screen)
   const [careerId, setCareerId] = useState(initial.careerId)
-  const [voiceOpen, setVoiceOpen] = useState(false)
+  const [voiceOpen, setVoiceOpen] = useState(() => new URLSearchParams(window.location.search).get('voice') === '1')
   const [mobileMenu, setMobileMenu] = useState(false)
 
   useEffect(() => {
