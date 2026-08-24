@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 mockup/
+Documentation/
 
 # Editor directories and files
 .vscode/*
