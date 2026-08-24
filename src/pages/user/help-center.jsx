@@ -1,0 +1,8 @@
+import Icon from '../../components/Icon'
+import { useMemo, useState } from 'react'
+
+export default function HelpCenterPage() {
+  const [query, setQuery] = useState('')
+  const topics = useMemo(() => ['Building your Career Passport', 'Understanding match scores', 'Managing saved careers and notes', 'Quiz privacy and personalization', 'Account security and data', 'Using Navi voice guidance'].filter((topic) => topic.toLowerCase().includes(query.toLowerCase())), [query])
+  return <div className="page-stack"><section className="help-hero"><span className="eyebrow">Help center</span><h1>How can we help?</h1><p>Find quick answers about your Career Passport, matches, account, and privacy.</p><div><Icon name="search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search help topics" /></div></section><section className="help-topic-grid">{topics.map((topic, index) => <button className="panel" key={topic}><span className={`career-icon ${['mint','lavender','blue','amber','rose','navy'][index] || 'mint'}`}><Icon name={['compass','sparkles','bookmark','shield','lock','mic'][index] || 'help'} /></span><strong>{topic}</strong><p>Step-by-step guidance and common questions.</p><Icon name="arrow" /></button>)}</section><section className="contact-strip panel"><img src="/assets/navi/navi-listening.png" alt="Navi listening" /><div><span className="eyebrow">Still need a hand?</span><h2>Talk to the PathSeeker team</h2><p>Send a message and we’ll get back to you within one working day.</p></div><button className="button primary">Contact support <Icon name="message" /></button></section></div>
+}

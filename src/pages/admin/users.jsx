@@ -1,0 +1,7 @@
+import Icon from '../../components/Icon'
+import PageHead from '../../components/admin/PageHead'
+import AdminTable from '../../components/admin/AdminTable'
+
+export default function UsersAdmin() {
+  return <div className="admin-stack"><PageHead eyebrow="Community" title="Users" description="View accounts, understand engagement, and manage access."><button className="button soft"><Icon name="download" /> Export users</button><button className="button primary"><Icon name="plus" /> Add user</button></PageHead><section className="admin-filterbar panel"><div className="admin-search"><Icon name="search" /><input placeholder="Search name or email" /></div><select><option>All user stages</option><option>Students</option><option>Graduates</option></select><select><option>Any status</option><option>Active</option><option>Inactive</option></select><button><Icon name="filter" /> More filters</button></section><AdminTable headings={['User','Stage','Quiz status','Saved careers','Last active','Status','']} rows={[['AM|Alex Morgan|alex@example.com','Student','Completed','3','2 min ago','Active','⋯'],['ZN|Zara Noor|zara@example.com','Graduate','Completed','6','18 min ago','Active','⋯'],['DK|Daniel Kim|daniel@example.com','Professional','In progress','2','Yesterday','Active','⋯'],['FA|Farah Ali|farah@example.com','Student','Not started','0','Aug 21','Invited','⋯'],['OS|Omar Shah|omar@example.com','Graduate','Completed','4','Aug 19','Inactive','⋯']]} /></div>
+}

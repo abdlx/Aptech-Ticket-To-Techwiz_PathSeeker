@@ -1,34 +1,38 @@
 import { useEffect, useState } from 'react'
 import AppShell from './components/AppShell'
 import NaviAssistant from './components/NaviAssistant'
-import { AuthPage, OnboardingPage, WelcomePage } from './pages/PublicPages'
-import { AdminLoginPage, ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage } from './pages/AuthFlowPages'
 import {
-  CareerBankPage,
-  CareerDetailPage,
+  WelcomePage,
+  OnboardingPage,
+  LoginPage,
+  SignupPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  VerifyEmailPage,
+  AdminLoginPage,
   DashboardPage,
-  FeedbackPage,
-  ProfilePage,
   QuizPage,
   RecommendationsPage,
+  CareerBankPage,
+  CareerDetailPage,
   ResourcesPage,
   SavedPage,
   StoriesPage,
-} from './pages/UserPages'
-import {
-  CompareCareersPage,
-  DocumentPreviewPage,
-  HelpCenterPage,
-  MediaDetailPage,
+  ProfilePage,
+  FeedbackPage,
   NotificationsPage,
   QuizHistoryPage,
   QuizResultDetailPage,
   RecentlyViewedPage,
+  CompareCareersPage,
   SavedFiltersPage,
+  MediaDetailPage,
+  DocumentPreviewPage,
   StoryDetailPage,
   SubmitStoryPage,
-} from './pages/ExtendedUserPages'
-import AdminPage from './pages/AdminPages'
+  HelpCenterPage,
+  AdminPage,
+} from './pages'
 import './App.css'
 import './ExtendedPages.css'
 
@@ -91,7 +95,8 @@ function App() {
   if (screen === 'admin-login') return <AdminLoginPage navigate={navigate} />
   if (screen.startsWith('admin')) return <AdminPage screen={screen} navigate={navigate} />
   if (screen === 'welcome') return <><WelcomePage navigate={navigate} onVoice={() => setVoiceOpen(true)} /><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context="getting started" /></>
-  if (screen === 'signup' || screen === 'login') return <AuthPage navigate={navigate} mode={screen} />
+  if (screen === 'signup') return <SignupPage navigate={navigate} />
+  if (screen === 'login') return <LoginPage navigate={navigate} />
   if (screen === 'forgot-password') return <ForgotPasswordPage navigate={navigate} />
   if (screen === 'reset-password') return <ResetPasswordPage navigate={navigate} />
   if (screen === 'verify-email') return <VerifyEmailPage navigate={navigate} />
