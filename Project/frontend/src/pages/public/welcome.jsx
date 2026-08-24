@@ -22,7 +22,6 @@ export default function WelcomePage({ navigate, onVoice }) {
           <div className="hero-navi"><img src="/assets/navi/navi-greeting.png" alt="Navi, your PathSeeker career guide" /></div>
           <div className="floating-card hero-chat"><span className="navi-dot"><img src="/assets/navi/navi-idle.png" alt="" /></span><div><strong>Hey, I’m Navi 👋</strong><p>Let’s find what kind of work brings out your best.</p></div></div>
           <div className="floating-card match-card"><span className="match-score">94%</span><div><small>Top match</small><strong>UX Designer</strong></div><Icon name="trend" /></div>
-          <div className="floating-card voice-card"><span className="voice-pulse"><Icon name="mic" /></span><div><strong>Voice guidance</strong><small>Talk, don’t type</small></div><span className="wave-bars"><i /><i /><i /><i /></span></div>
         </section>
       </main>
       <section className="trust-strip"><div><Icon name="target" /><strong>Personal matches</strong><span>Built around your interests</span></div><div><Icon name="compass" /><strong>Clear roadmaps</strong><span>Know exactly what to learn</span></div><div><Icon name="mic" /><strong>Guidance that listens</strong><span>Chat or talk with Navi</span></div><div><Icon name="shield" /><strong>Private by design</strong><span>Your journey stays yours</span></div></section>
