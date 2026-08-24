@@ -1,0 +1,20 @@
+{
+  "name": "pathseeker-database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PathSeeker Phase 1 MongoDB domain models, seeds, and tests.",
+  "scripts": {
+    "test": "node --test",
+    "seed": "node src/database/seed/run.js",
+    "seed:reset": "node src/database/seed/run.js --reset"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
+    "mongoose": "^9.0.0"
+  }
+}

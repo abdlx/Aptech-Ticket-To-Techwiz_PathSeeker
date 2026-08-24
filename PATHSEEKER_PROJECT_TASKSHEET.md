@@ -14,7 +14,7 @@
 
 ## Current project snapshot
 
-| Area | Current status | Honest assessment |
+| Area | Current status | Honest assessment |  
 | --- | --- | --- |
 | React frontend foundation | Done | React 19 and Vite are configured. ESLint passes. |
 | Public, authentication, user, and admin screens | UI only | A wide screen set exists and is navigable, but it is a prototype rather than an end-to-end application. |

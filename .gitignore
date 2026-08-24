@@ -13,6 +13,8 @@ dist-ssr
 *.local
 mockup/
 Documentation/
+PathSeeker_Career_Passport_SRS_Clean.md
+PATHSEEKER_PROJECT_TASKSHEET.md
 
 # Editor directories and files
 .vscode/*

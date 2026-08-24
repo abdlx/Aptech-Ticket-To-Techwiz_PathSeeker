@@ -403,7 +403,7 @@ Choose an appropriate backend stack from the specified options:
 5.  MongoDB, Express.js, Angular, Node.js
 6.  MongoDB, Express.js, React, Node.js
 
-**Database**
+**Database**  
 
 -   MySQL, or
 -   SQL Server
