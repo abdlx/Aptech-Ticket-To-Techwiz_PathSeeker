@@ -47,7 +47,7 @@ export function AuthPage({ navigate, mode = 'signup' }) {
       </section>
       <section className="auth-form-side">
         <button className="auth-back" onClick={() => navigate('welcome')}><Icon name="arrowLeft" /> Back</button>
-        <form className="auth-card" onSubmit={(e) => { e.preventDefault(); navigate(isLogin ? 'dashboard' : 'onboarding') }}>
+        <form className="auth-card" onSubmit={(e) => { e.preventDefault(); navigate(isLogin ? 'dashboard' : 'verify-email') }}>
           <span className="mobile-brand"><Brand /></span>
           <h2>{isLogin ? 'Welcome back' : <>Welcome to <em>PathSeeker</em></>}</h2>
           <p>{isLogin ? 'Log in to continue your journey' : 'Sign up to discover what fits you best'}</p>
@@ -55,11 +55,12 @@ export function AuthPage({ navigate, mode = 'signup' }) {
           <label>Email address<div className="input-wrap"><Icon name="message" /><input required type="email" placeholder="Enter your email address" defaultValue="alex@example.com" /></div></label>
           <label>Password<div className="input-wrap"><Icon name="lock" /><input required type="password" placeholder={isLogin ? 'Enter your password' : 'Create a password'} defaultValue="PathSeeker!26" /></div></label>
           {!isLogin && <div className="password-rules"><span><Icon name="check" /> At least 8 characters</span><span><Icon name="check" /> Include an uppercase letter</span><span><Icon name="check" /> Include a number</span><span><Icon name="check" /> Include a special character</span></div>}
-          {isLogin && <div className="remember-row"><label><input type="checkbox" defaultChecked /> Remember me</label><button type="button">Forgot password?</button></div>}
+          {isLogin && <div className="remember-row"><label><input type="checkbox" defaultChecked /> Remember me</label><button type="button" onClick={() => navigate('forgot-password')}>Forgot password?</button></div>}
           <button className="button primary full" type="submit">{isLogin ? 'Log in' : 'Create account'} <Icon name="arrow" /></button>
           <div className="divider"><span>or continue with</span></div>
           <div className="social-buttons"><button type="button">G&nbsp; Google</button><button type="button">▦&nbsp; Microsoft</button></div>
           <p className="auth-switch">{isLogin ? 'New to PathSeeker?' : 'Already have an account?'} <button type="button" onClick={() => navigate(isLogin ? 'signup' : 'login')}>{isLogin ? 'Create account' : 'Log in'}</button></p>
+          {isLogin && <p className="auth-switch admin-entry">Managing PathSeeker? <button type="button" onClick={() => navigate('admin-login')}>Admin sign in</button></p>}
         </form>
         <small className="legal">By continuing, you agree to our <span>Terms of Service</span> and <span>Privacy Policy</span>.</small>
       </section>

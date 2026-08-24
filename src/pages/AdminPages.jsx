@@ -1,6 +1,15 @@
 import Icon from '../components/Icon'
 import { Brand } from '../components/AppShell'
 import { careers } from '../data'
+import {
+  AdminCareerEditor,
+  AdminContentEditor,
+  AdminFeedbackAnalytics,
+  AdminHelpPage,
+  AdminSettingsPage,
+  AdminStoryReview,
+  AdminUserEditor,
+} from './AdminExtendedPages'
 
 const adminNav = [
   ['admin', 'Overview', 'home'],
@@ -10,6 +19,11 @@ const adminNav = [
   ['admin-quiz', 'Quiz builder', 'sparkles'],
   ['admin-stories', 'Success stories', 'message'],
   ['admin-feedback', 'Feedback', 'heart'],
+  ['admin-feedback-analytics', 'Feedback analytics', 'chart'],
+  ['admin-user-editor', 'User editor', 'edit'],
+  ['admin-career-editor', 'Career editor', 'pen'],
+  ['admin-content-editor', 'Content editor', 'file'],
+  ['admin-story-review', 'Story review', 'check'],
 ]
 
 const PageHead = ({ eyebrow, title, description, children }) => <div className="admin-page-head"><div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>{children}</div>
@@ -17,8 +31,32 @@ const PageHead = ({ eyebrow, title, description, children }) => <div className="
 export default function AdminPage({ screen, navigate }) {
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar"><Brand /><div className="admin-workspace"><span className="avatar">PS</span><p><strong>PathSeeker HQ</strong><small>Administrator</small></p><Icon name="chevron" /></div><nav><p className="nav-label">Workspace</p>{adminNav.map(([id, label, icon]) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => navigate(id)}><Icon name={icon} /><span>{label}</span>{id === 'admin-feedback' && <em>12</em>}</button>)}</nav><div className="admin-sidebar-bottom"><button><Icon name="help" /> Help center</button><button><Icon name="settings" /> Settings</button><button onClick={() => navigate('dashboard')}><Icon name="logout" /> Exit admin</button><div><span className="avatar small">SM</span><p><strong>Sarah Malik</strong><small>Super admin</small></p><Icon name="more" /></div></div></aside>
-      <main className="admin-main"><header className="admin-topbar"><div className="admin-search"><Icon name="search" /><input placeholder="Search PathSeeker admin" /><kbd>⌘ K</kbd></div><button className="icon-button"><Icon name="bell" /><span className="notification-dot" /></button><button className="button soft small" onClick={() => navigate('dashboard')}><Icon name="globe" /> View website</button></header><div className="admin-content">{screen === 'admin' && <AdminOverview navigate={navigate} />}{screen === 'admin-users' && <UsersAdmin />}{screen === 'admin-careers' && <CareersAdmin />}{screen === 'admin-content' && <ContentAdmin />}{screen === 'admin-quiz' && <QuizAdmin />}{screen === 'admin-stories' && <StoriesAdmin />}{screen === 'admin-feedback' && <FeedbackAdmin />}</div></main>
+      <aside className="admin-sidebar">
+        <Brand />
+        <div className="admin-workspace"><span className="avatar">PS</span><p><strong>PathSeeker HQ</strong><small>Administrator</small></p><Icon name="chevron" /></div>
+        <nav><p className="nav-label">Workspace</p>{adminNav.map(([id, label, icon]) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => navigate(id)}><Icon name={icon} /><span>{label}</span>{id === 'admin-feedback' && <em>12</em>}</button>)}</nav>
+        <div className="admin-sidebar-bottom"><button className={screen === 'admin-help' ? 'active' : ''} onClick={() => navigate('admin-help')}><Icon name="help" /> Help center</button><button className={screen === 'admin-settings' ? 'active' : ''} onClick={() => navigate('admin-settings')}><Icon name="settings" /> Settings</button><button onClick={() => navigate('dashboard')}><Icon name="logout" /> Exit admin</button><div><span className="avatar small">SM</span><p><strong>Sarah Malik</strong><small>Super admin</small></p><Icon name="more" /></div></div>
+      </aside>
+      <nav className="admin-mobile-nav" aria-label="Admin navigation">{adminNav.slice(0, 7).map(([id, label, icon]) => <button key={id} className={screen === id ? 'active' : ''} onClick={() => navigate(id)}><Icon name={icon} /><span>{label}</span></button>)}<button className={screen === 'admin-settings' ? 'active' : ''} onClick={() => navigate('admin-settings')}><Icon name="settings" /><span>Settings</span></button></nav>
+      <main className="admin-main">
+        <header className="admin-topbar"><button className="admin-mobile-menu" onClick={() => navigate('admin')} aria-label="Admin overview"><Icon name="menu" /></button><div className="admin-search"><Icon name="search" /><input placeholder="Search PathSeeker admin" /><kbd>⌘ K</kbd></div><button className="icon-button"><Icon name="bell" /><span className="notification-dot" /></button><button className="button soft small" onClick={() => navigate('dashboard')}><Icon name="globe" /> View website</button></header>
+        <div className="admin-content">
+          {screen === 'admin' && <AdminOverview navigate={navigate} />}
+          {screen === 'admin-users' && <UsersAdmin />}
+          {screen === 'admin-careers' && <CareersAdmin />}
+          {screen === 'admin-content' && <ContentAdmin />}
+          {screen === 'admin-quiz' && <QuizAdmin />}
+          {screen === 'admin-stories' && <StoriesAdmin />}
+          {screen === 'admin-feedback' && <FeedbackAdmin />}
+          {screen === 'admin-feedback-analytics' && <AdminFeedbackAnalytics navigate={navigate} />}
+          {screen === 'admin-settings' && <AdminSettingsPage navigate={navigate} />}
+          {screen === 'admin-help' && <AdminHelpPage navigate={navigate} />}
+          {screen === 'admin-user-editor' && <AdminUserEditor navigate={navigate} />}
+          {screen === 'admin-career-editor' && <AdminCareerEditor navigate={navigate} />}
+          {screen === 'admin-content-editor' && <AdminContentEditor navigate={navigate} />}
+          {screen === 'admin-story-review' && <AdminStoryReview navigate={navigate} />}
+        </div>
+      </main>
     </div>
   )
 }

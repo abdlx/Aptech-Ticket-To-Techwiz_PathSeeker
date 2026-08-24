@@ -10,6 +10,10 @@ This screen inventory translates the supplied product brief and TechWiz judging 
 | Sign up | `?screen=signup` | Account creation, password guidance, social sign-in presentation, privacy reassurance |
 | Log in | `?screen=login` | Returning-user access and password recovery entry point |
 | Guided onboarding | `?screen=onboarding` | User stage, interests, goals, Career Passport setup |
+| Forgot password | `?screen=forgot-password` | Password recovery request and sent state |
+| Reset password | `?screen=reset-password` | New-password form and completion state |
+| Verify email | `?screen=verify-email` | Six-digit OTP verification and resend action |
+| Admin login | `?screen=admin-login` | Dedicated protected-workspace entry |
 
 ## User Career Passport
 
@@ -26,6 +30,17 @@ This screen inventory translates the supplied product brief and TechWiz judging 
 | Profile and settings | `?screen=profile` | Career Passport, personal details, preferences, notifications, privacy/data |
 | Feedback | `?screen=feedback` | Rating, categorized feedback, contact consent, success confirmation |
 | Voice mode | `?screen=dashboard&voice=1` | Persistent voice-agent presentation with idle, listening, thinking, and speaking states |
+| Notifications | `?screen=notifications` | Read/unread career, learning, feedback, and account updates |
+| Quiz history | `?screen=quiz-history` | Previous attempts and result changes over time |
+| Quiz result detail | `?screen=quiz-result` | Signal breakdown, answer patterns, and ranked careers |
+| Recently viewed | `?screen=recently-viewed` | Cross-content activity history and continuation links |
+| Compare careers | `?screen=compare` | Side-by-side fit, salary, growth, skills, and readiness comparison |
+| Saved filters | `?screen=saved-filters` | Create, edit, apply, and alert on Career Bank filters |
+| Multimedia player | `?screen=media-detail` | Video controls, transcript, rating, and related resources |
+| Document preview | `?screen=document-preview` | In-app workbook/PDF preview and contents navigation |
+| Success story detail | `?screen=story-detail` | Long-form journey and timeline storytelling |
+| Submit success story | `?screen=submit-story` | Three-step user submission and consent flow |
+| Help center | `?screen=help` | Searchable support topics and contact entry point |
 
 ## Administration
 
@@ -38,6 +53,17 @@ This screen inventory translates the supplied product brief and TechWiz judging 
 | Quiz builder | `?screen=admin-quiz` | Question list, answer editing, signal mapping, preview/publish |
 | Success stories | `?screen=admin-stories` | Submission review, editing, publishing, featuring |
 | Feedback inbox | `?screen=admin-feedback` | Triage, rating/context, internal notes, assignment/resolution |
+| Feedback analytics | `?screen=admin-feedback-analytics` | Sentiment, response-type, resolution, and topic analytics |
+| User editor | `?screen=admin-user-editor` | Profile, role, status, and account-access editing |
+| Career editor | `?screen=admin-career-editor` | Overview, market, skills, roadmap, and matching fields |
+| Content editor | `?screen=admin-content-editor` | Media/document metadata, upload presentation, and tagging |
+| Story review | `?screen=admin-story-review` | Editorial review, consent, notes, and publishing status |
+| Admin settings | `?screen=admin-settings` | Workspace, team, notifications, security, and data controls |
+| Admin help | `?screen=admin-help` | Searchable administrator guidance and support |
+
+## Backend integration boundary
+
+The extended pages currently use frontend fixtures and interaction state. `src/services/pathseekerApi.js` centralizes future Express endpoint paths, JSON request handling, and MongoDB-compatible opaque string IDs so the UI can move to live data without changing page structure.
 
 ## Voice-agent behavior
 

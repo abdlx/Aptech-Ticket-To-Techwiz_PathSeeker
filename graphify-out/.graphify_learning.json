@@ -1,0 +1,181 @@
+{
+  "generated_at": "2026-08-24T09:18:10.934278+00:00",
+  "nodes": {
+    "components_appshell_appshell": {
+      "code_fingerprint": "a3380dd2262b37216c25ecf5a48547d5250a52c3ca70e267467fa366c6b2c95b",
+      "label": "AppShell()",
+      "last": "2026-08-24T09:08:28.933922+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:08:28.933922+00:00",
+          "outcome": "useful",
+          "q": "how is the current frontend design for this"
+        }
+      ],
+      "score": 0.999844375,
+      "source_file": "components/AppShell.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "pages_adminpages_adminpage": {
+      "code_fingerprint": "860ff5e1093a2447c294536f3a20e7b8aaf6020b9faedc0f0881e5f51e708a0a",
+      "label": "AdminPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        },
+        {
+          "date": "2026-08-24T09:08:28.933922+00:00",
+          "outcome": "useful",
+          "q": "how is the current frontend design for this"
+        }
+      ],
+      "score": 1.999750113,
+      "source_file": "pages/AdminPages.jsx",
+      "status": "preferred",
+      "uses": 2
+    },
+    "pages_publicpages_authpage": {
+      "code_fingerprint": "63880e75ce32afbdf5f78e062d6e8dfd5b0104a4c41253cfd6df1d55aba0316a",
+      "label": "AuthPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        }
+      ],
+      "score": 0.999905738,
+      "source_file": "pages/PublicPages.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "pages_publicpages_welcomepage": {
+      "code_fingerprint": "63880e75ce32afbdf5f78e062d6e8dfd5b0104a4c41253cfd6df1d55aba0316a",
+      "label": "WelcomePage()",
+      "last": "2026-08-24T09:08:28.933922+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:08:28.933922+00:00",
+          "outcome": "useful",
+          "q": "how is the current frontend design for this"
+        }
+      ],
+      "score": 0.999844375,
+      "source_file": "pages/PublicPages.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "pages_userpages_dashboardpage": {
+      "code_fingerprint": "39e9fe63010adf5891a9b19cfd305687bee2ab242dea3b92f83d3cd43a1ac116",
+      "label": "DashboardPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        },
+        {
+          "date": "2026-08-24T09:08:28.933922+00:00",
+          "outcome": "useful",
+          "q": "how is the current frontend design for this"
+        }
+      ],
+      "score": 1.999750113,
+      "source_file": "pages/UserPages.jsx",
+      "status": "preferred",
+      "uses": 2
+    },
+    "pages_userpages_profilepage": {
+      "code_fingerprint": "39e9fe63010adf5891a9b19cfd305687bee2ab242dea3b92f83d3cd43a1ac116",
+      "label": "ProfilePage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        }
+      ],
+      "score": 0.999905738,
+      "source_file": "pages/UserPages.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "pages_userpages_quizpage": {
+      "code_fingerprint": "39e9fe63010adf5891a9b19cfd305687bee2ab242dea3b92f83d3cd43a1ac116",
+      "label": "QuizPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        },
+        {
+          "date": "2026-08-24T09:08:28.933922+00:00",
+          "outcome": "useful",
+          "q": "how is the current frontend design for this"
+        }
+      ],
+      "score": 1.999750113,
+      "source_file": "pages/UserPages.jsx",
+      "status": "preferred",
+      "uses": 2
+    },
+    "pages_userpages_resourcespage": {
+      "code_fingerprint": "39e9fe63010adf5891a9b19cfd305687bee2ab242dea3b92f83d3cd43a1ac116",
+      "label": "ResourcesPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        }
+      ],
+      "score": 0.999905738,
+      "source_file": "pages/UserPages.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "pages_userpages_savedpage": {
+      "code_fingerprint": "39e9fe63010adf5891a9b19cfd305687bee2ab242dea3b92f83d3cd43a1ac116",
+      "label": "SavedPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        }
+      ],
+      "score": 0.999905738,
+      "source_file": "pages/UserPages.jsx",
+      "status": "tentative",
+      "uses": 1
+    },
+    "pages_userpages_storiespage": {
+      "code_fingerprint": "39e9fe63010adf5891a9b19cfd305687bee2ab242dea3b92f83d3cd43a1ac116",
+      "label": "StoriesPage()",
+      "last": "2026-08-24T09:12:18.427456+00:00",
+      "provenance": [
+        {
+          "date": "2026-08-24T09:12:18.427456+00:00",
+          "outcome": "useful",
+          "q": "create a list of what pages and modules are missing from the frontend"
+        }
+      ],
+      "score": 0.999905738,
+      "source_file": "pages/UserPages.jsx",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
+  "version": 1
+}
