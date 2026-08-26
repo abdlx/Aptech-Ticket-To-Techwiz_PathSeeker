@@ -202,6 +202,83 @@ button { border: 0; color: inherit; background: none; }
 }
 
 /* Dark Theme Overrides */
+[data-theme='dark'] .app-layout,
+[data-theme='dark'] .app-main,
+[data-theme='dark'] .page-content,
+[data-theme='dark'] .admin-layout,
+[data-theme='dark'] .admin-main,
+[data-theme='dark'] .admin-content {
+  background-color: #0b1320;
+  color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .welcome-page {
+  background: radial-gradient(circle at 75% 45%, rgba(40, 70, 50, .4), transparent 30%), linear-gradient(135deg, #0b1320 0%, #0f172a 55%, #131d2e 100%);
+  color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .welcome-copy > p,
+[data-theme='dark'] .welcome-header nav button {
+  color: var(--muted, #94a3b8);
+}
+
+[data-theme='dark'] .trust-strip {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .welcome-sitemap > div > div {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+[data-theme='dark'] .auth-page {
+  background: #0b1320;
+}
+
+[data-theme='dark'] .auth-visual {
+  background: radial-gradient(circle at 24% 85%, rgba(30, 60, 45, .5), transparent 31%), #0f172a;
+  border-right-color: #334155;
+}
+
+[data-theme='dark'] .auth-card {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .auth-trust {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: #334155;
+}
+
+[data-theme='dark'] .input-wrap {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .onboarding-page {
+  background: radial-gradient(circle at 88% 45%, rgba(35, 65, 45, .4), transparent 28%), #0b1320;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .choice-grid button,
+[data-theme='dark'] .interest-grid button,
+[data-theme='dark'] .choice-list button {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .choice-grid button.selected,
+[data-theme='dark'] .interest-grid button.selected,
+[data-theme='dark'] .choice-list button.selected {
+  background: #143825;
+  border-color: #4ade80;
+}
+
 [data-theme='dark'] .sidebar,
 [data-theme='dark'] .topbar,
 [data-theme='dark'] .panel,
@@ -216,7 +293,14 @@ button { border: 0; color: inherit; background: none; }
 [data-theme='dark'] .quiz-card,
 [data-theme='dark'] .admin-sidebar,
 [data-theme='dark'] .admin-topbar,
-[data-theme='dark'] .admin-table {
+[data-theme='dark'] .admin-table,
+[data-theme='dark'] .search-panel,
+[data-theme='dark'] .career-detail-hero,
+[data-theme='dark'] .result-card,
+[data-theme='dark'] .intro-stat,
+[data-theme='dark'] .empty-state,
+[data-theme='dark'] .featured-resource,
+[data-theme='dark'] .featured-story {
   background: var(--card-bg, #1e293b);
   border-color: var(--line, #334155);
   color: var(--ink, #f1f5f9);
@@ -228,6 +312,7 @@ button { border: 0; color: inherit; background: none; }
 
 [data-theme='dark'] .global-search,
 [data-theme='dark'] .resource-search,
+[data-theme='dark'] .career-search,
 [data-theme='dark'] input,
 [data-theme='dark'] select,
 [data-theme='dark'] textarea,
@@ -235,6 +320,22 @@ button { border: 0; color: inherit; background: none; }
   background: var(--input-bg, #0f172a);
   border-color: var(--line, #334155);
   color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .button.ghost,
+[data-theme='dark'] .icon-button,
+[data-theme='dark'] .filter-chips button,
+[data-theme='dark'] .advanced-filter,
+[data-theme='dark'] .save-button {
+  background: #1e293b;
+  border-color: #334155;
+  color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .button.soft {
+  background: #143825;
+  color: #4ade80;
+  border-color: #245838;
 }
 
 [data-theme='dark'] .nav-item {
@@ -288,4 +389,14 @@ button { border: 0; color: inherit; background: none; }
   background: #334155;
   color: #e2e8f0;
 }
+
+[data-theme='dark'] .responsibility-list > div,
+[data-theme='dark'] .tool-grid span,
+[data-theme='dark'] .momentum-score,
+[data-theme='dark'] .resource-feature {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
 
