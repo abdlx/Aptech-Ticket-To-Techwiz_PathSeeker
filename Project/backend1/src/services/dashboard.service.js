@@ -26,12 +26,26 @@ export async function getDashboard(user) {
     })
     : null
 
+  const completedAttempts = attempts.filter((a) => a.status === 'completed')
+  const evidenceCount = [
+    profile?.headline,
+    profile?.education?.length,
+    profile?.skills?.length,
+    profile?.interests?.length,
+    profile?.goals?.primaryGoal || (Array.isArray(profile?.goals) && profile?.goals?.length),
+    profile?.onboarding?.status === 'completed',
+    completedAttempts.length > 0,
+  ].filter(Boolean).length
+
+  const calculatedCompletion = Math.min(100, Math.round((evidenceCount / 7) * 100))
+  const completionPercent = passport?.completionPercent != null ? passport.completionPercent : calculatedCompletion
+
   return {
     user: { name: user.name, stage: user.stage },
     profile: {
       headline: profile?.headline,
       onboardingStatus: profile?.onboarding?.status,
-      completionPercent: passport?.completionPercent || 0,
+      completionPercent,
     },
     passport,
     topMatches: snapshot?.matches?.slice(0, 3) || [],
