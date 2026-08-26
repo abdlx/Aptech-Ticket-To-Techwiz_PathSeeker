@@ -39,22 +39,100 @@ export default function ConnectedAuthPage({ navigate: legacyNavigate, mode = 'si
     },
   })
 
-  return <div className="auth-page">
-    <section className="auth-visual"><Brand /><div className="auth-message"><span className="eyebrow">Your career passport</span><h1>{isLogin ? 'Welcome back to your next chapter.' : <>Your future<br />starts with <em>you.</em></>}</h1><p>{isLogin ? 'Pick up where you left off. Your matches, notes, and next steps are ready.' : 'Create your account and let PathSeeker guide you to the right career path.'}</p></div><div className="auth-navi"><img src={`/assets/navi/${isLogin ? 'navi-pointing-left' : 'navi-greeting'}.png`} alt="Navi welcoming you" /></div></section>
-    <section className="auth-form-side">
-      <button className="auth-back" onClick={() => legacyNavigate('welcome')}><Icon name="arrowLeft" /> Back</button>
-      <form className="auth-card" onSubmit={handleSubmit((values) => mutation.mutate(values))} noValidate>
-        <span className="mobile-brand"><Brand /></span><h2>{isLogin ? 'Welcome back' : <>Welcome to <em>PathSeeker</em></>}</h2><p>{isLogin ? 'Log in to continue your journey' : 'Sign up to discover what fits you best'}</p>
-        {!isLogin && <label>Full name<div className="input-wrap"><Icon name="users" /><input autoComplete="name" {...register('name')} /></div>{errors.name && <span className="field-error">{errors.name.message}</span>}</label>}
-        <label>Email address<div className="input-wrap"><Icon name="message" /><input type="email" autoComplete="email" {...register('email')} /></div>{errors.email && <span className="field-error">{errors.email.message}</span>}</label>
-        <label>Password<div className="input-wrap"><Icon name="lock" /><input type="password" autoComplete={isLogin ? 'current-password' : 'new-password'} {...register('password')} /></div>{errors.password && <span className="field-error">{errors.password.message}</span>}</label>
-        {!isLogin && <label>Current stage<select {...register('stage')}><option value="student">Student</option><option value="graduate">Graduate</option><option value="professional">Professional</option></select></label>}
-        {isLogin && <div className="remember-row"><span>Secure server session</span><button type="button" onClick={() => legacyNavigate('forgot-password')}>Forgot password?</button></div>}
-        {mutation.error && <p className="form-error" role="alert">{mutation.error.message}</p>}
-        <button className="button primary full" type="submit" disabled={mutation.isPending}>{mutation.isPending ? 'Please wait…' : isLogin ? 'Log in' : 'Create account'} <Icon name="arrow" /></button>
-        <p className="auth-switch">{isLogin ? 'New to PathSeeker?' : 'Already have an account?'} <button type="button" onClick={() => legacyNavigate(isLogin ? 'signup' : 'login')}>{isLogin ? 'Create account' : 'Log in'}</button></p>
-        {isLogin && <p className="auth-switch admin-entry">Managing PathSeeker? <button type="button" onClick={() => legacyNavigate('admin-login')}>Admin sign in</button></p>}
-      </form>
-    </section>
-  </div>
+  return (
+    <div className="auth-page">
+      <section className="auth-visual">
+        <div className="auth-visual-top">
+          <Brand />
+          <div className="auth-message">
+            <span className="eyebrow">Your career passport</span>
+            <h1>{isLogin ? 'Welcome back to your next chapter.' : <>Your future<br />starts with <em>you.</em></>}</h1>
+            <p>{isLogin ? 'Pick up where you left off. Your matches, notes, and next steps are ready.' : 'Create your account and let PathSeeker guide you to the right career path.'}</p>
+          </div>
+        </div>
+        <div className="auth-navi">
+          <div className="auth-navi-glow" />
+          <img src={`/assets/navi/${isLogin ? 'navi-pointing-left' : 'navi-greeting'}.png`} alt="Navi welcoming you" />
+          <div className="speech-bubble">
+            <strong>Hi! I’m Navi 👋</strong>
+            <p>{isLogin ? 'Good to see you again. Ready to keep exploring?' : 'Let’s build your Career Passport together.'}</p>
+          </div>
+        </div>
+        <div className="auth-trust">
+          <span><Icon name="shield" /><div><b>Secure</b><small>Your data is safe</small></div></span>
+          <span><Icon name="lock" /><div><b>Private</b><small>We respect privacy</small></div></span>
+          <span><Icon name="users" /><div><b>Personalized</b><small>Made just for you</small></div></span>
+        </div>
+      </section>
+      <section className="auth-form-side">
+        <button className="auth-back" type="button" onClick={() => legacyNavigate('welcome')}><Icon name="arrowLeft" /> Back</button>
+        <form className="auth-card" onSubmit={handleSubmit((values) => mutation.mutate(values))} noValidate>
+          <span className="mobile-brand"><Brand /></span>
+          <h2>{isLogin ? 'Welcome back' : <>Welcome to <em>PathSeeker</em></>}</h2>
+          <p>{isLogin ? 'Log in to continue your journey' : 'Sign up to discover what fits you best'}</p>
+          
+          {!isLogin && (
+            <label>
+              Full name
+              <div className="input-wrap">
+                <Icon name="users" />
+                <input placeholder="e.g. Alex Morgan" autoComplete="name" {...register('name')} />
+              </div>
+              {errors.name && <span className="field-error">{errors.name.message}</span>}
+            </label>
+          )}
+          
+          <label>
+            Email address
+            <div className="input-wrap">
+              <Icon name="message" />
+              <input type="email" placeholder="name@example.com" autoComplete="email" {...register('email')} />
+            </div>
+            {errors.email && <span className="field-error">{errors.email.message}</span>}
+          </label>
+          
+          <label>
+            Password
+            <div className="input-wrap">
+              <Icon name="lock" />
+              <input type="password" placeholder={isLogin ? 'Enter your password' : 'Create a strong password'} autoComplete={isLogin ? 'current-password' : 'new-password'} {...register('password')} />
+            </div>
+            {errors.password && <span className="field-error">{errors.password.message}</span>}
+          </label>
+          
+          {!isLogin && (
+            <label>
+              Current stage
+              <select {...register('stage')}>
+                <option value="student">Student</option>
+                <option value="graduate">Graduate</option>
+                <option value="professional">Professional</option>
+              </select>
+            </label>
+          )}
+          
+          {isLogin && (
+            <div className="remember-row">
+              <span>Secure server session</span>
+              <button type="button" onClick={() => legacyNavigate('forgot-password')}>Forgot password?</button>
+            </div>
+          )}
+          
+          {mutation.error && <p className="form-error" role="alert">{mutation.error.message}</p>}
+          <button className="button primary full" type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? 'Please wait…' : isLogin ? 'Log in' : 'Create account'} <Icon name="arrow" />
+          </button>
+          
+          <p className="auth-switch">
+            {isLogin ? 'New to PathSeeker?' : 'Already have an account?'} <button type="button" onClick={() => legacyNavigate(isLogin ? 'signup' : 'login')}>{isLogin ? 'Create account' : 'Log in'}</button>
+          </p>
+          {isLogin && (
+            <p className="auth-switch admin-entry">
+              Managing PathSeeker? <button type="button" onClick={() => legacyNavigate('admin-login')}>Admin sign in</button>
+            </p>
+          )}
+        </form>
+      </section>
+    </div>
+  )
 }

@@ -6,14 +6,27 @@ export default function AuthPage({ navigate, mode = 'signup' }) {
   return (
     <div className="auth-page">
       <section className="auth-visual">
-        <Brand />
-        <div className="auth-message">
-          <span className="eyebrow">Your career passport</span>
-          <h1>{isLogin ? 'Welcome back to your next chapter.' : <>Your future<br />starts with <em>you.</em></>}</h1>
-          <p>{isLogin ? 'Pick up where you left off. Your matches, notes, and next steps are ready.' : 'Create your account and let PathSeeker guide you to the right career path.'}</p>
+        <div className="auth-visual-top">
+          <Brand />
+          <div className="auth-message">
+            <span className="eyebrow">Your career passport</span>
+            <h1>{isLogin ? 'Welcome back to your next chapter.' : <>Your future<br />starts with <em>you.</em></>}</h1>
+            <p>{isLogin ? 'Pick up where you left off. Your matches, notes, and next steps are ready.' : 'Create your account and let PathSeeker guide you to the right career path.'}</p>
+          </div>
         </div>
-        <div className="auth-navi"><img src={`/assets/navi/${isLogin ? 'navi-pointing-left' : 'navi-greeting'}.png`} alt="Navi welcoming you" /><div className="speech-bubble"><strong>Hi! I’m Navi 👋</strong><p>{isLogin ? 'Good to see you again. Ready to keep exploring?' : 'Let’s build your Career Passport together.'}</p></div></div>
-        <div className="auth-trust"><span><Icon name="shield" /><b>Secure</b><small>Your data is safe</small></span><span><Icon name="lock" /><b>Private</b><small>We respect privacy</small></span><span><Icon name="users" /><b>Personalized</b><small>Made just for you</small></span></div>
+        <div className="auth-navi">
+          <div className="auth-navi-glow" />
+          <img src={`/assets/navi/${isLogin ? 'navi-pointing-left' : 'navi-greeting'}.png`} alt="Navi welcoming you" />
+          <div className="speech-bubble">
+            <strong>Hi! I’m Navi 👋</strong>
+            <p>{isLogin ? 'Good to see you again. Ready to keep exploring?' : 'Let’s build your Career Passport together.'}</p>
+          </div>
+        </div>
+        <div className="auth-trust">
+          <span><Icon name="shield" /><div><b>Secure</b><small>Your data is safe</small></div></span>
+          <span><Icon name="lock" /><div><b>Private</b><small>We respect privacy</small></div></span>
+          <span><Icon name="users" /><div><b>Personalized</b><small>Made just for you</small></div></span>
+        </div>
       </section>
       <section className="auth-form-side">
         <button className="auth-back" onClick={() => navigate('welcome')}><Icon name="arrowLeft" /> Back</button>
@@ -21,9 +34,9 @@ export default function AuthPage({ navigate, mode = 'signup' }) {
           <span className="mobile-brand"><Brand /></span>
           <h2>{isLogin ? 'Welcome back' : <>Welcome to <em>PathSeeker</em></>}</h2>
           <p>{isLogin ? 'Log in to continue your journey' : 'Sign up to discover what fits you best'}</p>
-          {!isLogin && <label>Full name<div className="input-wrap"><Icon name="users" /><input required placeholder="Enter your full name" defaultValue="Alex Morgan" /></div></label>}
-          <label>Email address<div className="input-wrap"><Icon name="message" /><input required type="email" placeholder="Enter your email address" defaultValue="alex@example.com" /></div></label>
-          <label>Password<div className="input-wrap"><Icon name="lock" /><input required type="password" placeholder={isLogin ? 'Enter your password' : 'Create a password'} defaultValue="PathSeeker!26" /></div></label>
+          {!isLogin && <label>Full name<div className="input-wrap"><Icon name="users" /><input required placeholder="e.g. Alex Morgan" defaultValue="Alex Morgan" /></div></label>}
+          <label>Email address<div className="input-wrap"><Icon name="message" /><input required type="email" placeholder="name@example.com" defaultValue="alex@example.com" /></div></label>
+          <label>Password<div className="input-wrap"><Icon name="lock" /><input required type="password" placeholder={isLogin ? 'Enter your password' : 'Create a strong password'} defaultValue="PathSeeker!26" /></div></label>
           {!isLogin && <div className="password-rules"><span><Icon name="check" /> At least 8 characters</span><span><Icon name="check" /> Include an uppercase letter</span><span><Icon name="check" /> Include a number</span><span><Icon name="check" /> Include a special character</span></div>}
           {isLogin && <div className="remember-row"><label><input type="checkbox" defaultChecked /> Remember me</label><button type="button" onClick={() => navigate('forgot-password')}>Forgot password?</button></div>}
           <button className="button primary full" type="submit">{isLogin ? 'Log in' : 'Create account'} <Icon name="arrow" /></button>
