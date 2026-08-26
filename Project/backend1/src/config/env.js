@@ -22,7 +22,7 @@ export const env = {
   mongodbUri: process.env.MONGODB_URI,
   mongodbDbName: process.env.MONGODB_DB_NAME,
 
-  frontendOrigins: toList(process.env.FRONTEND_ORIGIN, ['http://localhost:5173']),
+  frontendOrigins: toList(process.env.FRONTEND_ORIGIN, ['https://aptech-ticket-to-techwiz-path-seeke.vercel.app']),
 
   sessionCookieName: process.env.SESSION_COOKIE_NAME || 'ps_session',
   sessionTtlDays: toInt(process.env.SESSION_TTL_DAYS, 30),
