@@ -19,6 +19,11 @@ export const getSkills = asyncHandler(async (req, res) => {
   res.status(200).json({ data: { skills } })
 })
 
+export const getSearchSuggestions = asyncHandler(async (req, res) => {
+  const suggestions = await catalogService.searchSuggestions(req.query.q)
+  res.status(200).json({ data: { suggestions } })
+})
+
 export const getCareers = asyncHandler(async (req, res) => {
   const { q, domain, skill, demand, salaryMin, sort } = req.query
 
@@ -46,7 +51,7 @@ export const getCareers = asyncHandler(async (req, res) => {
     skip,
   })
 
-  res.status(200).json({ data: { careers }, meta })
+  res.status(200).json({ data: { careers, meta } })
 })
 
 export const getCareerBySlug = asyncHandler(async (req, res) => {
@@ -57,4 +62,24 @@ export const getCareerBySlug = asyncHandler(async (req, res) => {
   res.status(200).json({ data: { career } })
 })
 
-export default { getDomains, getSkills, getCareers, getCareerBySlug }
+export const getRelatedCareers = asyncHandler(async (req, res) => {
+  const careers = await catalogService.getRelatedCareers(req.params.slug, Number(req.query.limit) || 4)
+  if (!careers) throw new AppError(404, 'Career not found.', 'NOT_FOUND')
+  res.status(200).json({ data: { careers } })
+})
+
+export const getRelatedContent = asyncHandler(async (req, res) => {
+  const content = await catalogService.getRelatedContent(req.params.slug, Number(req.query.limit) || 6)
+  if (!content) throw new AppError(404, 'Career not found.', 'NOT_FOUND')
+  res.status(200).json({ data: content })
+})
+
+export default {
+  getDomains,
+  getSkills,
+  getSearchSuggestions,
+  getCareers,
+  getCareerBySlug,
+  getRelatedCareers,
+  getRelatedContent,
+}

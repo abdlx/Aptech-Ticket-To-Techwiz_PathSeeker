@@ -12,4 +12,12 @@ export const authRateLimiter = rateLimit({
   message: { message: 'Too many attempts. Please try again later.', code: 'RATE_LIMITED' },
 })
 
+export const assistantRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many assistant requests. Please try again shortly.', code: 'RATE_LIMITED' },
+})
+
 export default authRateLimiter

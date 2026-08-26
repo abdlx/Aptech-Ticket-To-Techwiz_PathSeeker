@@ -1,9 +1,12 @@
 import { Router } from 'express'
 import mongoose from 'mongoose'
 import adminRoutes from './admin.routes.js'
+import assistantRoutes from './assistant.routes.js'
 import authRoutes from './auth.routes.js'
 import catalogRoutes from './catalog.routes.js'
+import domainRoutes from './domainRoutes.js'
 import feedbackRoutes from './feedback.routes.js'
+import helpRoutes from './help.routes.js'
 import mediaRoutes from './media.routes.js'
 import notificationRoutes from './notification.routes.js'
 import personalizationRoutes from './personalization.routes.js'
@@ -12,6 +15,7 @@ import quizAttemptsRoutes from './quizAttempts.routes.js'
 import quizQuestionsRoutes from './quizQuestions.routes.js'
 import resourceRoutes from './resource.routes.js'
 import settingsRoutes from './settings.routes.js'
+import skillRoutes from './skillRoutes.js'
 import storyRoutes from './story.routes.js'
 
 const router = Router()
@@ -26,6 +30,8 @@ router.get('/health/db', (_req, res) => {
 
 router.use('/auth', authRoutes)
 router.use('/', catalogRoutes)
+router.use('/domains', domainRoutes)
+router.use('/skills', skillRoutes)
 router.use('/notifications', notificationRoutes)
 router.use('/quiz-questions', quizQuestionsRoutes)
 router.use('/quiz-attempts', quizAttemptsRoutes)
@@ -34,6 +40,8 @@ router.use('/users/me', personalizationRoutes)
 router.use('/resources', resourceRoutes)
 router.use('/media', mediaRoutes)
 router.use('/stories', storyRoutes)
+router.use('/assistant', assistantRoutes)
+router.use('/help', helpRoutes)
 router.use('/feedback', feedbackRoutes)
 router.use('/admin/settings', settingsRoutes)
 router.use('/admin', adminRoutes)

@@ -6,8 +6,7 @@ const router = Router()
 
 router.get('/', contentController.getMedia)
 router.get('/:id', contentController.getMediaById)
-// Rating requires auth: MediaRating is one-per-(user, media) and needs an
-// identity to enforce that and to prevent the same person inflating a score.
+router.get('/:id/related', contentController.getRelatedMedia)
 router.post('/:id/ratings', requireAuth, contentController.rateMedia)
 
 export default router

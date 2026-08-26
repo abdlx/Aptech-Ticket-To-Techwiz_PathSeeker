@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
+import path from 'node:path'
 import { env } from './config/env.js'
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js'
 import { requestContext } from './middleware/requestContext.js'
@@ -59,6 +60,10 @@ export function createApp() {
   app.use(requestContext)
   app.use(express.json({ limit: '1mb' }))
   app.use(cookieParser())
+
+  const uploadDir = path.resolve(process.env.UPLOAD_DIR || './uploads')
+  app.locals.uploadDir = uploadDir
+  app.use('/uploads', express.static(uploadDir, { maxAge: '1d', immutable: false }))
 
   app.use('/api', apiRouter)
 

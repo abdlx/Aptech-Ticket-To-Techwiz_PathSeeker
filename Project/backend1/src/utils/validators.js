@@ -25,10 +25,20 @@ export function isValidOtp(value, digits = 6) {
   return typeof value === 'string' && new RegExp(`^\\d{${digits}}$`).test(value)
 }
 
+export function isSafeHttpUrl(value) {
+  try {
+    const url = new URL(String(value))
+    return url.protocol === 'https:' || url.protocol === 'http:'
+  } catch {
+    return false
+  }
+}
+
 export default {
   isNonEmptyString,
   isValidEmail,
   isValidPassword,
   isValidStage,
   isValidOtp,
+  isSafeHttpUrl,
 }
