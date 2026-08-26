@@ -12,7 +12,6 @@ This screen inventory translates the supplied product brief and TechWiz judging 
 | Guided onboarding | `?screen=onboarding` | User stage, interests, goals, Career Passport setup |
 | Forgot password | `?screen=forgot-password` | Password recovery request and sent state |
 | Reset password | `?screen=reset-password` | New-password form and completion state |
-| Verify email | `?screen=verify-email` | Six-digit OTP verification and resend action |
 | Admin login | `?screen=admin-login` | Dedicated protected-workspace entry |
 
 ## User Career Passport

@@ -2,27 +2,13 @@ import bcrypt from 'bcryptjs'
 import { User, UserProfile, VerificationToken } from '../models/index.js'
 import { env } from '../config/env.js'
 import AppError from '../utils/AppError.js'
-import { generateNumericOtp, generateOpaqueToken, hashToken } from '../utils/token.js'
-import { sendPasswordResetEmail, sendVerificationOtpEmail } from './email.service.js'
+import { generateOpaqueToken, hashToken } from '../utils/token.js'
+import { sendPasswordResetEmail } from './email.service.js'
 import { getSettings } from './settings.service.js'
 
 function toSafeUser(userDocument) {
   // Model's toJSON transform already strips passwordHash/normalizedEmail/deletedAt.
   return userDocument.toJSON ? userDocument.toJSON() : userDocument
-}
-
-async function issueEmailVerificationOtp(user) {
-  const otp = generateNumericOtp(6)
-  const expiresAt = new Date(Date.now() + env.verificationOtpTtlMinutes * 60 * 1000)
-
-  await VerificationToken.create({
-    userId: user._id,
-    purpose: 'email_verification',
-    tokenHash: hashToken(otp),
-    expiresAt,
-  })
-
-  await sendVerificationOtpEmail(user, otp)
 }
 
 export async function registerUser({ name, email, password, stage }) {
@@ -46,6 +32,8 @@ export async function registerUser({ name, email, password, stage }) {
     passwordHash,
     role: 'user',
     stage,
+    emailVerified: true,
+    emailVerifiedAt: new Date(),
   })
 
   try {
@@ -54,63 +42,6 @@ export async function registerUser({ name, email, password, stage }) {
     await User.deleteOne({ _id: user._id })
     throw error
   }
-
-  await issueEmailVerificationOtp(user)
-
-  return toSafeUser(user)
-}
-
-export async function resendVerificationOtp(email) {
-  const normalizedEmail = email.trim().toLowerCase()
-  const user = await User.findOne({ normalizedEmail })
-
-  // Do not reveal whether the account exists.
-  if (!user || user.emailVerified) return
-
-  await issueEmailVerificationOtp(user)
-}
-
-export async function verifyEmailOtp({ email, code }) {
-  const normalizedEmail = email.trim().toLowerCase()
-  const user = await User.findOne({ normalizedEmail })
-
-  if (!user) {
-    throw new AppError(400, 'Invalid email or verification code.', 'INVALID_CODE')
-  }
-
-  if (user.emailVerified) {
-    return toSafeUser(user)
-  }
-
-  const token = await VerificationToken.findOne({
-    userId: user._id,
-    purpose: 'email_verification',
-    usedAt: { $exists: false },
-    expiresAt: { $gt: new Date() },
-  })
-    .sort({ createdAt: -1 })
-    .select('+tokenHash')
-
-  if (!token) {
-    throw new AppError(400, 'This code has expired. Request a new one.', 'CODE_EXPIRED')
-  }
-
-  if (token.attempts >= 10) {
-    throw new AppError(429, 'Too many attempts. Request a new code.', 'TOO_MANY_ATTEMPTS')
-  }
-
-  if (token.tokenHash !== hashToken(code)) {
-    token.attempts += 1
-    await token.save()
-    throw new AppError(400, 'Invalid email or verification code.', 'INVALID_CODE')
-  }
-
-  token.usedAt = new Date()
-  await token.save()
-
-  user.emailVerified = true
-  user.emailVerifiedAt = new Date()
-  await user.save()
 
   return toSafeUser(user)
 }
@@ -130,10 +61,6 @@ export async function verifyCredentials(email, password) {
 
   if (user.status !== 'active') {
     throw new AppError(403, 'This account is not active.', 'ACCOUNT_INACTIVE')
-  }
-
-  if (!user.emailVerified) {
-    throw new AppError(403, 'Please verify your email before logging in.', 'EMAIL_NOT_VERIFIED')
   }
 
   user.lastLoginAt = new Date()
@@ -192,8 +119,6 @@ export async function resetPassword({ token, password }) {
 
 export default {
   registerUser,
-  resendVerificationOtp,
-  verifyEmailOtp,
   verifyCredentials,
   forgotPassword,
   resetPassword,

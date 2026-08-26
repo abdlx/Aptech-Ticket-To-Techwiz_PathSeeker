@@ -1,6 +1,6 @@
-import { quizQuestionIds } from './ids.js'
+import { domainIds, quizQuestionIds } from './ids.js'
 
-export const quizQuestionsSeed = [
+const rawQuizQuestionsSeed = [
   {
     _id: quizQuestionIds.q1,
     order: 1,
@@ -107,3 +107,34 @@ export const quizQuestionsSeed = [
     active: true,
   },
 ]
+
+const traitDomains = {
+  creative: [domainIds.design, domainIds.marketing],
+  analytical: [domainIds.dataAi, domainIds.finance],
+  people: [domainIds.business, domainIds.education],
+  technical: [domainIds.softwareEngineering, domainIds.cybersecurity],
+  communication: [domainIds.marketing, domainIds.business],
+  empathy: [domainIds.design, domainIds.healthcare],
+  organization: [domainIds.business, domainIds.engineering],
+}
+
+export const quizQuestionsSeed = rawQuizQuestionsSeed.map((question, questionIndex) => ({
+  _id: question._id,
+  questionText: question.question,
+  eyebrow: question.eyebrow,
+  hint: question.hint,
+  type: question.type,
+  order: question.order,
+  timeLimitSeconds: 90,
+  options: question.options.map((option, optionIndex) => ({
+    key: String.fromCharCode(97 + optionIndex),
+    label: option.label,
+    icon: option.icon,
+    trait: option.trait,
+    domainWeights: (traitDomains[option.trait] || []).map((domainId, index) => ({
+      domainId,
+      weight: index === 0 ? 3 : 2,
+    })),
+  })),
+  active: question.active,
+}))

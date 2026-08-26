@@ -8,7 +8,6 @@ import {
   SignupPage,
   ForgotPasswordPage,
   ResetPasswordPage,
-  VerifyEmailPage,
   AdminLoginPage,
   DashboardPage,
   QuizPage,
@@ -99,7 +98,6 @@ function App() {
   if (screen === 'login') return <LoginPage navigate={navigate} />
   if (screen === 'forgot-password') return <ForgotPasswordPage navigate={navigate} />
   if (screen === 'reset-password') return <ResetPasswordPage navigate={navigate} />
-  if (screen === 'verify-email') return <VerifyEmailPage navigate={navigate} />
   if (screen === 'onboarding') return <OnboardingPage navigate={navigate} />
 
   return (

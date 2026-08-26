@@ -1,9 +1,17 @@
 import { Router } from 'express'
 import * as personalizationController from '../controllers/personalization.controller.js'
+import * as careerIntelligenceController from '../controllers/careerIntelligence.controller.js'
+import * as dashboardController from '../controllers/dashboard.controller.js'
 import { requireAuth } from '../middleware/auth.middleware.js'
 
 const router = Router()
 router.use(requireAuth)
+
+router.get('/dashboard', dashboardController.getDashboard)
+router.get('/passport', careerIntelligenceController.getPassport)
+router.get('/recommendations', careerIntelligenceController.getRecommendations)
+router.get('/careers/:slug/intelligence', careerIntelligenceController.getCareerIntelligence)
+router.post('/careers/:slug/simulate', careerIntelligenceController.simulateCareer)
 
 // Not yet in frontend/src/services/pathseekerApi.js endpoints map — added
 // here because bookmarking is an explicit SRS requirement. See handover

@@ -9,7 +9,7 @@ import {
 } from '../services/session.service.js'
 import AppError from '../utils/AppError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
-import { isNonEmptyString, isValidEmail, isValidOtp, isValidPassword, isValidStage } from '../utils/validators.js'
+import { isNonEmptyString, isValidEmail, isValidPassword, isValidStage } from '../utils/validators.js'
 
 async function issueSessionCookie(res, user, req) {
   const { rawToken, expiresAt } = await createSession(user, {
@@ -36,27 +36,8 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   const user = await authService.registerUser({ name: name.trim(), email, password, stage })
-  res.status(201).json({ data: { user }, message: 'Account created. Check your email for a verification code.' })
-})
-
-export const verifyEmail = asyncHandler(async (req, res) => {
-  const { email, code } = req.body
-  if (!isValidEmail(email) || !isValidOtp(code)) {
-    throw new AppError(400, 'A valid email and 6-digit code are required.', 'VALIDATION_ERROR')
-  }
-
-  const user = await authService.verifyEmailOtp({ email, code })
   await issueSessionCookie(res, user, req)
-  res.status(200).json({ data: { user }, message: 'Email verified.' })
-})
-
-export const resendVerification = asyncHandler(async (req, res) => {
-  const { email } = req.body
-  if (!isValidEmail(email)) {
-    throw new AppError(400, 'Enter a valid email address.', 'VALIDATION_ERROR')
-  }
-  await authService.resendVerificationOtp(email)
-  res.status(200).json({ data: null, message: 'If that account exists, a new code has been sent.' })
+  res.status(201).json({ data: { user }, message: 'Account created.' })
 })
 
 async function loginWithRole(req, res, allowedRoles) {
@@ -109,4 +90,4 @@ export const resetPassword = asyncHandler(async (req, res) => {
   res.status(200).json({ data: null, message: 'Password updated. Please log in again.' })
 })
 
-export default { register, verifyEmail, resendVerification, login, adminLogin, logout, me, forgotPassword, resetPassword }
+export default { register, login, adminLogin, logout, me, forgotPassword, resetPassword }

@@ -4,7 +4,6 @@ export const endpoints = {
   auth: {
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
-    verifyEmail: '/auth/verify-email',
     adminLogin: '/auth/admin/login',
   },
   notifications: '/notifications',

@@ -34,7 +34,6 @@ export const env = {
   emailProvider: process.env.EMAIL_PROVIDER || 'console',
   emailFrom: process.env.EMAIL_FROM || 'no-reply@pathseeker.local',
 
-  verificationOtpTtlMinutes: toInt(process.env.VERIFICATION_TOKEN_TTL_MINUTES, 10),
   passwordResetTtlMinutes: toInt(process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES, 20),
 
   rateLimitWindowMinutes: toInt(process.env.AUTH_RATE_LIMIT_WINDOW_MINUTES, 15),

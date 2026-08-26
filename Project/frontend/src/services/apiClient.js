@@ -60,7 +60,7 @@ export async function apiRequest(path, { query, timeoutMs = DEFAULT_TIMEOUT_MS, 
 }
 
 export const endpoints = {
-  auth: { register: '/auth/register', verifyEmail: '/auth/verify-email', resendVerification: '/auth/resend-verification', login: '/auth/login', adminLogin: '/auth/admin/login', logout: '/auth/logout', me: '/auth/me', forgotPassword: '/auth/forgot-password', resetPassword: '/auth/reset-password' },
+  auth: { register: '/auth/register', login: '/auth/login', adminLogin: '/auth/admin/login', logout: '/auth/logout', me: '/auth/me', forgotPassword: '/auth/forgot-password', resetPassword: '/auth/reset-password' },
   profile: '/users/me/profile', onboarding: '/users/me/profile/onboarding', careers: '/careers', domains: '/domains', skills: '/skills',
   notifications: '/notifications', quizQuestions: '/quiz-questions', quizAttempts: '/quiz-attempts', recentlyViewed: '/users/me/recently-viewed',
   savedFilters: '/users/me/saved-filters', comparisons: '/users/me/comparisons', media: '/media', resources: '/resources', stories: '/stories', feedback: '/feedback',

@@ -10,7 +10,7 @@ import './ExtendedPages.css'
 const WelcomePage = lazy(() => import('./pages/public/welcome')); const OnboardingPage = lazy(() => import('./pages/onboarding/onboarding'))
 const LoginPage = lazy(() => import('./pages/auth/login')); const SignupPage = lazy(() => import('./pages/auth/signup'))
 const authFlows = () => import('./components/auth/ConnectedAuthFlows')
-const VerifyEmailPage = lazy(() => authFlows().then((module) => ({ default: module.VerifyEmailFlow }))); const ForgotPasswordPage = lazy(() => authFlows().then((module) => ({ default: module.ForgotPasswordFlow })))
+const ForgotPasswordPage = lazy(() => authFlows().then((module) => ({ default: module.ForgotPasswordFlow })))
 const ResetPasswordPage = lazy(() => authFlows().then((module) => ({ default: module.ResetPasswordFlow }))); const AdminLoginPage = lazy(() => authFlows().then((module) => ({ default: module.AdminLoginFlow })))
 const DashboardPage = lazy(() => import('./pages/user/dashboard')); const QuizPage = lazy(() => import('./pages/user/quiz')); const RecommendationsPage = lazy(() => import('./pages/user/recommendations'))
 const CareerBankPage = lazy(() => import('./pages/user/connected-career-bank')); const CareerDetailPage = lazy(() => import('./pages/user/connected-career-detail')); const ResourcesPage = lazy(() => import('./pages/user/resources'))
@@ -21,7 +21,7 @@ const MediaDetailPage = lazy(() => import('./pages/user/media-detail')); const D
 const SubmitStoryPage = lazy(() => import('./pages/user/submit-story')); const HelpCenterPage = lazy(() => import('./pages/user/help-center')); const AdminPage = lazy(() => import('./pages/admin/layout'))
 
 const screenPaths = {
-  welcome: '/', signup: '/signup', login: '/login', 'verify-email': '/verify-email', 'forgot-password': '/forgot-password', 'reset-password': '/reset-password', onboarding: '/onboarding',
+  welcome: '/', signup: '/signup', login: '/login', 'forgot-password': '/forgot-password', 'reset-password': '/reset-password', onboarding: '/onboarding',
   dashboard: '/app/dashboard', quiz: '/app/quiz', 'quiz-history': '/app/quiz/history', 'quiz-result': '/app/quiz/results', recommendations: '/app/recommendations', careers: '/app/careers',
   'career-detail': '/app/careers', compare: '/app/careers/compare', resources: '/app/resources', 'document-preview': '/app/resources', 'media-detail': '/app/media', saved: '/app/saved',
   'saved-filters': '/app/saved-filters', 'recently-viewed': '/app/recently-viewed', stories: '/app/stories', 'submit-story': '/app/stories/submit', 'story-detail': '/app/stories',
@@ -105,7 +105,7 @@ export default function RouterApp() {
   return <Suspense fallback={<main className="page-content"><PageSkeleton /></main>}><Routes>
     <Route path="/" element={<PublicPage Component={WelcomePage} />} />
     <Route path="/signup" element={<AuthPageRoute Component={SignupPage} />} /><Route path="/login" element={<AuthPageRoute Component={LoginPage} />} />
-    <Route path="/verify-email" element={<AuthPageRoute Component={VerifyEmailPage} />} /><Route path="/forgot-password" element={<AuthPageRoute Component={ForgotPasswordPage} />} />
+    <Route path="/forgot-password" element={<AuthPageRoute Component={ForgotPasswordPage} />} />
     <Route path="/reset-password" element={<AuthPageRoute Component={ResetPasswordPage} />} /><Route path="/admin/login" element={<AuthPageRoute Component={AdminLoginPage} />} />
     <Route path="/forbidden" element={<main className="page-content"><Forbidden /></main>} />
 

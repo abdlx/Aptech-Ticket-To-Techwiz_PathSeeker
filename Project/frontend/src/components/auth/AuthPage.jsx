@@ -17,7 +17,7 @@ export default function AuthPage({ navigate, mode = 'signup' }) {
       </section>
       <section className="auth-form-side">
         <button className="auth-back" onClick={() => navigate('welcome')}><Icon name="arrowLeft" /> Back</button>
-        <form className="auth-card" onSubmit={(e) => { e.preventDefault(); navigate(isLogin ? 'dashboard' : 'verify-email') }}>
+        <form className="auth-card" onSubmit={(e) => { e.preventDefault(); navigate(isLogin ? 'dashboard' : 'onboarding') }}>
           <span className="mobile-brand"><Brand /></span>
           <h2>{isLogin ? 'Welcome back' : <>Welcome to <em>PathSeeker</em></>}</h2>
           <p>{isLogin ? 'Log in to continue your journey' : 'Sign up to discover what fits you best'}</p>

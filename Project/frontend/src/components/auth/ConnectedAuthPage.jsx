@@ -24,14 +24,15 @@ export default function ConnectedAuthPage({ navigate: legacyNavigate, mode = 'si
   })
   const mutation = useMutation({
     mutationFn: (values) => isLogin ? authApi.login(values) : authApi.register(values),
-    onSuccess: (payload, values) => {
+    onSuccess: (payload) => {
       if (isLogin) {
         auth.setUser(payload.data.user)
         toast.success('Welcome back.')
         routerNavigate(location.state?.from?.pathname || '/app/dashboard', { replace: true })
       } else {
-        toast.success('Account created. Check your email for the verification code.')
-        routerNavigate(`/verify-email?email=${encodeURIComponent(values.email)}`)
+        auth.setUser(payload.data.user)
+        toast.success('Account created.')
+        routerNavigate('/onboarding', { replace: true })
       }
     },
   })

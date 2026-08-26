@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { QUIZ_QUESTION_TYPES } from '../constants/database.js'
+import { QUIZ_QUESTION_TYPES, QUIZ_TRAITS } from '../constants/database.js'
 
 const { Schema } = mongoose
 
@@ -19,6 +19,8 @@ const quizOptionSchema = new Schema(
   {
     key: { type: String, required: true, trim: true, maxlength: 20 },
     label: { type: String, required: true, trim: true, maxlength: 300 },
+    icon: { type: String, trim: true, maxlength: 50 },
+    trait: { type: String, enum: QUIZ_TRAITS },
     domainWeights: { type: [domainWeightSchema], default: [] },
   },
   { _id: false },
@@ -27,6 +29,8 @@ const quizOptionSchema = new Schema(
 const quizQuestionSchema = new Schema(
   {
     questionText: { type: String, required: true, trim: true, maxlength: 500 },
+    eyebrow: { type: String, trim: true, maxlength: 100 },
+    hint: { type: String, trim: true, maxlength: 300 },
     type: { type: String, required: true, enum: QUIZ_QUESTION_TYPES, default: 'multiple_choice' },
     options: {
       type: [quizOptionSchema],

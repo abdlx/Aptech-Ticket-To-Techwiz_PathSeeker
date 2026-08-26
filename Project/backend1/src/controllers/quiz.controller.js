@@ -4,8 +4,8 @@ import { asyncHandler } from '../utils/asyncHandler.js'
 import { isNonEmptyString } from '../utils/validators.js'
 
 export const getQuestions = asyncHandler(async (_req, res) => {
-  const questions = await quizService.listActiveQuestions()
-  res.status(200).json({ data: { questions } })
+  const quiz = await quizService.listActiveQuestions()
+  res.status(200).json({ data: { quiz, questions: quiz.questions } })
 })
 
 export const getAttempts = asyncHandler(async (req, res) => {
@@ -24,11 +24,11 @@ export const getAttempt = asyncHandler(async (req, res) => {
 })
 
 export const answerQuestion = asyncHandler(async (req, res) => {
-  const { questionId, optionKey } = req.body
-  if (!isNonEmptyString(questionId, { min: 12, max: 64 }) || !isNonEmptyString(optionKey, { min: 1, max: 20 })) {
-    throw new AppError(400, 'questionId and optionKey are required.', 'VALIDATION_ERROR')
+  const { questionKey, optionKey } = req.body
+  if (!isNonEmptyString(questionKey, { min: 1, max: 50 }) || !isNonEmptyString(optionKey, { min: 1, max: 20 })) {
+    throw new AppError(400, 'questionKey and optionKey are required.', 'VALIDATION_ERROR')
   }
-  const attempt = await quizService.answerQuestion(req.user.id, req.params.id, { questionId, optionKey })
+  const attempt = await quizService.answerQuestion(req.user.id, req.params.id, { questionKey, optionKey })
   res.status(200).json({ data: { attempt } })
 })
 

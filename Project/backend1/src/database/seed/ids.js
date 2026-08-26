@@ -83,3 +83,7 @@ export const quizQuestionIds = Object.freeze({
   q6: deterministicId('6', 6),
   q7: deterministicId('6', 7),
 })
+
+export const quizIds = Object.freeze({
+  careerPassportV1: deterministicId('7', 1),
+})

@@ -23,14 +23,6 @@ export async function sendEmail({ to, subject, text }) {
   )
 }
 
-export async function sendVerificationOtpEmail(user, otp) {
-  return sendEmail({
-    to: user.email,
-    subject: 'Verify your PathSeeker email',
-    text: `Hi ${user.name},\n\nYour PathSeeker verification code is: ${otp}\nIt expires in ${env.verificationOtpTtlMinutes} minutes.\n\nIf you did not request this, ignore this email.`,
-  })
-}
-
 export async function sendPasswordResetEmail(user, rawToken) {
   return sendEmail({
     to: user.email,
@@ -39,4 +31,4 @@ export async function sendPasswordResetEmail(user, rawToken) {
   })
 }
 
-export default { sendEmail, sendVerificationOtpEmail, sendPasswordResetEmail }
+export default { sendEmail, sendPasswordResetEmail }

@@ -1,6 +1,6 @@
 import { careerIds, domainIds, skillIds } from './ids.js'
 
-export const careersSeed = [
+const rawCareersSeed = [
   {
     _id: careerIds.uxDesigner,
     slug: 'ux-ui-designer',
@@ -170,3 +170,37 @@ export const careersSeed = [
     active: true,
   },
 ]
+
+export const careersSeed = rawCareersSeed.map((career) => ({
+  _id: career._id,
+  slug: career.slug,
+  title: career.title,
+  summary: career.summary,
+  description: career.description,
+  domainId: career.domainId,
+  requiredSkills: career.requiredSkillIds.map((skillId, index) => ({
+    skillId,
+    importance: index < 2 ? 'critical' : 'important',
+    requiredLevel: Math.max(6, 8 - Math.floor(index / 2)),
+  })),
+  responsibilities: career.responsibilities,
+  toolsToLearn: career.toolsToLearn,
+  traits: career.traits,
+  expectedSalary: {
+    min: career.salaryMin,
+    max: career.salaryMax,
+    currency: career.salaryCurrency,
+  },
+  demand: career.demand,
+  growthRatePercent: career.growthPercent,
+  timeToJobReady: {
+    minMonths: career.timeToJobReadyMinMonths,
+    maxMonths: career.timeToJobReadyMaxMonths,
+  },
+  iconKey: career.icon,
+  colorTone: career.tone,
+  tags: career.tags,
+  status: 'published',
+  publishedAt: new Date('2026-08-01T00:00:00.000Z'),
+  active: career.active,
+}))

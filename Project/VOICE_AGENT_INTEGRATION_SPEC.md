@@ -2587,7 +2587,7 @@ file — not from planning documents.
 | Endpoint | Status | Voice relevance |
 |---|---|---|
 | `GET /api/health`, `GET /api/health/db` | `EXISTING` | Mock/real readiness probe |
-| `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout` (+ register, verify, resend, forgot, reset) | `EXISTING` | Establishes the `ps_session` cookie the public Navi routes require |
+| `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout` (+ register, forgot, reset) | `EXISTING` | Establishes the `ps_session` cookie the public Navi routes require |
 | `GET /api/users/me/profile` | `EXISTING` | Context source: explicit user facts |
 | `PATCH /api/users/me/profile` | `EXISTING` | Insight application target (allowlist precedent, §6.1) |
 | `PATCH /api/users/me/profile/onboarding` | `EXISTING` | Onboarding-purpose sessions |

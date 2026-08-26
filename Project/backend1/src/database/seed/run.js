@@ -3,8 +3,12 @@ import bcrypt from 'bcryptjs'
 import { connectDatabase, disconnectDatabase } from '../../config/database.js'
 import {
   Career,
+  CareerPassport,
   Domain,
+  Quiz,
   QuizQuestion,
+  QuizAttempt,
+  RecommendationSnapshot,
   Session,
   Skill,
   User,
@@ -15,6 +19,7 @@ import { careersSeed } from './careers.seed.js'
 import { domainsSeed, skillsSeed } from './catalog.seed.js'
 import { profileIds, userIds } from './ids.js'
 import { quizQuestionsSeed } from './quizQuestions.seed.js'
+import { quizzesSeed } from './quizzes.seed.js'
 import { buildUsersSeed, profilesSeed } from './users.seed.js'
 
 const isReset = process.argv.includes('--reset')
@@ -46,6 +51,9 @@ async function resetSeedOwnedRecords() {
     Session.deleteMany({ userId: { $in: seededUserIds } }),
     VerificationToken.deleteMany({ userId: { $in: seededUserIds } }),
     UserProfile.deleteMany({ _id: { $in: Object.values(profileIds) } }),
+    CareerPassport.deleteMany({ userId: { $in: seededUserIds } }),
+    RecommendationSnapshot.deleteMany({ userId: { $in: seededUserIds } }),
+    QuizAttempt.deleteMany({ userId: { $in: seededUserIds } }),
   ])
 
   await Promise.all([
@@ -54,6 +62,7 @@ async function resetSeedOwnedRecords() {
     Domain.deleteMany({ _id: { $in: domainsSeed.map(({ _id }) => _id) } }),
     Career.deleteMany({ _id: { $in: careersSeed.map(({ _id }) => _id) } }),
     QuizQuestion.deleteMany({ _id: { $in: quizQuestionsSeed.map(({ _id }) => _id) } }),
+    Quiz.deleteMany({ _id: { $in: quizzesSeed.map(({ _id }) => _id) } }),
   ])
 }
 
@@ -72,6 +81,7 @@ async function seed() {
   await Domain.bulkWrite(toUpserts(domainsSeed))
   await Career.bulkWrite(toUpserts(careersSeed))
   await QuizQuestion.bulkWrite(toUpserts(quizQuestionsSeed))
+  await Quiz.bulkWrite(toUpserts(quizzesSeed))
   await User.bulkWrite(toUpserts(usersSeed))
   await UserProfile.bulkWrite(toUpserts(profilesSeed))
 
@@ -80,6 +90,10 @@ async function seed() {
     Domain.syncIndexes(),
     Career.syncIndexes(),
     QuizQuestion.syncIndexes(),
+    Quiz.syncIndexes(),
+    QuizAttempt.syncIndexes(),
+    CareerPassport.syncIndexes(),
+    RecommendationSnapshot.syncIndexes(),
     User.syncIndexes(),
     UserProfile.syncIndexes(),
     Session.syncIndexes(),
@@ -91,12 +105,13 @@ async function seed() {
     Domain.countDocuments({ _id: { $in: domainsSeed.map(({ _id }) => _id) } }),
     Career.countDocuments({ _id: { $in: careersSeed.map(({ _id }) => _id) } }),
     QuizQuestion.countDocuments({ _id: { $in: quizQuestionsSeed.map(({ _id }) => _id) } }),
+    Quiz.countDocuments({ _id: { $in: quizzesSeed.map(({ _id }) => _id) } }),
     User.countDocuments({ _id: { $in: Object.values(userIds) } }),
     UserProfile.countDocuments({ _id: { $in: Object.values(profileIds) } }),
   ])
 
   console.log(
-    `Seed complete: ${counts[0]} skills, ${counts[1]} domains, ${counts[2]} careers, ${counts[3]} quiz questions, ${counts[4]} users, ${counts[5]} profiles.`,
+    `Seed complete: ${counts[0]} skills, ${counts[1]} domains, ${counts[2]} careers, ${counts[3]} quiz questions, ${counts[4]} quizzes, ${counts[5]} users, ${counts[6]} profiles.`,
   )
 }
 

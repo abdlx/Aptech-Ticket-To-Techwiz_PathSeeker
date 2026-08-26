@@ -7,16 +7,8 @@ export function generateOpaqueToken(bytes = 32) {
   return crypto.randomBytes(bytes).toString('base64url')
 }
 
-// Six-digit numeric code for email verification, matching the OTP input
-// already built in frontend/src/pages/auth/verify-email.jsx.
-export function generateNumericOtp(digits = 6) {
-  const min = 10 ** (digits - 1)
-  const max = 10 ** digits - 1
-  return String(crypto.randomInt(min, max + 1))
-}
-
 export function hashToken(rawToken) {
   return crypto.createHash('sha256').update(rawToken).digest('hex')
 }
 
-export default { generateOpaqueToken, generateNumericOtp, hashToken }
+export default { generateOpaqueToken, hashToken }
