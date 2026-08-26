@@ -139,6 +139,7 @@ test('Session stores only a token hash and expires through a TTL index', async (
 
 test('VerificationToken is single-purpose, attempt-bounded, hashed, and TTL-indexed', async () => {
   assert.equal(VerificationToken.schema.path('tokenHash').options.select, false)
+  assert.equal(VerificationToken.schema.path('otpHash').options.select, false)
   assert.ok(hasIndex(VerificationToken, { expiresAt: 1 }, { expireAfterSeconds: 0 }))
 
   const invalidToken = new VerificationToken({
@@ -157,6 +158,15 @@ test('VerificationToken is single-purpose, attempt-bounded, hashed, and TTL-inde
     expiresAt: new Date(Date.now() + 60_000),
   })
   await assert.rejects(tooManyAttempts.validate(), /attempts/i)
+
+  const emailOtp = new VerificationToken({
+    userId: objectId(),
+    purpose: 'email_verification',
+    otpHash: 'a'.repeat(64),
+    attempts: 5,
+    expiresAt: new Date(Date.now() + 10 * 60_000),
+  })
+  await emailOtp.validate()
 })
 
 test('all Phase 1 models use explicit collection names', () => {

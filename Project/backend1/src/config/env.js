@@ -33,6 +33,11 @@ export const env = {
 
   emailProvider: process.env.EMAIL_PROVIDER || 'console',
   emailFrom: process.env.EMAIL_FROM || 'no-reply@pathseeker.local',
+  resendApiKey: process.env.RESEND_API_KEY,
+
+  emailVerificationTtlMinutes: toInt(process.env.EMAIL_VERIFICATION_OTP_TTL_MINUTES, 10),
+  emailVerificationMaxAttempts: toInt(process.env.EMAIL_VERIFICATION_MAX_ATTEMPTS, 5),
+  emailVerificationResendCooldownSeconds: toInt(process.env.EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS, 60),
 
   passwordResetTtlMinutes: toInt(process.env.PASSWORD_RESET_TOKEN_TTL_MINUTES, 20),
 
@@ -46,6 +51,7 @@ export function assertRequiredEnv() {
   const missing = []
   if (!env.mongodbUri) missing.push('MONGODB_URI')
   if (!env.mongodbDbName) missing.push('MONGODB_DB_NAME')
+  if (env.emailProvider === 'resend' && !env.resendApiKey) missing.push('RESEND_API_KEY')
 
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`)

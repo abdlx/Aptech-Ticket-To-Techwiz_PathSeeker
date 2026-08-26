@@ -40,3 +40,21 @@ test('unknown routes use the standard error contract and correlation ID', async 
   assert.equal(payload.code, 'NOT_FOUND')
   assert.equal(payload.requestId, response.headers.get('x-request-id'))
 })
+
+test('email verification endpoints reject malformed requests before database access', async () => {
+  const verifyResponse = await fetch(`${baseUrl}/api/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: 'not-an-email', otp: '123' }),
+  })
+  assert.equal(verifyResponse.status, 400)
+  assert.equal((await verifyResponse.json()).code, 'VALIDATION_ERROR')
+
+  const resendResponse = await fetch(`${baseUrl}/api/auth/resend-verification`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: 'not-an-email' }),
+  })
+  assert.equal(resendResponse.status, 400)
+  assert.equal((await resendResponse.json()).code, 'VALIDATION_ERROR')
+})

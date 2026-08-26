@@ -45,7 +45,7 @@ export const REMOTE_PREFERENCES = Object.freeze([
   'unspecified',
 ])
 
-export const TOKEN_PURPOSES = Object.freeze(['password_reset'])
+export const TOKEN_PURPOSES = Object.freeze(['password_reset', 'email_verification'])
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 

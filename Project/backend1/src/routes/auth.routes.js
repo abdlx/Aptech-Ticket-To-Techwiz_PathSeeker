@@ -6,6 +6,8 @@ import { authRateLimiter } from '../middleware/rateLimit.middleware.js'
 const router = Router()
 
 router.post('/register', authRateLimiter, authController.register)
+router.post('/verify-email', authRateLimiter, authController.verifyEmail)
+router.post('/resend-verification', authRateLimiter, authController.resendVerification)
 router.post('/login', authRateLimiter, authController.login)
 router.post('/admin/login', authRateLimiter, authController.adminLogin)
 router.post('/forgot-password', authRateLimiter, authController.forgotPassword)

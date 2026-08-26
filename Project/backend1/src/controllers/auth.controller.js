@@ -36,8 +36,25 @@ export const register = asyncHandler(async (req, res) => {
   }
 
   const user = await authService.registerUser({ name: name.trim(), email, password, stage })
-  await issueSessionCookie(res, user, req)
-  res.status(201).json({ data: { user }, message: 'Account created.' })
+  res.status(201).json({ data: { user }, message: 'Account created. Check your email for the verification code.' })
+})
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body
+  if (!isValidEmail(email) || !/^\d{6}$/.test(otp || '')) {
+    throw new AppError(400, 'A valid email and 6-digit OTP are required.', 'VALIDATION_ERROR')
+  }
+  const user = await authService.verifyEmail({ email, otp })
+  res.status(200).json({ data: { user }, message: 'Email verified successfully.' })
+})
+
+export const resendVerification = asyncHandler(async (req, res) => {
+  const { email } = req.body
+  if (!isValidEmail(email)) {
+    throw new AppError(400, 'Enter a valid email address.', 'VALIDATION_ERROR')
+  }
+  await authService.resendVerification(email)
+  res.status(200).json({ data: null, message: 'A new verification code has been sent.' })
 })
 
 async function loginWithRole(req, res, allowedRoles) {
@@ -90,4 +107,4 @@ export const resetPassword = asyncHandler(async (req, res) => {
   res.status(200).json({ data: null, message: 'Password updated. Please log in again.' })
 })
 
-export default { register, login, adminLogin, logout, me, forgotPassword, resetPassword }
+export default { register, verifyEmail, resendVerification, login, adminLogin, logout, me, forgotPassword, resetPassword }
