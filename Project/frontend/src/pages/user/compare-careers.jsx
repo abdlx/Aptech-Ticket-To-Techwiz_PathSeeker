@@ -1,14 +1,147 @@
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import Icon from '../../components/Icon'
 import PageTitle from '../../components/common/PageTitle'
-import { useState } from 'react'
-import { careers } from '../../data'
+import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
+import { careersApi } from '../../services/careersApi'
+import { personalizationApi } from '../../services/personalizationApi'
 
 export default function CompareCareersPage({ navigate }) {
-  const [ids, setIds] = useState(['ux-designer', 'data-analyst', 'product-manager'])
-  const selected = ids.map((id) => careers.find((career) => career.id === id)).filter(Boolean)
-  const update = (index, id) => setIds(ids.map((value, i) => i === index ? id : value))
+  const [overrideSlugs, setOverrideSlugs] = useState(null)
+
+  const careersQuery = useQuery({
+    queryKey: ['careers', 'list', 'all'],
+    queryFn: ({ signal }) => careersApi.getCareers({}, { signal }),
+    staleTime: 60_000,
+  })
+
+  const saveComparisonMutation = useMutation({
+    mutationFn: (careerIds) => personalizationApi.saveComparison({ careerIds }),
+  })
+
+  if (careersQuery.isLoading) return <PageSkeleton />
+  if (careersQuery.error) return <ErrorState message={careersQuery.error.message} onRetry={careersQuery.refetch} />
+
+  const allCareers = careersQuery.data?.data?.careers || []
+  const selectedSlugs = overrideSlugs || allCareers.slice(0, 3).map((c) => c.slug)
+
+  const selected = selectedSlugs
+    .map((slug) => allCareers.find((c) => c.slug === slug || c._id === slug))
+    .filter(Boolean)
+
+  const update = (index, newSlug) => {
+    const next = selectedSlugs.map((s, i) => (i === index ? newSlug : s))
+    setOverrideSlugs(next)
+    const selectedIds = next
+      .map((slug) => allCareers.find((c) => c.slug === slug)?._id)
+      .filter(Boolean)
+    if (selectedIds.length >= 2) {
+      saveComparisonMutation.mutate(selectedIds)
+    }
+  }
+
   const rows = [
-    ['Match', (career) => `${career.match}%`], ['Typical salary', (career) => career.salary], ['Projected growth', (career) => career.growth], ['Demand', (career) => career.demand], ['Time to job-ready', (_, index) => ['6–12 months', '4–9 months', '8–14 months'][index]], ['Best-fit skill', (career) => career.skills[0]],
+    [
+      'Typical salary',
+      (career) =>
+        career.expectedSalary
+          ? `$${(career.expectedSalary.min / 1000).toFixed(0)}k – $${(career.expectedSalary.max / 1000).toFixed(0)}k`
+          : '$70k – $110k',
+    ],
+    ['Projected growth', (career) => `+${career.growthRatePercent ?? 12}%`],
+    [
+      'Market demand',
+      (career) =>
+        career.marketDemand === 'very_high'
+          ? 'Very high'
+          : career.marketDemand === 'high'
+          ? 'High demand'
+          : career.marketDemand === 'medium'
+          ? 'Medium'
+          : 'Growing',
+    ],
+    [
+      'Domain stream',
+      (career) => career.domainId?.name || 'Technology',
+    ],
   ]
-  return <div className="page-stack"><PageTitle eyebrow="Career comparison" title="See the tradeoffs clearly" copy="Compare the fit, opportunity, preparation, and day-to-day shape of your saved careers." actions={<button className="button soft"><Icon name="download" /> Export comparison</button>} /><section className="compare-table panel"><div className="compare-head"><span>Compare</span>{selected.map((career, index) => <div key={`${career.id}-${index}`}><span className={`career-icon ${career.tone}`}><Icon name={career.icon} /></span><select value={career.id} onChange={(event) => update(index, event.target.value)}>{careers.map((item) => <option value={item.id} key={item.id}>{item.title}</option>)}</select><button onClick={() => navigate('career-detail', career.id)}>View profile</button></div>)}</div>{rows.map(([label, value]) => <div className="compare-row" key={label}><strong>{label}</strong>{selected.map((career, index) => <span key={`${career.id}-${label}`}>{value(career, index)}</span>)}</div>)}<div className="compare-row skills"><strong>Core skills</strong>{selected.map((career) => <span key={`${career.id}-skills`}>{career.skills.slice(0, 3).map((skill) => <em key={skill}>{skill}</em>)}</span>)}</div></section><section className="comparison-note"><img src="/assets/navi/navi-explaining.png" alt="Navi explaining" /><div><span className="eyebrow">Navi’s take</span><h2>UX Designer is your closest overall fit</h2><p>Data Analyst offers faster growth, while Product Manager has the highest salary ceiling. Your strongest personal alignment remains UX because it combines empathy and creative problem-solving.</p></div></section></div>
+
+  const handlePrint = () => {
+    window.print()
+  }
+
+  return (
+    <div className="page-stack">
+      <PageTitle
+        eyebrow="Career comparison"
+        title="See the tradeoffs clearly"
+        copy="Compare fit, salary expectations, growth outlook, and core skills side by side."
+        actions={
+          <button className="button soft" onClick={handlePrint}>
+            <Icon name="download" /> Export comparison
+          </button>
+        }
+      />
+
+      <section className="compare-table panel">
+        <div className="compare-head">
+          <span>Compare</span>
+          {selected.map((career, index) => (
+            <div key={`${career._id}-${index}`}>
+              <span className={`career-icon ${career.colorTone || 'lavender'}`}>
+                <Icon name={career.iconKey || 'briefcase'} />
+              </span>
+              <select
+                value={career.slug}
+                onChange={(event) => update(index, event.target.value)}
+              >
+                {allCareers.map((item) => (
+                  <option value={item.slug} key={item._id}>
+                    {item.title}
+                  </option>
+                ))}
+              </select>
+              <button onClick={() => navigate('career-detail', career.slug)}>
+                View profile
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {rows.map(([label, value]) => (
+          <div className="compare-row" key={label}>
+            <strong>{label}</strong>
+            {selected.map((career, index) => (
+              <span key={`${career._id}-${label}`}>{value(career, index)}</span>
+            ))}
+          </div>
+        ))}
+
+        <div className="compare-row skills">
+          <strong>Core skills</strong>
+          {selected.map((career) => {
+            const skills = (career.requiredSkills || []).map((s) => s.skillId?.name || s.name || 'Skill')
+            return (
+              <span key={`${career._id}-skills`}>
+                {skills.slice(0, 3).map((skill) => (
+                  <em key={skill}>{skill}</em>
+                ))}
+              </span>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="comparison-note">
+        <img src="/assets/navi/navi-explaining.png" alt="Navi explaining" />
+        <div>
+          <span className="eyebrow">Navi’s take</span>
+          <h2>{selected[0]?.title || 'UX Designer'} leads your comparison</h2>
+          <p>
+            {selected[0]?.title} pairs strong user empathy with creative problem-solving. Review the skill roadmap on each career profile to plan your next high-leverage project.
+          </p>
+        </div>
+      </section>
+    </div>
+  )
 }

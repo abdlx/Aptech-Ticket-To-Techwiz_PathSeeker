@@ -1,5 +1,68 @@
+import { useQuery } from '@tanstack/react-query'
 import Back from '../../components/common/BackButton'
+import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
+import { queryKeys } from '../../lib/queryKeys'
+import { contentApi } from '../../services/contentApi'
 
-export default function StoryDetailPage({ navigate }) {
-  return <div className="page-stack"><Back navigate={navigate} to="stories">Back to success stories</Back><section className="story-detail-hero"><div><span className="eyebrow">Career change · Design</span><h1>“My psychology degree became my UX superpower.”</h1><p>Aisha Rahman · Psychology graduate → Junior UX Designer</p><div className="story-tags"><span>5-month journey</span><span>Karachi, Pakistan</span><span>First design role</span></div></div><div className="story-portrait">AR</div></section><div className="story-detail-layout"><main className="panel story-article"><blockquote>“I thought changing direction meant starting over. It turned out I already had the hardest skill to teach: understanding people.”</blockquote><p>After graduation, Aisha knew she wanted people-centered work but could not see how her psychology degree connected to technology. A PathSeeker quiz surfaced UX research, content design, and product roles.</p><h2>The turning point</h2><p>Instead of enrolling in another degree, she tested the direction with one short research project. She interviewed students about campus services and redesigned a confusing sign-up flow.</p><h2>What changed</h2><p>That first project became a portfolio case study. Four months later, she began interviewing and accepted a junior UX role at Looma.</p></main><aside className="story-timeline panel"><span className="eyebrow">Aisha’s timeline</span>{[['01','Explored','Completed the Career Passport quiz'],['02','Tested','Took a two-week UX foundations course'],['03','Built','Created two research-led portfolio projects'],['04','Moved','Accepted her first junior UX role']].map(([number, title, copy]) => <div key={number}><span>{number}</span><p><strong>{title}</strong><small>{copy}</small></p></div>)}<button className="button primary" onClick={() => navigate('submit-story')}>Share your story</button></aside></div></div>
+export default function StoryDetailPage({ navigate, storyId }) {
+  const query = useQuery({
+    queryKey: queryKeys.stories.detail(storyId),
+    queryFn: ({ signal }) => (storyId ? contentApi.getStoryById(storyId, { signal }) : Promise.resolve(null)),
+    enabled: Boolean(storyId),
+  })
+
+  if (storyId && query.isLoading) return <PageSkeleton />
+  if (storyId && query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
+
+  const story = query.data?.data?.story
+  const author = story?.authorName || 'Aisha Rahman'
+  const domain = story?.domainId?.name || 'Design & Technology'
+  const initials = author.split(' ').map((p) => p[0]).join('') || 'PS'
+  const storyText = story?.storyText || 'After graduation, exploring different career paths led to practical, fulfilling work.'
+
+  return (
+    <div className="page-stack">
+      <Back navigate={navigate} to="stories">
+        Back to success stories
+      </Back>
+      <section className="story-detail-hero">
+        <div>
+          <span className="eyebrow">Career journey · {domain}</span>
+          <h1>{author}’s Career Transition</h1>
+          <p>{author} · {domain}</p>
+          <div className="story-tags">
+            <span>Verified journey</span>
+            <span>{domain}</span>
+          </div>
+        </div>
+        <div className="story-portrait">{initials}</div>
+      </section>
+      <div className="story-detail-layout">
+        <main className="panel story-article">
+          <blockquote>“Finding work that feels like you is built one step at a time.”</blockquote>
+          <p style={{ whiteSpace: 'pre-line', lineHeight: '1.7' }}>{storyText}</p>
+        </main>
+        <aside className="story-timeline panel">
+          <span className="eyebrow">Journey milestones</span>
+          {[
+            ['01', 'Explored', 'Completed the Career Assessment & explored fits'],
+            ['02', 'Tested', 'Built foundational skills with curated learning'],
+            ['03', 'Built', 'Created real project evidence and portfolio work'],
+            ['04', 'Landed', 'Transitioned into target career role'],
+          ].map(([number, title, copy]) => (
+            <div key={number}>
+              <span>{number}</span>
+              <p>
+                <strong>{title}</strong>
+                <small>{copy}</small>
+              </p>
+            </div>
+          ))}
+          <button className="button primary" onClick={() => navigate('submit-story')}>
+            Share your story
+          </button>
+        </aside>
+      </div>
+    </div>
+  )
 }
