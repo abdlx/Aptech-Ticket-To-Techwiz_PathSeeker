@@ -62,10 +62,18 @@ export default function AppShell({ screen, navigate, children, onVoice, mobileMe
           <button className="nav-item" onClick={logout}><Icon name="logout" /><span>Log out</span></button>
         </nav>
         <div className="sidebar-card">
-          <div className="sidebar-navi"><img src="/assets/navi/navi-pointing-left.png" alt="Navi pointing" /></div>
-          <strong>Need a hand?</strong>
-          <p>Talk it through with Navi, your career guide.</p>
-          <button onClick={onVoice}><Icon name="mic" size={17} /> Talk to Navi</button>
+          <div className="sidebar-card-top">
+            <span className="sidebar-card-badge"><span className="pulse-dot" /> AI Guide</span>
+            <div className="sidebar-navi"><img src="/assets/navi/navi-pointing-left.png" alt="Navi pointing" /></div>
+          </div>
+          <div className="sidebar-card-body">
+            <strong>Need a hand?</strong>
+            <p>Talk it through with Navi, your career guide.</p>
+          </div>
+          <button className="sidebar-card-cta" onClick={onVoice}>
+            <span className="mic-circle"><Icon name="mic" size={16} /></span>
+            <span>Talk to Navi</span>
+          </button>
         </div>
         <button className="user-chip" onClick={() => navigate('profile')} aria-label={`View profile for ${displayName}`}>
           <span className="avatar">{initials}</span>
