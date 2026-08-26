@@ -14,18 +14,20 @@ export default function AuthPage({ navigate, mode = 'signup' }) {
             <p>{isLogin ? 'Pick up where you left off. Your matches, notes, and next steps are ready.' : 'Create your account and let PathSeeker guide you to the right career path.'}</p>
           </div>
         </div>
-        <div className="auth-navi">
-          <div className="auth-navi-glow" />
-          <img src={`/assets/navi/${isLogin ? 'navi-pointing-left' : 'navi-greeting'}.png`} alt="Navi welcoming you" />
-          <div className="speech-bubble">
-            <strong>Hi! I’m Navi 👋</strong>
-            <p>{isLogin ? 'Good to see you again. Ready to keep exploring?' : 'Let’s build your Career Passport together.'}</p>
+        <div className="auth-visual-bottom">
+          <div className="auth-navi">
+            <div className="auth-navi-glow" />
+            <img src={`/assets/navi/${isLogin ? 'navi-pointing-left' : 'navi-greeting'}.png`} alt="Navi welcoming you" />
+            <div className="speech-bubble">
+              <strong>Hi! I’m Navi 👋</strong>
+              <p>{isLogin ? 'Good to see you again. Ready to keep exploring?' : 'Let’s build your Career Passport together.'}</p>
+            </div>
           </div>
-        </div>
-        <div className="auth-trust">
-          <span><Icon name="shield" /><div><b>Secure</b><small>Your data is safe</small></div></span>
-          <span><Icon name="lock" /><div><b>Private</b><small>We respect privacy</small></div></span>
-          <span><Icon name="users" /><div><b>Personalized</b><small>Made just for you</small></div></span>
+          <div className="auth-trust">
+            <span><Icon name="shield" /><div><b>Secure</b><small>Your data is safe</small></div></span>
+            <span><Icon name="lock" /><div><b>Private</b><small>We respect privacy</small></div></span>
+            <span><Icon name="users" /><div><b>Personalized</b><small>Made just for you</small></div></span>
+          </div>
         </div>
       </section>
       <section className="auth-form-side">
