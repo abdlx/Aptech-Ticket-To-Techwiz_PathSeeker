@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import Icon from '../../components/Icon'
 import Back from '../../components/common/BackButton'
+import Breadcrumbs from '../../components/common/Breadcrumbs'
 import PageTitle from '../../components/common/PageTitle'
 import { careersApi } from '../../services/careersApi'
 import { contentApi } from '../../services/contentApi'
@@ -65,6 +66,13 @@ export default function SubmitStoryPage({ navigate }) {
 
   return (
     <div className="page-stack">
+      <Breadcrumbs
+        items={[
+          { label: 'Stories', to: 'stories' },
+          { label: 'Share your story' },
+        ]}
+        navigate={navigate}
+      />
       <Back navigate={navigate} to="stories">
         Back to success stories
       </Back>

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import Back from '../../components/common/BackButton'
+import Breadcrumbs from '../../components/common/Breadcrumbs'
 import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
 import { contentApi } from '../../services/contentApi'
@@ -22,6 +23,13 @@ export default function StoryDetailPage({ navigate, storyId }) {
 
   return (
     <div className="page-stack">
+      <Breadcrumbs
+        items={[
+          { label: 'Stories', to: 'stories' },
+          { label: `${author}’s Story` },
+        ]}
+        navigate={navigate}
+      />
       <Back navigate={navigate} to="stories">
         Back to success stories
       </Back>

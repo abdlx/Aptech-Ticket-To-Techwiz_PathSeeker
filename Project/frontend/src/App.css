@@ -200,3 +200,92 @@ button { border: 0; color: inherit; background: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; }
 }
+
+/* Dark Theme Overrides */
+[data-theme='dark'] .sidebar,
+[data-theme='dark'] .topbar,
+[data-theme='dark'] .panel,
+[data-theme='dark'] .career-card,
+[data-theme='dark'] .resource-card,
+[data-theme='dark'] .story-grid article,
+[data-theme='dark'] .settings-nav,
+[data-theme='dark'] .settings-content,
+[data-theme='dark'] .profile-hero,
+[data-theme='dark'] .compare-table,
+[data-theme='dark'] .feedback-card,
+[data-theme='dark'] .quiz-card,
+[data-theme='dark'] .admin-sidebar,
+[data-theme='dark'] .admin-topbar,
+[data-theme='dark'] .admin-table {
+  background: var(--card-bg, #1e293b);
+  border-color: var(--line, #334155);
+  color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .topbar {
+  background: var(--topbar-bg, rgba(15, 23, 42, 0.9));
+}
+
+[data-theme='dark'] .global-search,
+[data-theme='dark'] .resource-search,
+[data-theme='dark'] input,
+[data-theme='dark'] select,
+[data-theme='dark'] textarea,
+[data-theme='dark'] .admin-search {
+  background: var(--input-bg, #0f172a);
+  border-color: var(--line, #334155);
+  color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .nav-item {
+  color: var(--muted, #94a3b8);
+}
+
+[data-theme='dark'] .nav-item.active {
+  background: #1e3a2c;
+  color: var(--green, #4ade80);
+}
+
+[data-theme='dark'] .quiz-options button {
+  background: var(--card-bg, #1e293b);
+  border-color: var(--line, #334155);
+  color: var(--ink, #f1f5f9);
+}
+
+[data-theme='dark'] .quiz-options button.selected {
+  background: #143825;
+  border-color: var(--green, #4ade80);
+}
+
+[data-theme='dark'] .navi-prompt {
+  background: linear-gradient(105deg, #1e2d26, #16221c);
+  border-color: #2c4438;
+}
+
+[data-theme='dark'] .results-hero,
+[data-theme='dark'] .stories-hero {
+  background: linear-gradient(125deg, #1e293b, #0f172a);
+}
+
+[data-theme='dark'] .mobile-nav {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: #334155;
+}
+
+[data-theme='dark'] .sidebar-card {
+  background: #142820;
+  border-color: #244637;
+}
+
+[data-theme='dark'] .user-chip {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme='dark'] .skill-row span,
+[data-theme='dark'] .story-tags span,
+[data-theme='dark'] .results-badge {
+  background: #334155;
+  color: #e2e8f0;
+}
+

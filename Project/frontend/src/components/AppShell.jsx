@@ -2,6 +2,7 @@ import Icon from './Icon'
 import { navItems } from '../data'
 import { authApi } from '../services/authApi'
 import { useAuth } from '../providers/AuthProvider'
+import { useAccessibilityStore } from '../stores/appStores'
 
 export function Brand({ compact = false }) {
   return (
@@ -14,6 +15,7 @@ export function Brand({ compact = false }) {
 
 export default function AppShell({ screen, navigate, children, onVoice, mobileMenu, setMobileMenu }) {
   const auth = useAuth()
+  const { theme, setTheme, fontScale, setFontScale } = useAccessibilityStore()
   const logout = async () => {
     try { await authApi.logout() } finally { auth.clearUser(); navigate('login') }
   }
@@ -72,6 +74,35 @@ export default function AppShell({ screen, navigate, children, onVoice, mobileMe
           </div>
           <button className="global-search" onClick={() => navigate('careers')}><Icon name="search" size={18} /><span>Search careers or resources</span><kbd>⌘ K</kbd></button>
           <div className="topbar-actions">
+            <div className="accessibility-pills" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <button
+                className="icon-button"
+                style={{ width: '32px', height: '32px', fontSize: '11px', fontWeight: 800 }}
+                onClick={() => setFontScale(fontScale - 0.05)}
+                title="Decrease font size"
+                aria-label="Decrease font size"
+              >
+                A-
+              </button>
+              <button
+                className="icon-button"
+                style={{ width: '32px', height: '32px', fontSize: '11px', fontWeight: 800 }}
+                onClick={() => setFontScale(fontScale + 0.05)}
+                title="Increase font size"
+                aria-label="Increase font size"
+              >
+                A+
+              </button>
+              <button
+                className="icon-button"
+                style={{ width: '32px', height: '32px' }}
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                aria-label="Toggle dark mode"
+              >
+                <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
+              </button>
+            </div>
             <button className="voice-pill" onClick={onVoice}><span className="mini-wave"><i /><i /><i /></span><span>Talk to Navi</span></button>
             <button className="icon-button notification" aria-label="Notifications" onClick={() => navigate('notifications')}><Icon name="bell" /><span /></button>
             <button className="avatar small" onClick={() => navigate('profile')}>AM</button>

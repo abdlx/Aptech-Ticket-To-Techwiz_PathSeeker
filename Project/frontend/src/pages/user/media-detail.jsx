@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import Icon from '../../components/Icon'
 import Back from '../../components/common/BackButton'
+import Breadcrumbs from '../../components/common/Breadcrumbs'
 import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
 import { contentApi } from '../../services/contentApi'
@@ -60,6 +61,13 @@ export default function MediaDetailPage({ navigate, mediaId }) {
 
   return (
     <div className="page-stack">
+      <Breadcrumbs
+        items={[
+          { label: 'Resources', to: 'resources' },
+          { label: title },
+        ]}
+        navigate={navigate}
+      />
       <Back navigate={navigate} to="resources">
         Back to resources
       </Back>

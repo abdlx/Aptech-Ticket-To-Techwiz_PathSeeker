@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import Icon from '../../components/Icon'
+import Breadcrumbs from '../../components/common/Breadcrumbs'
 import PageTitle from '../../components/common/PageTitle'
 import { EmptyState, ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
@@ -57,6 +58,13 @@ export default function SavedFiltersPage({ navigate }) {
 
   return (
     <div className="page-stack">
+      <Breadcrumbs
+        items={[
+          { label: 'Career Bank', to: 'careers' },
+          { label: 'Saved Filters' },
+        ]}
+        navigate={navigate}
+      />
       <PageTitle
         eyebrow="Career Bank"
         title="Saved searches and filters"

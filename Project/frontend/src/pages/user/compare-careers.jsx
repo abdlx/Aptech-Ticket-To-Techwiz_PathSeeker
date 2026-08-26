@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import Icon from '../../components/Icon'
+import Breadcrumbs from '../../components/common/Breadcrumbs'
 import PageTitle from '../../components/common/PageTitle'
 import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { careersApi } from '../../services/careersApi'
@@ -72,6 +73,13 @@ export default function CompareCareersPage({ navigate }) {
 
   return (
     <div className="page-stack">
+      <Breadcrumbs
+        items={[
+          { label: 'Career Bank', to: 'careers' },
+          { label: 'Compare Careers' },
+        ]}
+        navigate={navigate}
+      />
       <PageTitle
         eyebrow="Career comparison"
         title="See the tradeoffs clearly"
