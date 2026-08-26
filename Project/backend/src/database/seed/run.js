@@ -1,9 +1,20 @@
 import 'dotenv/config'
 import bcrypt from 'bcryptjs'
 import { connectDatabase, disconnectDatabase } from '../../config/database.js'
-import { Domain, Session, Skill, User, UserProfile, VerificationToken } from '../../models/index.js'
+import {
+  Career,
+  Domain,
+  QuizQuestion,
+  Session,
+  Skill,
+  User,
+  UserProfile,
+  VerificationToken,
+} from '../../models/index.js'
+import { careersSeed } from './careers.seed.js'
 import { domainsSeed, skillsSeed } from './catalog.seed.js'
 import { profileIds, userIds } from './ids.js'
+import { quizQuestionsSeed } from './quizQuestions.seed.js'
 import { buildUsersSeed, profilesSeed } from './users.seed.js'
 
 const isReset = process.argv.includes('--reset')
@@ -41,6 +52,8 @@ async function resetSeedOwnedRecords() {
     User.deleteMany({ _id: { $in: seededUserIds } }),
     Skill.deleteMany({ _id: { $in: skillsSeed.map(({ _id }) => _id) } }),
     Domain.deleteMany({ _id: { $in: domainsSeed.map(({ _id }) => _id) } }),
+    Career.deleteMany({ _id: { $in: careersSeed.map(({ _id }) => _id) } }),
+    QuizQuestion.deleteMany({ _id: { $in: quizQuestionsSeed.map(({ _id }) => _id) } }),
   ])
 }
 
@@ -57,12 +70,16 @@ async function seed() {
 
   await Skill.bulkWrite(toUpserts(skillsSeed))
   await Domain.bulkWrite(toUpserts(domainsSeed))
+  await Career.bulkWrite(toUpserts(careersSeed))
+  await QuizQuestion.bulkWrite(toUpserts(quizQuestionsSeed))
   await User.bulkWrite(toUpserts(usersSeed))
   await UserProfile.bulkWrite(toUpserts(profilesSeed))
 
   await Promise.all([
     Skill.syncIndexes(),
     Domain.syncIndexes(),
+    Career.syncIndexes(),
+    QuizQuestion.syncIndexes(),
     User.syncIndexes(),
     UserProfile.syncIndexes(),
     Session.syncIndexes(),
@@ -72,12 +89,14 @@ async function seed() {
   const counts = await Promise.all([
     Skill.countDocuments({ _id: { $in: skillsSeed.map(({ _id }) => _id) } }),
     Domain.countDocuments({ _id: { $in: domainsSeed.map(({ _id }) => _id) } }),
+    Career.countDocuments({ _id: { $in: careersSeed.map(({ _id }) => _id) } }),
+    QuizQuestion.countDocuments({ _id: { $in: quizQuestionsSeed.map(({ _id }) => _id) } }),
     User.countDocuments({ _id: { $in: Object.values(userIds) } }),
     UserProfile.countDocuments({ _id: { $in: Object.values(profileIds) } }),
   ])
 
   console.log(
-    `Seed complete: ${counts[0]} skills, ${counts[1]} domains, ${counts[2]} users, ${counts[3]} profiles.`,
+    `Seed complete: ${counts[0]} skills, ${counts[1]} domains, ${counts[2]} careers, ${counts[3]} quiz questions, ${counts[4]} users, ${counts[5]} profiles.`,
   )
 }
 
