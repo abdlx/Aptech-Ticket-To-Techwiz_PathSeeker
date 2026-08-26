@@ -37,3 +37,10 @@ h1, h2, h3, .brand { font-family: 'Manrope', 'Segoe UI', sans-serif; }
 @media (max-width: 720px) {
   body { background: #fafbf8; }
 }
+html[data-reduced-motion="true"] *, html[data-reduced-motion="true"] *::before, html[data-reduced-motion="true"] *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+.state-page { max-width: 680px; margin: 8vh auto; padding: 2.5rem; text-align: center; }
+.state-page p { color: var(--muted, #64748b); margin: 0.75rem 0 1.5rem; }
+.state-skeleton { min-height: 260px; background: linear-gradient(90deg, #f4f3fb 25%, #ebe8f8 50%, #f4f3fb 75%); background-size: 200% 100%; animation: state-shimmer 1.4s infinite; }
+.state-skeleton.short { min-height: 140px; }
+@keyframes state-shimmer { to { background-position-x: -200%; } }
+.field-error, .form-error { color: #b42318; font-size: 0.82rem; margin-top: 0.35rem; }

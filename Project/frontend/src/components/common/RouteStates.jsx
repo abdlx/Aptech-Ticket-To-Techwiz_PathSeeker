@@ -1,0 +1,6 @@
+export function PageSkeleton() { return <div className="page-stack" aria-busy="true" aria-label="Loading"><div className="panel state-skeleton" /><div className="panel state-skeleton short" /></div> }
+export function ErrorState({ title = 'We could not load this page', message = 'Try again in a moment.', onRetry }) { return <section className="panel state-page" role="alert"><h1>{title}</h1><p>{message}</p>{onRetry && <button className="button primary" onClick={onRetry}>Try again</button>}</section> }
+export function EmptyState({ title = 'Nothing here yet', message = 'New items will appear here when they are available.' }) { return <section className="panel state-page"><h1>{title}</h1><p>{message}</p></section> }
+export function Unauthorized() { return <section className="panel state-page"><h1>Sign in required</h1><p>Please sign in to continue your PathSeeker journey.</p></section> }
+export function Forbidden() { return <section className="panel state-page"><h1>Access denied</h1><p>Your account does not have permission to open this area.</p></section> }
+export function NotFound() { return <main className="page-content"><section className="panel state-page"><h1>Page not found</h1><p>The page you requested does not exist or has moved.</p><a className="button primary" href="/">Return home</a></section></main> }

@@ -46,7 +46,7 @@ export const getCareers = asyncHandler(async (req, res) => {
     skip,
   })
 
-  res.status(200).json({ data: { careers, meta } })
+  res.status(200).json({ data: { careers }, meta })
 })
 
 export const getCareerBySlug = asyncHandler(async (req, res) => {

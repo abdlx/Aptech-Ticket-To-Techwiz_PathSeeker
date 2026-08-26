@@ -1,5 +1,5 @@
-import AuthPage from '../../components/auth/AuthPage'
+import ConnectedAuthPage from '../../components/auth/ConnectedAuthPage'
 
 export default function SignupPage({ navigate }) {
-  return <AuthPage navigate={navigate} mode="signup" />
+  return <ConnectedAuthPage navigate={navigate} mode="signup" />
 }

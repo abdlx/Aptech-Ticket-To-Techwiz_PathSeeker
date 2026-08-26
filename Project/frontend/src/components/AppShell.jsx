@@ -1,5 +1,7 @@
 import Icon from './Icon'
 import { navItems } from '../data'
+import { authApi } from '../services/authApi'
+import { useAuth } from '../providers/AuthProvider'
 
 export function Brand({ compact = false }) {
   return (
@@ -11,6 +13,10 @@ export function Brand({ compact = false }) {
 }
 
 export default function AppShell({ screen, navigate, children, onVoice, mobileMenu, setMobileMenu }) {
+  const auth = useAuth()
+  const logout = async () => {
+    try { await authApi.logout() } finally { auth.clearUser(); navigate('login') }
+  }
   const activeItem = navItems.find((item) => item.id === screen)
   const extraScreenLabels = {
     notifications: 'Notifications', 'quiz-history': 'Quiz history', 'quiz-result': 'Quiz results',
@@ -40,6 +46,7 @@ export default function AppShell({ screen, navigate, children, onVoice, mobileMe
           <button className={`nav-item ${screen === 'saved-filters' ? 'active' : ''}`} onClick={() => navigate('saved-filters')}><Icon name="filter" /><span>Saved filters</span></button>
           <button className="nav-item" onClick={() => navigate('feedback')}><Icon name="message" /><span>Send feedback</span></button>
           <button className={`nav-item ${screen === 'help' ? 'active' : ''}`} onClick={() => navigate('help')}><Icon name="help" /><span>Help center</span></button>
+          <button className="nav-item" onClick={logout}><Icon name="logout" /><span>Log out</span></button>
         </nav>
         <div className="sidebar-card">
           <div className="sidebar-navi"><img src="/assets/navi/navi-pointing-left.png" alt="Navi pointing" /></div>

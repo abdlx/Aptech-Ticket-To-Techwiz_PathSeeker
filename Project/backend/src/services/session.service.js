@@ -1,6 +1,6 @@
 import { Session } from '../models/index.js'
 import { env } from '../config/env.js'
-import { generateOpaqueToken, hashToken } from '../utils/tokens.js'
+import { generateOpaqueToken, hashToken } from '../utils/token.js'
 
 export async function createSession(user, { ipAddress, userAgent } = {}) {
   const rawToken = generateOpaqueToken()

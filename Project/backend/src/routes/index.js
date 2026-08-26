@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import mongoose from 'mongoose'
 import adminRoutes from './admin.routes.js'
 import authRoutes from './auth.routes.js'
 import catalogRoutes from './catalog.routes.js'
@@ -16,6 +17,12 @@ import storyRoutes from './story.routes.js'
 const router = Router()
 
 router.get('/health', (_req, res) => res.status(200).json({ data: { status: 'ok' } }))
+router.get('/health/db', (_req, res) => {
+  const ready = mongoose.connection.readyState === 1
+  res.status(ready ? 200 : 503).json({
+    data: { status: ready ? 'ready' : 'not_ready', database: ready ? 'connected' : 'disconnected' },
+  })
+})
 
 router.use('/auth', authRoutes)
 router.use('/', catalogRoutes)

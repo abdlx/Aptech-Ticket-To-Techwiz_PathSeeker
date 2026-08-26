@@ -2,8 +2,9 @@ import bcrypt from 'bcryptjs'
 import { User, UserProfile, VerificationToken } from '../models/index.js'
 import { env } from '../config/env.js'
 import AppError from '../utils/AppError.js'
-import { generateNumericOtp, generateOpaqueToken, hashToken } from '../utils/tokens.js'
+import { generateNumericOtp, generateOpaqueToken, hashToken } from '../utils/token.js'
 import { sendPasswordResetEmail, sendVerificationOtpEmail } from './email.service.js'
+import { getSettings } from './settings.service.js'
 
 function toSafeUser(userDocument) {
   // Model's toJSON transform already strips passwordHash/normalizedEmail/deletedAt.
@@ -25,6 +26,10 @@ async function issueEmailVerificationOtp(user) {
 }
 
 export async function registerUser({ name, email, password, stage }) {
+  const settings = await getSettings()
+  if (!settings.allowNewRegistrations) {
+    throw new AppError(403, 'New registrations are currently paused.', 'REGISTRATION_DISABLED')
+  }
   const normalizedEmail = email.trim().toLowerCase()
 
   const existing = await User.findOne({ normalizedEmail })
@@ -43,7 +48,12 @@ export async function registerUser({ name, email, password, stage }) {
     stage,
   })
 
-  await UserProfile.create({ userId: user._id })
+  try {
+    await UserProfile.create({ userId: user._id })
+  } catch (error) {
+    await User.deleteOne({ _id: user._id })
+    throw error
+  }
 
   await issueEmailVerificationOtp(user)
 

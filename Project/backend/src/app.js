@@ -4,6 +4,7 @@ import express from 'express'
 import helmet from 'helmet'
 import { env } from './config/env.js'
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js'
+import { requestContext } from './middleware/requestContext.js'
 import apiRouter from './routes/index.js'
 
 export function createApp() {
@@ -13,6 +14,7 @@ export function createApp() {
   app.set('trust proxy', 1)
 
   app.use(helmet())
+  app.use(requestContext)
   app.use(
     cors({
       origin: env.frontendOrigins,
