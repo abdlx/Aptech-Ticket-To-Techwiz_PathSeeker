@@ -64,3 +64,22 @@ export const profileIds = Object.freeze({
   graduate: deterministicId('4', 2),
   professional: deterministicId('4', 3),
 })
+
+export const careerIds = Object.freeze({
+  uxDesigner: deterministicId('5', 1),
+  dataAnalyst: deterministicId('5', 2),
+  softwareEngineer: deterministicId('5', 3),
+  digitalMarketer: deterministicId('5', 4),
+  cybersecurityAnalyst: deterministicId('5', 5),
+  productManager: deterministicId('5', 6),
+})
+
+export const quizQuestionIds = Object.freeze({
+  q1: deterministicId('6', 1),
+  q2: deterministicId('6', 2),
+  q3: deterministicId('6', 3),
+  q4: deterministicId('6', 4),
+  q5: deterministicId('6', 5),
+  q6: deterministicId('6', 6),
+  q7: deterministicId('6', 7),
+})
