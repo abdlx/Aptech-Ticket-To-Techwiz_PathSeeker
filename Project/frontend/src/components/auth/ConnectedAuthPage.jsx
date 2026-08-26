@@ -30,9 +30,11 @@ export default function ConnectedAuthPage({ navigate: legacyNavigate, mode = 'si
         toast.success('Welcome back.')
         routerNavigate(location.state?.from?.pathname || '/app/dashboard', { replace: true })
       } else {
-        auth.setUser(payload.data.user)
-        toast.success('Account created.')
-        routerNavigate('/onboarding', { replace: true })
+        toast.success('Account created. Enter the code sent to your email.')
+        routerNavigate(`/verify-email?email=${encodeURIComponent(payload.data.user.email)}`, {
+          replace: true,
+          state: { verificationSentAt: Date.now() },
+        })
       }
     },
   })
