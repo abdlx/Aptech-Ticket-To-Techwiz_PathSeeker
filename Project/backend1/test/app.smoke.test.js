@@ -41,6 +41,37 @@ test('unknown routes use the standard error contract and correlation ID', async 
   assert.equal(payload.requestId, response.headers.get('x-request-id'))
 })
 
+test('CORS preflight is handled before API routes', async () => {
+  const origin = 'https://aptech-ticket-to-techwiz-path-seeke.vercel.app'
+  const response = await fetch(`${baseUrl}/api/auth/login`, {
+    method: 'OPTIONS',
+    headers: {
+      origin,
+      'access-control-request-method': 'POST',
+      'access-control-request-headers': 'content-type',
+    },
+  })
+
+  assert.equal(response.status, 204)
+  assert.equal(response.headers.get('access-control-allow-origin'), origin)
+  assert.equal(response.headers.get('access-control-allow-credentials'), 'true')
+  assert.match(response.headers.get('access-control-allow-methods'), /POST/)
+  assert.match(response.headers.get('access-control-allow-headers'), /Content-Type/i)
+
+  const demoOrigin = 'https://pathseeker-demo.alync.co'
+  const demoResponse = await fetch(`${baseUrl}/api/auth/login`, {
+    method: 'OPTIONS',
+    headers: {
+      origin: demoOrigin,
+      'access-control-request-method': 'POST',
+      'access-control-request-headers': 'content-type',
+    },
+  })
+  assert.equal(demoResponse.status, 204)
+  assert.equal(demoResponse.headers.get('access-control-allow-origin'), demoOrigin)
+  assert.equal(demoResponse.headers.get('access-control-allow-credentials'), 'true')
+})
+
 test('email verification endpoints reject malformed requests before database access', async () => {
   const verifyResponse = await fetch(`${baseUrl}/api/auth/verify-email`, {
     method: 'POST',

@@ -22,7 +22,19 @@ export const env = {
   mongodbUri: process.env.MONGODB_URI,
   mongodbDbName: process.env.MONGODB_DB_NAME,
 
-  frontendOrigins: toList(process.env.FRONTEND_ORIGIN, ['https://aptech-ticket-to-techwiz-path-seeke.vercel.app']),
+  frontendOrigins: toList(
+    process.env.FRONTEND_ORIGIN || process.env.FRONTEND_ORIGINS || process.env.FRONTEND_ORIGIN,
+    [
+      'https://pathseeker-demo.alync.co',
+      'http://pathseeker-demo.alync.co',
+      'https://aptech-ticket-to-techwiz-path-seeke.vercel.app',
+      'http://localhost:5173',
+      'https://localhost:5173',
+      'http://localhost:3000',
+      '*.alync.co',
+      '*.vercel.app',
+    ],
+  ),
 
   sessionCookieName: process.env.SESSION_COOKIE_NAME || 'ps_session',
   sessionTtlDays: toInt(process.env.SESSION_TTL_DAYS, 30),
