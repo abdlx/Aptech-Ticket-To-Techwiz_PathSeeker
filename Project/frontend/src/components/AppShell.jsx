@@ -26,6 +26,17 @@ export default function AppShell({ screen, navigate, children, onVoice, mobileMe
     'media-detail': 'Media player', 'document-preview': 'Document preview', 'story-detail': 'Success story',
     'submit-story': 'Share your story', help: 'Help center',
   }
+  const user = auth?.user
+  const initials = user?.name
+    ? user.name.split(/\s+/).map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'PS'
+  const displayName = user?.name || 'Career Explorer'
+  const stageDisplay = user?.stage
+    ? `${user.stage.charAt(0).toUpperCase() + user.stage.slice(1)} Explorer`
+    : user?.role === 'admin' || user?.role === 'super_admin'
+      ? 'Administrator'
+      : 'Active Passport'
+
   return (
     <div className="app-layout">
       <aside className={`sidebar ${mobileMenu ? 'open' : ''}`}>
@@ -56,9 +67,9 @@ export default function AppShell({ screen, navigate, children, onVoice, mobileMe
           <p>Talk it through with Navi, your career guide.</p>
           <button onClick={onVoice}><Icon name="mic" size={17} /> Talk to Navi</button>
         </div>
-        <button className="user-chip" onClick={() => navigate('profile')}>
-          <span className="avatar">AM</span>
-          <span><strong>Alex Morgan</strong><small>Explorer plan</small></span>
+        <button className="user-chip" onClick={() => navigate('profile')} aria-label={`View profile for ${displayName}`}>
+          <span className="avatar">{initials}</span>
+          <span><strong>{displayName}</strong><small>{stageDisplay}</small></span>
           <Icon name="more" />
         </button>
       </aside>
@@ -105,7 +116,7 @@ export default function AppShell({ screen, navigate, children, onVoice, mobileMe
             </div>
             <button className="voice-pill" onClick={onVoice}><span className="mini-wave"><i /><i /><i /></span><span>Talk to Navi</span></button>
             <button className="icon-button notification" aria-label="Notifications" onClick={() => navigate('notifications')}><Icon name="bell" /><span /></button>
-            <button className="avatar small" onClick={() => navigate('profile')}>AM</button>
+            <button className="avatar small" onClick={() => navigate('profile')} title={`Profile: ${displayName}`}>{initials}</button>
           </div>
         </header>
         <main className="page-content">{children}</main>
