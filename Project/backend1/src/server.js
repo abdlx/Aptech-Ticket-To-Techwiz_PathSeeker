@@ -1,14 +1,7 @@
-import dns from 'node:dns'
 import { pathToFileURL } from 'node:url'
 import { createApp } from './app.js'
 import { connectDatabase, disconnectDatabase } from './config/database.js'
 import { assertRequiredEnv, env } from './config/env.js'
-
-// Fix: The system DNS resolver on this machine refuses SRV queries, which
-// prevents MongoDB Atlas SRV connection strings from resolving. Force Node.js
-// to use Cloudflare (1.1.1.1) and Google (8.8.8.8) public DNS instead.
-// This must run before any mongoose.connect() call.
-dns.setServers(['1.1.1.1', '8.8.8.8'])
 
 export async function startServer() {
   assertRequiredEnv()

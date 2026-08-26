@@ -55,7 +55,10 @@ export async function listAttempts(userId) {
 }
 
 export async function getAttempt(userId, attemptId) {
-  const attempt = await QuizAttempt.findOne({ _id: attemptId, userId }).populate('topCareerId', 'title slug')
+  const attempt = await QuizAttempt.findOne({ _id: attemptId, userId })
+    .populate('topCareerId', 'title slug')
+    .populate('passportId')
+    .populate({ path: 'recommendationSnapshotId', populate: { path: 'matches.careerId', select: 'title slug summary description iconKey colorTone' } })
   if (!attempt) throw new AppError(404, 'Quiz attempt not found.', 'NOT_FOUND')
   return attempt
 }

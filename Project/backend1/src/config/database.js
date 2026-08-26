@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import dns from 'node:dns'
 
 const DEFAULT_OPTIONS = Object.freeze({
   serverSelectionTimeoutMS: 10_000,
@@ -22,6 +23,13 @@ export async function connectDatabase({ uri, dbName, options = {} } = {}) {
 
   if (mongoose.connection.readyState === 1) {
     return mongoose.connection
+  }
+
+  // Some Windows/network configurations refuse SRV lookups through the
+  // system resolver. Apply the repository's reviewed fallback at the shared
+  // adapter boundary so the server, seeds, and integration tools behave alike.
+  if (connectionUri.startsWith('mongodb+srv://')) {
+    dns.setServers(['1.1.1.1', '8.8.8.8'])
   }
 
   await mongoose.connect(connectionUri, {

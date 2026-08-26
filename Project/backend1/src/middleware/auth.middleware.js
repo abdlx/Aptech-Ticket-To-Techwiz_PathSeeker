@@ -17,7 +17,7 @@ export const requireAuth = asyncHandler(async (req, _res, next) => {
     throw new AppError(401, 'You must be logged in to do that.', 'UNAUTHENTICATED')
   }
 
-  req.user = user.toJSON()
+  req.user = { ...user.toJSON(), id: user._id.toString() }
   req.session = session
   next()
 })

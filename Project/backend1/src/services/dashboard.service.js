@@ -9,10 +9,11 @@ import {
 } from '../models/index.js'
 
 export async function getDashboard(user) {
-  const [profile, passport, attempts, bookmarkCount, bookmarks, recentActivity, trendingCareers] = await Promise.all([
+  const [profile, passport, attempts, attemptCount, bookmarkCount, bookmarks, recentActivity, trendingCareers] = await Promise.all([
     UserProfile.findOne({ userId: user.id }),
     CareerPassport.findOne({ userId: user.id }).sort({ calculatedAt: -1 }).populate('skills.skillId', 'name slug'),
     QuizAttempt.find({ userId: user.id }).sort({ createdAt: -1 }).limit(3).populate('topCareerId', 'title slug'),
+    QuizAttempt.countDocuments({ userId: user.id, status: 'completed' }),
     Bookmark.countDocuments({ userId: user.id }),
     Bookmark.find({ userId: user.id }).sort({ createdAt: -1 }).limit(4).populate('itemId'),
     RecentlyViewed.find({ userId: user.id }).sort({ viewedAt: -1 }).limit(5).populate('itemId'),
@@ -35,7 +36,7 @@ export async function getDashboard(user) {
     passport,
     topMatches: snapshot?.matches?.slice(0, 3) || [],
     latestAttempt: attempts[0] || null,
-    attemptCount: attempts.filter(({ status }) => status === 'completed').length,
+    attemptCount,
     bookmarkCount,
     bookmarks,
     recentActivity,

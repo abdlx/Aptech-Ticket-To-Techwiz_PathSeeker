@@ -1,7 +1,8 @@
 export const queryKeys = {
   auth: { me: () => ['auth', 'me'] }, profile: { me: () => ['profile', 'me'] },
+  dashboard: { me: () => ['dashboard', 'me'] }, passport: { me: () => ['passport', 'me'] },
   careers: { list: (filters = {}) => ['careers', 'list', filters], detail: (slug) => ['careers', 'detail', slug] },
-  recommendations: { me: () => ['recommendations', 'me'] },
+  recommendations: { me: () => ['recommendations', 'me'], career: (slug) => ['recommendations', 'career', slug] },
   quiz: { questions: (version) => ['quiz', 'questions', version], attempts: { list: (params = {}) => ['quiz', 'attempts', params], detail: (id) => ['quiz', 'attempt', id] } },
   bookmarks: { list: (params = {}) => ['bookmarks', params] }, recentlyViewed: { list: (params = {}) => ['recently-viewed', params] },
   savedFilters: { list: () => ['saved-filters'] }, comparisons: { list: () => ['comparisons'] },

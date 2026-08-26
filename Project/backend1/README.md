@@ -1,39 +1,36 @@
-# PathSeeker database package
+# PathSeeker API
 
-This directory contains the Phase 1 MongoDB/Mongoose domain layer. It intentionally does not include Express controllers or routes.
+This package is the Express/Mongoose backend for PathSeeker. It contains the HTTP API, secure opaque-session authentication, validation/controllers/services, MongoDB models, deterministic seeds, and automated tests.
 
-## Included models
+See the repository [README](../../README.md) for complete full-stack setup, architecture, evaluator identities, and current limitations.
 
-- `Skill`
-- `Domain`
-- `User`
-- `UserProfile`
-- `Session`
-- `VerificationToken`
+## Commands
 
-`UserProfile` stores user-provided facts. Calculated Career Passport state belongs to the Phase 2 `CareerPassport` model and must be written only by its future domain service.
+```powershell
+npm.cmd ci
+npm.cmd test
+npm.cmd run seed
+npm.cmd run seed:reset
+npm.cmd start
+```
 
-## Local setup
+Copy `.env.example` to `.env` before starting or seeding. `seed:reset` removes only deterministic seed-owned records, but it must still never target a database containing important data.
 
-1. Install Node.js 20 or newer and MongoDB 7 or newer.
-2. Copy `.env.example` to `.env` and replace the placeholder demo password.
-3. Run `npm install`.
-4. Run `npm test`.
-5. Start MongoDB and run `npm run seed`.
+## Health
 
-Use `npm run seed:reset` to remove and recreate only the deterministic records owned by the seed scripts. It does not delete arbitrary development data.
+- `GET /api/health` checks the Express process.
+- `GET /api/health/db` returns ready only while Mongoose is connected.
 
-## Live database tests
+## Career intelligence API
 
-The normal test suite validates Mongoose schemas and index contracts without requiring MongoDB. To additionally exercise persistence and unique/TTL index creation, set `TEST_MONGODB_URI` and `TEST_MONGODB_DB_NAME` to a disposable test database before running `npm test`.
+- `GET /api/quiz-questions` — active published quiz without private scoring weights.
+- `POST /api/quiz-attempts` — create or resume the current version's attempt.
+- `PATCH /api/quiz-attempts/:id/answer` — persist an answer by immutable question key.
+- `POST /api/quiz-attempts/:id/complete` — generate the Passport and recommendation snapshot.
+- `GET /api/users/me/passport` — latest Career Passport.
+- `GET /api/users/me/recommendations` — latest explainable recommendation snapshot.
+- `GET /api/users/me/careers/:slug/intelligence` — match, readiness, and skill gap.
+- `POST /api/users/me/careers/:slug/simulate` — stateless skill-level simulation.
+- `GET /api/users/me/dashboard` — live user dashboard aggregation.
 
-Never point the integration tests or reset seed command at a database containing important data.
-
-## Demo identities created by the seed
-
-- `admin@pathseeker.local` — super administrator
-- `demo.student@pathseeker.local` — student
-- `demo.graduate@pathseeker.local` — graduate
-- `demo.professional@pathseeker.local` — professional
-
-All demo identities use the private password supplied through `SEED_DEMO_PASSWORD`; the password is never committed.
+All `/users/me` and assessment-mutation endpoints require the session cookie. Scores are calculated by backend services and are never trusted from client payloads.
