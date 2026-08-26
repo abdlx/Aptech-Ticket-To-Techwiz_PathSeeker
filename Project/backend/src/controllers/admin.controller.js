@@ -1,0 +1,262 @@
+import * as adminService from '../services/admin.service.js'
+import AppError from '../utils/AppError.js'
+import { asyncHandler } from '../utils/asyncHandler.js'
+import { parsePagination } from '../utils/pagination.js'
+import { isNonEmptyString } from '../utils/validators.js'
+import {
+  FEEDBACK_CATEGORIES,
+  FEEDBACK_STATUSES,
+  MULTIMEDIA_TYPES,
+  RESOURCE_TYPES,
+  STORY_STATUSES,
+  USER_ROLES,
+  USER_STAGES,
+  USER_STATUSES,
+} from '../constants/database.js'
+
+// --- Users -------------------------------------------------------------
+
+export const getUsers = asyncHandler(async (req, res) => {
+  const { q, stage, status } = req.query
+  if (stage && !USER_STAGES.includes(stage)) {
+    throw new AppError(400, `stage must be one of: ${USER_STAGES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  if (status && !USER_STATUSES.includes(status)) {
+    throw new AppError(400, `status must be one of: ${USER_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  const { page, limit, skip } = parsePagination(req.query)
+  const { users, meta } = await adminService.listUsers({ q, stage, status, page, limit, skip })
+  res.status(200).json({ data: { users, meta } })
+})
+
+export const getUserById = asyncHandler(async (req, res) => {
+  const user = await adminService.getUserById(req.params.id)
+  res.status(200).json({ data: { user } })
+})
+
+export const updateUser = asyncHandler(async (req, res) => {
+  const { role, status } = req.body
+  if (role && !USER_ROLES.includes(role)) {
+    throw new AppError(400, `role must be one of: ${USER_ROLES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  if (status && !USER_STATUSES.includes(status)) {
+    throw new AppError(400, `status must be one of: ${USER_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  const user = await adminService.updateUser(req.params.id, { role, status })
+  res.status(200).json({ data: { user } })
+})
+
+// --- Careers -------------------------------------------------------------
+
+export const getCareers = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = parsePagination(req.query)
+  const { careers, meta } = await adminService.listAllCareers({ page, limit, skip })
+  res.status(200).json({ data: { careers, meta } })
+})
+
+export const createCareer = asyncHandler(async (req, res) => {
+  const { slug, title, domainId } = req.body
+  if (!isNonEmptyString(slug, { min: 2, max: 150 }) || !isNonEmptyString(title, { min: 2, max: 150 })) {
+    throw new AppError(400, 'slug and title are required.', 'VALIDATION_ERROR')
+  }
+  if (!isNonEmptyString(domainId, { min: 12, max: 64 })) {
+    throw new AppError(400, 'domainId is required.', 'VALIDATION_ERROR')
+  }
+  const career = await adminService.createCareer(req.user.id, req.body)
+  res.status(201).json({ data: { career } })
+})
+
+export const updateCareer = asyncHandler(async (req, res) => {
+  const career = await adminService.updateCareer(req.params.id, req.body)
+  res.status(200).json({ data: { career } })
+})
+
+export const deleteCareer = asyncHandler(async (req, res) => {
+  await adminService.deleteCareer(req.params.id)
+  res.status(200).json({ data: null, message: 'Career deleted.' })
+})
+
+// --- Quiz questions -------------------------------------------------------------
+
+export const getQuizQuestions = asyncHandler(async (_req, res) => {
+  const questions = await adminService.listAllQuizQuestions()
+  res.status(200).json({ data: { questions } })
+})
+
+export const createQuizQuestion = asyncHandler(async (req, res) => {
+  const { questionText, options } = req.body
+  if (!isNonEmptyString(questionText, { min: 3, max: 500 })) {
+    throw new AppError(400, 'questionText is required.', 'VALIDATION_ERROR')
+  }
+  if (!Array.isArray(options) || options.length < 2) {
+    throw new AppError(400, 'options must contain at least two entries.', 'VALIDATION_ERROR')
+  }
+  const question = await adminService.createQuizQuestion(req.user.id, req.body)
+  res.status(201).json({ data: { question } })
+})
+
+export const updateQuizQuestion = asyncHandler(async (req, res) => {
+  const question = await adminService.updateQuizQuestion(req.params.id, req.body)
+  res.status(200).json({ data: { question } })
+})
+
+export const deleteQuizQuestion = asyncHandler(async (req, res) => {
+  await adminService.deleteQuizQuestion(req.params.id)
+  res.status(200).json({ data: null, message: 'Quiz question deleted.' })
+})
+
+// --- Resources -------------------------------------------------------------
+
+export const getResources = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = parsePagination(req.query)
+  const { resources, meta } = await adminService.listAllResources({ page, limit, skip })
+  res.status(200).json({ data: { resources, meta } })
+})
+
+export const createResource = asyncHandler(async (req, res) => {
+  const { title, type, file } = req.body
+  if (!isNonEmptyString(title, { min: 2, max: 200 })) {
+    throw new AppError(400, 'title must be between 2 and 200 characters.', 'VALIDATION_ERROR')
+  }
+  if (!RESOURCE_TYPES.includes(type)) {
+    throw new AppError(400, `type must be one of: ${RESOURCE_TYPES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  if (!isNonEmptyString(file?.url, { min: 1, max: 2_000 })) {
+    throw new AppError(400, 'file.url is required.', 'VALIDATION_ERROR')
+  }
+  const resource = await adminService.createResource(req.user.id, req.body)
+  res.status(201).json({ data: { resource } })
+})
+
+export const updateResource = asyncHandler(async (req, res) => {
+  const resource = await adminService.updateResource(req.params.id, req.body)
+  res.status(200).json({ data: { resource } })
+})
+
+export const deleteResource = asyncHandler(async (req, res) => {
+  await adminService.deleteResource(req.params.id)
+  res.status(200).json({ data: null, message: 'Resource deleted.' })
+})
+
+// --- Multimedia -------------------------------------------------------------
+
+export const getMedia = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = parsePagination(req.query)
+  const { media, meta } = await adminService.listAllMedia({ page, limit, skip })
+  res.status(200).json({ data: { media, meta } })
+})
+
+export const createMedia = asyncHandler(async (req, res) => {
+  const { title, type, url } = req.body
+  if (!isNonEmptyString(title, { min: 2, max: 200 })) {
+    throw new AppError(400, 'title must be between 2 and 200 characters.', 'VALIDATION_ERROR')
+  }
+  if (!MULTIMEDIA_TYPES.includes(type)) {
+    throw new AppError(400, `type must be one of: ${MULTIMEDIA_TYPES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  if (!isNonEmptyString(url, { min: 1, max: 2_000 })) {
+    throw new AppError(400, 'url is required.', 'VALIDATION_ERROR')
+  }
+  const media = await adminService.createMedia(req.user.id, req.body)
+  res.status(201).json({ data: { media } })
+})
+
+export const updateMedia = asyncHandler(async (req, res) => {
+  const media = await adminService.updateMedia(req.params.id, req.body)
+  res.status(200).json({ data: { media } })
+})
+
+export const deleteMedia = asyncHandler(async (req, res) => {
+  await adminService.deleteMedia(req.params.id)
+  res.status(200).json({ data: null, message: 'Media deleted.' })
+})
+
+// --- Story approval workflow -------------------------------------------------------------
+
+export const getStories = asyncHandler(async (req, res) => {
+  const { status } = req.query
+  if (status && !STORY_STATUSES.includes(status)) {
+    throw new AppError(400, `status must be one of: ${STORY_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  const { page, limit, skip } = parsePagination(req.query)
+  const { stories, meta } = await adminService.listAllStories({ status, page, limit, skip })
+  res.status(200).json({ data: { stories, meta } })
+})
+
+export const approveStory = asyncHandler(async (req, res) => {
+  const story = await adminService.approveStory(req.user.id, req.params.id)
+  res.status(200).json({ data: { story }, message: 'Story approved.' })
+})
+
+export const rejectStory = asyncHandler(async (req, res) => {
+  const story = await adminService.rejectStory(req.user.id, req.params.id)
+  res.status(200).json({ data: { story }, message: 'Story rejected.' })
+})
+
+// --- Feedback -------------------------------------------------------------
+
+export const getFeedback = asyncHandler(async (req, res) => {
+  const { status, category } = req.query
+  if (status && !FEEDBACK_STATUSES.includes(status)) {
+    throw new AppError(400, `status must be one of: ${FEEDBACK_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  if (category && !FEEDBACK_CATEGORIES.includes(category)) {
+    throw new AppError(400, `category must be one of: ${FEEDBACK_CATEGORIES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  const { page, limit, skip } = parsePagination(req.query)
+  const { feedback, meta } = await adminService.listAllFeedback({ status, category, page, limit, skip })
+  res.status(200).json({ data: { feedback, meta } })
+})
+
+export const respondToFeedback = asyncHandler(async (req, res) => {
+  const { response, status } = req.body
+  if (!isNonEmptyString(response, { min: 1, max: 2_000 })) {
+    throw new AppError(400, 'response is required.', 'VALIDATION_ERROR')
+  }
+  if (status && !FEEDBACK_STATUSES.includes(status)) {
+    throw new AppError(400, `status must be one of: ${FEEDBACK_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
+  }
+  const feedback = await adminService.respondToFeedback(req.user.id, req.params.id, { response, status })
+  res.status(200).json({ data: { feedback }, message: 'Response sent.' })
+})
+
+export const getFeedbackAnalytics = asyncHandler(async (_req, res) => {
+  const analytics = await adminService.getFeedbackAnalytics()
+  res.status(200).json({ data: { analytics } })
+})
+
+// --- Usage statistics -------------------------------------------------------------
+
+export const getStats = asyncHandler(async (_req, res) => {
+  const stats = await adminService.getUsageStats()
+  res.status(200).json({ data: { stats } })
+})
+
+export default {
+  getUsers,
+  getUserById,
+  updateUser,
+  getCareers,
+  createCareer,
+  updateCareer,
+  deleteCareer,
+  getQuizQuestions,
+  createQuizQuestion,
+  updateQuizQuestion,
+  deleteQuizQuestion,
+  getResources,
+  createResource,
+  updateResource,
+  deleteResource,
+  getMedia,
+  createMedia,
+  updateMedia,
+  deleteMedia,
+  getStories,
+  approveStory,
+  rejectStory,
+  getFeedback,
+  respondToFeedback,
+  getFeedbackAnalytics,
+  getStats,
+}
