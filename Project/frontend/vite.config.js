@@ -6,6 +6,15 @@ import process from 'node:process'
 export default defineConfig({
   base: '/',
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name]-[hash]-v2.js',
+        chunkFileNames: 'assets/[name]-[hash]-v2.js',
+        assetFileNames: 'assets/[name]-[hash]-v2.[ext]',
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': { target: process.env.VITE_BACKEND_URL || 'http://localhost:4000', changeOrigin: true },
