@@ -11,10 +11,17 @@ node_modules
 dist
 dist-ssr
 *.local
+
 mockup/
 Documentation/
+graphify-out/
+
 PathSeeker_Career_Passport_SRS_Clean.md
 PATHSEEKER_PROJECT_TASKSHEET.md
+BACKEND_AUDIT_AND_REMAINING_WORK.md
+FRESH_SRS_FUNCTIONAL_AUDIT.md
+FULL_STACK_IMPLEMENTATION_PLAN.md
+PATHSEEKER_COMPLETION_PROMPT.md
 
 # Editor directories and files
 .vscode/*
