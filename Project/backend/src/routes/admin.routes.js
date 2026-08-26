@@ -5,8 +5,8 @@ import { STAFF_ROLES, USER_MANAGEMENT_ROLES } from '../constants/database.js'
 
 const router = Router()
 
-// Every /admin/* route needs a logged-in staff account. requireAuth first,
-// then a per-route requireRole narrows it further.
+// Every /admin/* route needs a logged-in staff account.
+// requireAuth first, then requireRole ensures the user has a staff role.
 router.use(requireAuth, requireRole(...STAFF_ROLES))
 
 // User management is sensitive (role/status changes) — admin/super_admin only.
@@ -47,6 +47,16 @@ router.get('/feedback', adminController.getFeedback)
 router.patch('/feedback/:id/respond', adminController.respondToFeedback)
 router.get('/feedback/analytics', adminController.getFeedbackAnalytics)
 
+// Dashboard statistics — any staff role.
 router.get('/stats', adminController.getStats)
 
+// Audit logs are sensitive oversight data — admin/super_admin only,
+// same permission level as user management.
+router.get(
+  '/audit-logs',
+  requireRole(...USER_MANAGEMENT_ROLES),
+  adminController.getAuditLogs
+)
+
 export default router
+ 

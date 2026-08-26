@@ -9,6 +9,7 @@ import {
   SuccessStory,
   User,
 } from '../models/index.js'
+import { logAction } from './auditLog.service.js'
 import { buildPaginationMeta } from '../utils/pagination.js'
 import AppError from '../utils/AppError.js'
 
@@ -40,11 +41,12 @@ export async function getUserById(id) {
   return user
 }
 
-export async function updateUser(id, { role, status }) {
+export async function updateUser(adminUserId, id, { role, status }) {
   const user = await getUserById(id)
   if (role) user.role = role
   if (status) user.status = status
   await user.save()
+  await logAction(adminUserId, 'user.update', 'User', user._id, { role, status })
   return user
 }
 
@@ -61,24 +63,28 @@ export async function listAllCareers({ page, limit, skip }) {
 }
 
 export async function createCareer(adminUserId, payload) {
-  return Career.create({ ...payload, createdBy: adminUserId })
+  const career = await Career.create({ ...payload, createdBy: adminUserId })
+  await logAction(adminUserId, 'career.create', 'Career', career._id)
+  return career
 }
 
-export async function updateCareer(careerId, payload) {
+export async function updateCareer(adminUserId, careerId, payload) {
   const career = await Career.findById(careerId)
   if (!career) {
     throw new AppError(404, 'Career not found.', 'NOT_FOUND')
   }
   Object.assign(career, payload)
   await career.save()
+  await logAction(adminUserId, 'career.update', 'Career', career._id)
   return career
 }
 
-export async function deleteCareer(careerId) {
+export async function deleteCareer(adminUserId, careerId) {
   const result = await Career.deleteOne({ _id: careerId })
   if (result.deletedCount === 0) {
     throw new AppError(404, 'Career not found.', 'NOT_FOUND')
   }
+  await logAction(adminUserId, 'career.delete', 'Career', careerId)
 }
 
 // ---------------------------------------------------------------------------
@@ -90,28 +96,32 @@ export async function listAllQuizQuestions() {
 }
 
 export async function createQuizQuestion(adminUserId, payload) {
-  return QuizQuestion.create({ ...payload, createdBy: adminUserId })
+  const question = await QuizQuestion.create({ ...payload, createdBy: adminUserId })
+  await logAction(adminUserId, 'quizQuestion.create', 'QuizQuestion', question._id)
+  return question
 }
 
-export async function updateQuizQuestion(questionId, payload) {
+export async function updateQuizQuestion(adminUserId, questionId, payload) {
   const question = await QuizQuestion.findById(questionId)
   if (!question) {
     throw new AppError(404, 'Quiz question not found.', 'NOT_FOUND')
   }
   Object.assign(question, payload)
   await question.save()
+  await logAction(adminUserId, 'quizQuestion.update', 'QuizQuestion', question._id)
   return question
 }
 
-export async function deleteQuizQuestion(questionId) {
+export async function deleteQuizQuestion(adminUserId, questionId) {
   const result = await QuizQuestion.deleteOne({ _id: questionId })
   if (result.deletedCount === 0) {
     throw new AppError(404, 'Quiz question not found.', 'NOT_FOUND')
   }
+  await logAction(adminUserId, 'quizQuestion.delete', 'QuizQuestion', questionId)
 }
 
 // ---------------------------------------------------------------------------
-// Resources (full CRUD, including inactive) — Milestone 6 Part B
+// Resources (full CRUD, including inactive)
 // ---------------------------------------------------------------------------
 
 export async function listAllResources({ page, limit, skip }) {
@@ -123,28 +133,32 @@ export async function listAllResources({ page, limit, skip }) {
 }
 
 export async function createResource(adminUserId, payload) {
-  return Resource.create({ ...payload, createdBy: adminUserId })
+  const resource = await Resource.create({ ...payload, createdBy: adminUserId })
+  await logAction(adminUserId, 'resource.create', 'Resource', resource._id)
+  return resource
 }
 
-export async function updateResource(resourceId, payload) {
+export async function updateResource(adminUserId, resourceId, payload) {
   const resource = await Resource.findById(resourceId)
   if (!resource) {
     throw new AppError(404, 'Resource not found.', 'NOT_FOUND')
   }
   Object.assign(resource, payload)
   await resource.save()
+  await logAction(adminUserId, 'resource.update', 'Resource', resource._id)
   return resource
 }
 
-export async function deleteResource(resourceId) {
+export async function deleteResource(adminUserId, resourceId) {
   const result = await Resource.deleteOne({ _id: resourceId })
   if (result.deletedCount === 0) {
     throw new AppError(404, 'Resource not found.', 'NOT_FOUND')
   }
+  await logAction(adminUserId, 'resource.delete', 'Resource', resourceId)
 }
 
 // ---------------------------------------------------------------------------
-// Multimedia (full CRUD, including inactive) — Milestone 6 Part B
+// Multimedia (full CRUD, including inactive)
 // ---------------------------------------------------------------------------
 
 export async function listAllMedia({ page, limit, skip }) {
@@ -156,28 +170,32 @@ export async function listAllMedia({ page, limit, skip }) {
 }
 
 export async function createMedia(adminUserId, payload) {
-  return Multimedia.create({ ...payload, createdBy: adminUserId })
+  const media = await Multimedia.create({ ...payload, createdBy: adminUserId })
+  await logAction(adminUserId, 'media.create', 'Multimedia', media._id)
+  return media
 }
 
-export async function updateMedia(mediaId, payload) {
+export async function updateMedia(adminUserId, mediaId, payload) {
   const media = await Multimedia.findById(mediaId)
   if (!media) {
     throw new AppError(404, 'Media not found.', 'NOT_FOUND')
   }
   Object.assign(media, payload)
   await media.save()
+  await logAction(adminUserId, 'media.update', 'Multimedia', media._id)
   return media
 }
 
-export async function deleteMedia(mediaId) {
+export async function deleteMedia(adminUserId, mediaId) {
   const result = await Multimedia.deleteOne({ _id: mediaId })
   if (result.deletedCount === 0) {
     throw new AppError(404, 'Media not found.', 'NOT_FOUND')
   }
+  await logAction(adminUserId, 'media.delete', 'Multimedia', mediaId)
 }
 
 // ---------------------------------------------------------------------------
-// Success story approval workflow — Milestone 6 Part B
+// Success story approval workflow
 // ---------------------------------------------------------------------------
 
 export async function listAllStories({ status, page, limit, skip }) {
@@ -208,8 +226,8 @@ export async function approveStory(adminUserId, storyId) {
   const story = await getStoryOrThrow(storyId)
   story.status = 'approved'
   story.approvedBy = adminUserId
-  // approvedAt is set automatically by the model's pre('validate') hook.
   await story.save()
+  await logAction(adminUserId, 'story.approve', 'SuccessStory', story._id)
   return story
 }
 
@@ -218,11 +236,12 @@ export async function rejectStory(adminUserId, storyId) {
   story.status = 'rejected'
   story.approvedBy = adminUserId
   await story.save()
+  await logAction(adminUserId, 'story.reject', 'SuccessStory', story._id)
   return story
 }
 
 // ---------------------------------------------------------------------------
-// Feedback (admin view + response) — Milestone 6 Part B
+// Feedback (admin view + response)
 // ---------------------------------------------------------------------------
 
 export async function listAllFeedback({ status, category, page, limit, skip }) {
@@ -245,15 +264,11 @@ export async function respondToFeedback(adminUserId, feedbackId, { response, sta
   feedback.response = response
   feedback.respondedBy = adminUserId
   if (status) feedback.status = status
-  // respondedAt is set automatically by the model's pre('validate') hook.
   await feedback.save()
+  await logAction(adminUserId, 'feedback.respond', 'Feedback', feedback._id, { status })
   return feedback
 }
 
-// Real aggregate counts (by category, by status). Note: the SRS mentions a
-// "sentiment summary" — true sentiment analysis needs an NLP provider that
-// hasn't been chosen/confirmed, so it's intentionally left out here rather
-// than faked. Category/status breakdowns below are genuine DB aggregates.
 export async function getFeedbackAnalytics() {
   const [byCategory, byStatus, total] = await Promise.all([
     Feedback.aggregate([{ $group: { _id: '$category', count: { $sum: 1 } } }]),
@@ -265,8 +280,7 @@ export async function getFeedbackAnalytics() {
 }
 
 // ---------------------------------------------------------------------------
-// Usage statistics (SRS: "View usage statistics: active users, quiz
-// attempts, popular content")
+// Usage statistics
 // ---------------------------------------------------------------------------
 
 export async function getUsageStats() {

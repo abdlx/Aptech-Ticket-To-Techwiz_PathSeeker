@@ -6,6 +6,7 @@ import feedbackRoutes from './feedback.routes.js'
 import mediaRoutes from './media.routes.js'
 import notificationRoutes from './notification.routes.js'
 import personalizationRoutes from './personalization.routes.js'
+import profileRoutes from './profile.routes.js'
 import quizAttemptsRoutes from './quizAttempts.routes.js'
 import quizQuestionsRoutes from './quizQuestions.routes.js'
 import resourceRoutes from './resource.routes.js'
@@ -21,6 +22,7 @@ router.use('/', catalogRoutes)
 router.use('/notifications', notificationRoutes)
 router.use('/quiz-questions', quizQuestionsRoutes)
 router.use('/quiz-attempts', quizAttemptsRoutes)
+router.use('/users/me/profile', profileRoutes)
 router.use('/users/me', personalizationRoutes)
 router.use('/resources', resourceRoutes)
 router.use('/media', mediaRoutes)

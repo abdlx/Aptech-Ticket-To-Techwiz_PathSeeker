@@ -1,4 +1,5 @@
 import * as adminService from '../services/admin.service.js'
+import * as auditLogService from '../services/auditLog.service.js'
 import AppError from '../utils/AppError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { parsePagination } from '../utils/pagination.js'
@@ -42,7 +43,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   if (status && !USER_STATUSES.includes(status)) {
     throw new AppError(400, `status must be one of: ${USER_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
   }
-  const user = await adminService.updateUser(req.params.id, { role, status })
+  const user = await adminService.updateUser(req.user.id, req.params.id, { role, status })
   res.status(200).json({ data: { user } })
 })
 
@@ -67,12 +68,12 @@ export const createCareer = asyncHandler(async (req, res) => {
 })
 
 export const updateCareer = asyncHandler(async (req, res) => {
-  const career = await adminService.updateCareer(req.params.id, req.body)
+  const career = await adminService.updateCareer(req.user.id, req.params.id, req.body)
   res.status(200).json({ data: { career } })
 })
 
 export const deleteCareer = asyncHandler(async (req, res) => {
-  await adminService.deleteCareer(req.params.id)
+  await adminService.deleteCareer(req.user.id, req.params.id)
   res.status(200).json({ data: null, message: 'Career deleted.' })
 })
 
@@ -96,12 +97,12 @@ export const createQuizQuestion = asyncHandler(async (req, res) => {
 })
 
 export const updateQuizQuestion = asyncHandler(async (req, res) => {
-  const question = await adminService.updateQuizQuestion(req.params.id, req.body)
+  const question = await adminService.updateQuizQuestion(req.user.id, req.params.id, req.body)
   res.status(200).json({ data: { question } })
 })
 
 export const deleteQuizQuestion = asyncHandler(async (req, res) => {
-  await adminService.deleteQuizQuestion(req.params.id)
+  await adminService.deleteQuizQuestion(req.user.id, req.params.id)
   res.status(200).json({ data: null, message: 'Quiz question deleted.' })
 })
 
@@ -129,12 +130,12 @@ export const createResource = asyncHandler(async (req, res) => {
 })
 
 export const updateResource = asyncHandler(async (req, res) => {
-  const resource = await adminService.updateResource(req.params.id, req.body)
+  const resource = await adminService.updateResource(req.user.id, req.params.id, req.body)
   res.status(200).json({ data: { resource } })
 })
 
 export const deleteResource = asyncHandler(async (req, res) => {
-  await adminService.deleteResource(req.params.id)
+  await adminService.deleteResource(req.user.id, req.params.id)
   res.status(200).json({ data: null, message: 'Resource deleted.' })
 })
 
@@ -162,12 +163,12 @@ export const createMedia = asyncHandler(async (req, res) => {
 })
 
 export const updateMedia = asyncHandler(async (req, res) => {
-  const media = await adminService.updateMedia(req.params.id, req.body)
+  const media = await adminService.updateMedia(req.user.id, req.params.id, req.body)
   res.status(200).json({ data: { media } })
 })
 
 export const deleteMedia = asyncHandler(async (req, res) => {
-  await adminService.deleteMedia(req.params.id)
+  await adminService.deleteMedia(req.user.id, req.params.id)
   res.status(200).json({ data: null, message: 'Media deleted.' })
 })
 
@@ -232,6 +233,15 @@ export const getStats = asyncHandler(async (_req, res) => {
   res.status(200).json({ data: { stats } })
 })
 
+// --- Audit logs -------------------------------------------------------------
+
+export const getAuditLogs = asyncHandler(async (req, res) => {
+  const { actorId, targetType } = req.query
+  const { page, limit, skip } = parsePagination(req.query)
+  const { logs, meta } = await auditLogService.listAuditLogs({ actorId, targetType, page, limit, skip })
+  res.status(200).json({ data: { logs, meta } })
+})
+
 export default {
   getUsers,
   getUserById,
@@ -259,4 +269,5 @@ export default {
   respondToFeedback,
   getFeedbackAnalytics,
   getStats,
+  getAuditLogs,
 }
