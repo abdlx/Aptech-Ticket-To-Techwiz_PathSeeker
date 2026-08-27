@@ -7,7 +7,8 @@ export const respond = asyncHandler(async (req, res) => {
   if (!text || text.length > 500) {
     throw new AppError(400, 'Voice text must be between 1 and 500 characters.', 'VALIDATION_ERROR')
   }
-  res.status(200).json({ data: assistantService.respondToIntent(text) })
+  const result = await assistantService.respondToIntent(text, req.user)
+  res.status(200).json({ data: result })
 })
 
 export default { respond }

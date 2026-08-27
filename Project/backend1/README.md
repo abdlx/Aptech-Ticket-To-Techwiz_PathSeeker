@@ -34,3 +34,12 @@ Copy `.env.example` to `.env` before starting or seeding. `seed:reset` removes o
 - `GET /api/users/me/dashboard` — live user dashboard aggregation.
 
 All `/users/me` and assessment-mutation endpoints require the session cookie. Scores are calculated by backend services and are never trusted from client payloads.
+
+## Navi voice assistant API
+
+- `POST /api/assistant/respond` accepts `{ "text": "..." }` for guest guidance and authenticated Career Passport updates.
+- Informational questions remain public and rate-limited. Account mutations resolve the existing secure session cookie before touching profile data.
+- Supported updates include experience, education, approved catalog skills, interests, goals, target income, location, headline, and feedback.
+- Destructive list clearing requires Navi's explicit confirmation phrase; it is never inferred from an ambiguous request.
+
+Cloud voice is configured only in the frontend with `VITE_VAPI_PUBLIC_KEY` and optional `VITE_VAPI_ASSISTANT_ID`. When those values are absent or cloud voice fails, typed chat and browser speech continue to use this API.

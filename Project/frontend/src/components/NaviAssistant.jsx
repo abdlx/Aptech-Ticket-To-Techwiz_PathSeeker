@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon'
+import NaviDialog from '../voiceAgent/NaviDialog'
 
 const poseForState = {
   idle: '/assets/navi/navi-explaining.png',
@@ -15,7 +16,7 @@ const copyForState = {
   speaking: ['Here’s what I’m noticing', 'Your strongest matches combine creativity, empathy, and structured problem-solving. UX design is a great place to explore first.'],
 }
 
-export default function NaviAssistant({ open, onClose, context = 'your career journey' }) {
+export function NaviAssistantPrototype({ open, onClose, context = 'your career journey' }) {
   const [state, setState] = useState('idle')
   const [muted, setMuted] = useState(false)
   const timers = useRef([])
@@ -73,4 +74,8 @@ export default function NaviAssistant({ open, onClose, context = 'your career jo
       </div>
     </div>
   )
+}
+
+export default function NaviAssistant({ open, onClose, context = 'your career journey', navigate }) {
+  return open ? <NaviDialog onClose={onClose} context={context} navigate={navigate} /> : null
 }

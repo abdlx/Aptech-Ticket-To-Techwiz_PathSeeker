@@ -20,16 +20,25 @@ after(async () => {
   await new Promise((resolve) => server.close(resolve))
 })
 
-test('assistant service responds with matched intent and guidance', () => {
-  const quizMatch = respondToIntent('I want to take a quiz')
+test('assistant service responds with matched intent and guidance', async () => {
+  const quizMatch = await respondToIntent('I want to take a quiz')
   assert.equal(quizMatch.intent, 'quiz')
-  assert.match(quizMatch.reply, /career quiz/)
+  assert.match(quizMatch.reply, /assessment|Career Passport/)
 
-  const careerMatch = respondToIntent('show me careers')
+  const careerMatch = await respondToIntent('show me careers')
   assert.equal(careerMatch.intent, 'careers')
+  assert.match(careerMatch.reply, /Opening Career Bank/)
 
-  const fallback = respondToIntent('something unknown')
+  const fallback = await respondToIntent('something unknown')
   assert.equal(fallback.intent, 'help')
+})
+
+test('assistant never claims a guest profile mutation succeeded', async () => {
+  const result = await respondToIntent('Add experience Frontend Developer at Acme')
+  assert.equal(result.intent, 'login')
+  assert.equal(result.requiresAuth, true)
+  assert.equal(result.dataSaved, undefined)
+  assert.match(result.reply, /sign in/i)
 })
 
 test('assistant endpoint responds via HTTP', async () => {

@@ -56,7 +56,7 @@ function RequireUser({ staff = false }) {
 function PublicPage({ Component }) {
   const navigate = useLegacyNavigate()
   const [voiceOpen, setVoiceOpen] = useState(false)
-  return <><Component navigate={navigate} onVoice={() => setVoiceOpen(true)} /><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context="getting started" /></>
+  return <><Component navigate={navigate} onVoice={() => setVoiceOpen(true)} /><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} navigate={navigate} context="getting started" /></>
 }
 
 function AuthPageRoute({ Component }) {
@@ -82,7 +82,7 @@ function UserLayout() {
   const [voiceOpen, setVoiceOpen] = useState(false)
   const [mobileMenu, setMobileMenu] = useState(false)
   const screen = screenFromPath(location.pathname)
-  return <><AppShell screen={screen} navigate={navigate} onVoice={() => setVoiceOpen(true)} mobileMenu={mobileMenu} setMobileMenu={setMobileMenu}><Outlet /></AppShell><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context={screen.replaceAll('-', ' ')} /></>
+  return <><AppShell screen={screen} navigate={navigate} onVoice={() => setVoiceOpen(true)} mobileMenu={mobileMenu} setMobileMenu={setMobileMenu}><Outlet /></AppShell><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} navigate={navigate} context={screen.replaceAll('-', ' ')} /></>
 }
 
 function LegacyRoute({ Component }) {

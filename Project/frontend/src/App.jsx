@@ -93,7 +93,7 @@ function App() {
 
   if (screen === 'admin-login') return <AdminLoginPage navigate={navigate} />
   if (screen.startsWith('admin')) return <AdminPage screen={screen} navigate={navigate} />
-  if (screen === 'welcome') return <><WelcomePage navigate={navigate} onVoice={() => setVoiceOpen(true)} /><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context="getting started" /></>
+  if (screen === 'welcome') return <><WelcomePage navigate={navigate} onVoice={() => setVoiceOpen(true)} /><NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} navigate={navigate} context="getting started" /></>
   if (screen === 'signup') return <SignupPage navigate={navigate} />
   if (screen === 'login') return <LoginPage navigate={navigate} />
   if (screen === 'forgot-password') return <ForgotPasswordPage navigate={navigate} />
@@ -103,7 +103,7 @@ function App() {
   return (
     <>
       <AppShell screen={screen} navigate={navigate} onVoice={() => setVoiceOpen(true)} mobileMenu={mobileMenu} setMobileMenu={setMobileMenu}>{page}</AppShell>
-      <NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} context={screen.replace('-', ' ')} />
+      <NaviAssistant open={voiceOpen} onClose={() => setVoiceOpen(false)} navigate={navigate} context={screen.replace('-', ' ')} />
     </>
   )
 }

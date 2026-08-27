@@ -22,6 +22,23 @@ export const requireAuth = asyncHandler(async (req, _res, next) => {
   next()
 })
 
+// Public assistant questions should work without a session, while profile-changing
+// commands still need the same active user identity as protected endpoints.
+export const optionalAuth = asyncHandler(async (req, _res, next) => {
+  const rawToken = req.cookies?.[env.sessionCookieName]
+  if (!rawToken) return next()
+
+  const session = await findActiveSessionByRawToken(rawToken).catch(() => null)
+  if (!session) return next()
+
+  const user = await User.findById(session.userId)
+  if (user?.status === 'active') {
+    req.user = { ...user.toJSON(), id: user._id.toString() }
+    req.session = session
+  }
+  return next()
+})
+
 export function requireRole(...allowedRoles) {
   return function checkRole(req, _res, next) {
     if (!req.user) {
@@ -34,4 +51,4 @@ export function requireRole(...allowedRoles) {
   }
 }
 
-export default { requireAuth, requireRole }
+export default { optionalAuth, requireAuth, requireRole }
