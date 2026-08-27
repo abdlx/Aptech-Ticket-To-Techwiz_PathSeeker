@@ -1,8 +1,35 @@
+import { StrictMode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, it, vi } from 'vitest'
 import NaviAssistant from './NaviAssistant'
+
+const vapiInstances = vi.hoisted(() => [])
+
+vi.mock('@vapi-ai/web', () => {
+  class MockVapi {
+    constructor() {
+      this.listeners = new Map()
+      vapiInstances.push(this)
+    }
+
+    on(event, listener) {
+      this.listeners.set(event, listener)
+    }
+
+    setVolume() {}
+
+    async start() {
+      queueMicrotask(() => this.listeners.get('call-start')?.())
+      return { id: 'test-call' }
+    }
+
+    async stop() {}
+  }
+
+  return { default: MockVapi }
+})
 
 function renderAssistant(props = {}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -11,6 +38,8 @@ function renderAssistant(props = {}) {
 
 afterEach(() => {
   vi.restoreAllMocks()
+  vi.unstubAllEnvs()
+  vapiInstances.length = 0
   delete window.SpeechRecognition
   delete window.webkitSpeechRecognition
 })
@@ -48,4 +77,22 @@ it('explains the browser limitation when speech recognition is unavailable', asy
   if (browserMode) await userEvent.click(browserMode)
   await userEvent.click(screen.getByRole('button', { name: 'Start voice session' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('does not provide speech recognition')
+})
+
+it('processes Vapi callbacks after the Strict Mode effect replay', async () => {
+  vi.stubEnv('VITE_VAPI_PUBLIC_KEY', 'test-public-key')
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+
+  render(
+    <StrictMode>
+      <QueryClientProvider client={client}>
+        <NaviAssistant open onClose={() => {}} />
+      </QueryClientProvider>
+    </StrictMode>,
+  )
+
+  await userEvent.click(screen.getByRole('button', { name: 'Start voice session' }))
+
+  expect(await screen.findByRole('dialog', { name: /listening/i })).toBeInTheDocument()
+  expect(vapiInstances).toHaveLength(1)
 })

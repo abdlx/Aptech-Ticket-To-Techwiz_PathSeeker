@@ -59,7 +59,6 @@ export function createInlineVapiAssistant() {
   return {
     name: VAPI_ASSISTANT_NAME,
     firstMessage: VAPI_FIRST_MESSAGE,
-    firstMessageMode: 'assistant-speaks-first',
     model: {
       provider: 'openai',
       model: 'gpt-4o-mini',
@@ -75,6 +74,6 @@ export function createInlineVapiAssistant() {
       model: 'nova-2',
       language: 'en',
     },
-    recordingEnabled: false,
   }
 }
+

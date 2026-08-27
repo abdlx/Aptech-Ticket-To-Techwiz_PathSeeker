@@ -78,6 +78,9 @@ export default function NaviDialog({ onClose, context, navigate }) {
   const inputRef = useRef(null)
   const messageIdRef = useRef(1)
   const mountedRef = useRef(true)
+  const activeUtteranceRef = useRef(null)
+  const connectionTimeoutRef = useRef(null)
+  const speechTimeoutRef = useRef(null)
   const processedToolCallsRef = useRef(new Set())
   const transcriptSignaturesRef = useRef(new Set())
 
@@ -89,6 +92,15 @@ export default function NaviDialog({ onClose, context, navigate }) {
   }, [])
 
   const releaseVoiceResources = useCallback(() => {
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current)
+      connectionTimeoutRef.current = null
+    }
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current)
+      speechTimeoutRef.current = null
+    }
+    activeUtteranceRef.current = null
     requestControllerRef.current?.abort()
     requestControllerRef.current = null
     if (recognitionRef.current) {
@@ -99,14 +111,26 @@ export default function NaviDialog({ onClose, context, navigate }) {
       }
       recognitionRef.current = null
     }
-    if (vapiRef.current) vapiRef.current.stop().catch(() => undefined)
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel()
+    if (vapiRef.current) {
+      try {
+        vapiRef.current.stop().catch(() => undefined)
+      } catch {
+        // Ignore stop error
+      }
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel()
+      } catch {
+        // Ignore cancel error
+      }
+    }
   }, [])
 
   const getBestVoice = useCallback(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null
     const voices = window.speechSynthesis.getVoices()
-    const preferredNames = ['Microsoft Aria', 'Microsoft Guy', 'Google UK English', 'Google US English']
+    const preferredNames = ['Microsoft Christopher Online (Natural)', 'Microsoft Guy Online (Natural)', 'Microsoft Aria Online (Natural)', 'Microsoft Aria', 'Microsoft Guy', 'Google UK English', 'Google US English']
     return preferredNames.map((name) => voices.find((voice) => voice.name.includes(name))).find(Boolean)
       || voices.find((voice) => voice.lang?.startsWith('en') && /natural|neural|google/i.test(voice.name))
       || voices.find((voice) => voice.lang?.startsWith('en'))
@@ -114,20 +138,51 @@ export default function NaviDialog({ onClose, context, navigate }) {
   }, [])
 
   const speakInBrowser = useCallback((text) => {
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current)
+      speechTimeoutRef.current = null
+    }
     if (naviMuted || typeof window === 'undefined' || !('speechSynthesis' in window)) {
       setState('idle')
       return
     }
-    window.speechSynthesis.cancel()
+    try {
+      window.speechSynthesis.cancel()
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume()
+      }
+    } catch (_) {}
+
     const utterance = new SpeechSynthesisUtterance(text)
+    activeUtteranceRef.current = utterance
     const voice = getBestVoice()
     if (voice) utterance.voice = voice
     utterance.rate = 0.98
     utterance.pitch = 1
-    utterance.onstart = () => mountedRef.current && setState('speaking')
-    utterance.onend = () => mountedRef.current && setState('idle')
-    utterance.onerror = () => mountedRef.current && setState('idle')
-    window.speechSynthesis.speak(utterance)
+
+    const clearUtterance = () => {
+      if (speechTimeoutRef.current) {
+        clearTimeout(speechTimeoutRef.current)
+        speechTimeoutRef.current = null
+      }
+      activeUtteranceRef.current = null
+      if (mountedRef.current) setState('idle')
+    }
+
+    utterance.onstart = () => {
+      if (mountedRef.current) setState('speaking')
+    }
+    utterance.onend = clearUtterance
+    utterance.onerror = clearUtterance
+
+    const timeoutDuration = Math.max(3000, text.length * 85 + 2000)
+    speechTimeoutRef.current = setTimeout(clearUtterance, timeoutDuration)
+
+    try {
+      window.speechSynthesis.speak(utterance)
+    } catch (_) {
+      clearUtterance()
+    }
   }, [getBestVoice, naviMuted])
 
   const refreshPersonalization = useCallback((entity) => {
@@ -233,16 +288,24 @@ export default function NaviDialog({ onClose, context, navigate }) {
   const ensureVapi = useCallback(async () => {
     if (vapiRef.current) return vapiRef.current
     const module = await import('@vapi-ai/web')
-    const Vapi = module.default
-    const vapi = new Vapi(publicKey)
+    const VapiConstructor = module.default || module.Vapi || module
+    const vapi = new VapiConstructor(publicKey)
     vapi.setVolume(naviMuted ? 0 : 1)
     vapi.on('call-start', () => {
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current)
+        connectionTimeoutRef.current = null
+      }
       if (!mountedRef.current) return
       setMode('cloud')
       setState('listening')
       setError('')
     })
     vapi.on('call-end', () => {
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current)
+        connectionTimeoutRef.current = null
+      }
       if (!mountedRef.current) return
       setMode('none')
       setState('idle')
@@ -252,35 +315,28 @@ export default function NaviDialog({ onClose, context, navigate }) {
     vapi.on('speech-end', () => mountedRef.current && setState('listening'))
     vapi.on('volume-level', (value) => mountedRef.current && setVolumeLevel(Math.min(1, Math.max(0, Number(value) * 2.5))))
     vapi.on('message', handleVapiMessage)
-    vapi.on('error', (voiceError) => {
+
+    const handleVoiceFailure = (voiceError) => {
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current)
+        connectionTimeoutRef.current = null
+      }
       if (!mountedRef.current) return
-      setError(voiceError?.message || 'Cloud voice could not start. Browser voice is ready as a fallback.')
+      const msg = voiceError?.message || 'Cloud voice could not connect. Switched to browser voice.'
+      setError(msg)
       setPreferredMode('browser')
       setMode('none')
       setState('idle')
-    })
+      if (vapiRef.current) {
+        try { vapiRef.current.stop().catch(() => undefined) } catch (_) {}
+      }
+    }
+
+    vapi.on('error', handleVoiceFailure)
+    vapi.on('call-start-failed', handleVoiceFailure)
     vapiRef.current = vapi
     return vapi
   }, [handleVapiMessage, naviMuted, publicKey])
-
-  const startCloudVoice = useCallback(async () => {
-    if (!cloudAvailable) return
-    setState('connecting')
-    setError('')
-    processedToolCallsRef.current.clear()
-    transcriptSignaturesRef.current.clear()
-    try {
-      const vapi = await ensureVapi()
-      if (assistantId) await vapi.start(assistantId, { recordingEnabled: false })
-      else await vapi.start(createInlineVapiAssistant())
-    } catch (voiceError) {
-      if (!mountedRef.current) return
-      setError(voiceError?.message || 'Cloud voice could not start. Choose browser voice to continue.')
-      setPreferredMode('browser')
-      setMode('none')
-      setState('idle')
-    }
-  }, [assistantId, cloudAvailable, ensureVapi])
 
   const startBrowserVoice = useCallback(() => {
     const Recognition = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition)
@@ -340,6 +396,49 @@ export default function NaviDialog({ onClose, context, navigate }) {
     }
   }, [releaseVoiceResources, submitMessage])
 
+  const startCloudVoice = useCallback(async () => {
+    if (!cloudAvailable) {
+      startBrowserVoice()
+      return
+    }
+    if (connectionTimeoutRef.current) {
+      clearTimeout(connectionTimeoutRef.current)
+    }
+    setState('connecting')
+    setError('')
+    processedToolCallsRef.current.clear()
+    transcriptSignaturesRef.current.clear()
+
+    // 6.5s timeout safeguard against hung WebRTC / Vapi connection
+    connectionTimeoutRef.current = setTimeout(() => {
+      if (mountedRef.current) {
+        setError('Cloud voice connection timed out. Switched to browser voice.')
+        setPreferredMode('browser')
+        setMode('none')
+        setState('idle')
+        if (vapiRef.current) {
+          try { vapiRef.current.stop().catch(() => undefined) } catch (_) {}
+        }
+      }
+    }, 6500)
+
+    try {
+      const vapi = await ensureVapi()
+      if (assistantId) await vapi.start(assistantId, { recordingEnabled: false })
+      else await vapi.start(createInlineVapiAssistant())
+    } catch (voiceError) {
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current)
+        connectionTimeoutRef.current = null
+      }
+      if (!mountedRef.current) return
+      setError(voiceError?.message || 'Cloud voice could not start. Switched to browser voice.')
+      setPreferredMode('browser')
+      setMode('none')
+      setState('idle')
+    }
+  }, [assistantId, cloudAvailable, ensureVapi, startBrowserVoice])
+
   const stopSession = useCallback(() => {
     releaseVoiceResources()
     setMode('none')
@@ -373,6 +472,7 @@ export default function NaviDialog({ onClose, context, navigate }) {
     else startBrowserVoice()
   }, [cloudAvailable, preferredMode, startBrowserVoice, startCloudVoice, state, stopSession])
 
+
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
@@ -396,9 +496,15 @@ export default function NaviDialog({ onClose, context, navigate }) {
     vapiRef.current?.setVolume(naviMuted ? 0 : 1)
   }, [naviMuted])
 
-  useEffect(() => () => {
-    mountedRef.current = false
-    releaseVoiceResources()
+  useEffect(() => {
+    // React Strict Mode replays effects in development. Restore this guard on
+    // every setup so Vapi and browser-speech callbacks are not mistaken for
+    // post-unmount work after the replay cleanup runs.
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      releaseVoiceResources()
+    }
   }, [releaseVoiceResources])
 
   const active = state !== 'idle'
