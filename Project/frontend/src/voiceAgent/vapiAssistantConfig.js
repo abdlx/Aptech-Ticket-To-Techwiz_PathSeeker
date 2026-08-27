@@ -1,4 +1,9 @@
 export const VAPI_ASSISTANT_NAME = 'Navi'
+export const VAPI_VOICE = Object.freeze({
+  provider: 'vapi',
+  voiceId: 'Nico',
+  version: '2',
+})
 
 export const VAPI_FIRST_MESSAGE = 'Hi, I’m Navi, your PathSeeker career guide. We can explore a direction, review your Career Passport, or update one profile detail. What would help most right now?'
 
@@ -65,10 +70,7 @@ export function createInlineVapiAssistant() {
       messages: [{ role: 'system', content: VAPI_SYSTEM_PROMPT }],
       tools: VAPI_TOOL_DEFINITIONS,
     },
-    voice: {
-      provider: '11labs',
-      voiceId: import.meta.env.VITE_VAPI_VOICE_ID || 'josh',
-    },
+    voice: { ...VAPI_VOICE },
     transcriber: {
       provider: 'deepgram',
       model: 'nova-2',
@@ -76,4 +78,3 @@ export function createInlineVapiAssistant() {
     },
   }
 }
-

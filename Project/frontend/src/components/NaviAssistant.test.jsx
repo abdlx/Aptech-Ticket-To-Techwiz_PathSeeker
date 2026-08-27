@@ -20,7 +20,8 @@ vi.mock('@vapi-ai/web', () => {
 
     setVolume() {}
 
-    async start() {
+    async start(...args) {
+      this.startArgs = args
       queueMicrotask(() => this.listeners.get('call-start')?.())
       return { id: 'test-call' }
     }
@@ -81,6 +82,7 @@ it('explains the browser limitation when speech recognition is unavailable', asy
 
 it('processes Vapi callbacks after the Strict Mode effect replay', async () => {
   vi.stubEnv('VITE_VAPI_PUBLIC_KEY', 'test-public-key')
+  vi.stubEnv('VITE_VAPI_ASSISTANT_ID', 'saved-assistant-id')
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
   render(
@@ -95,4 +97,11 @@ it('processes Vapi callbacks after the Strict Mode effect replay', async () => {
 
   expect(await screen.findByRole('dialog', { name: /listening/i })).toBeInTheDocument()
   expect(vapiInstances).toHaveLength(1)
+  expect(vapiInstances[0].startArgs).toEqual([
+    'saved-assistant-id',
+    {
+      recordingEnabled: false,
+      voice: { provider: 'vapi', voiceId: 'Nico', version: '2' },
+    },
+  ])
 })

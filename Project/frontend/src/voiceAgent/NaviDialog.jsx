@@ -4,7 +4,7 @@ import Icon from '../components/Icon'
 import { queryKeys } from '../lib/queryKeys'
 import { assistantApi } from '../services/assistantApi'
 import { useAccessibilityStore } from '../stores/appStores'
-import { createInlineVapiAssistant, VAPI_FIRST_MESSAGE } from './vapiAssistantConfig'
+import { createInlineVapiAssistant, VAPI_FIRST_MESSAGE, VAPI_VOICE } from './vapiAssistantConfig'
 
 const poseForState = {
   idle: '/assets/navi/navi-greeting.png',
@@ -434,7 +434,12 @@ export default function NaviDialog({ onClose, context, navigate }) {
 
     try {
       const vapi = await ensureVapi()
-      if (assistantId) await vapi.start(assistantId, { recordingEnabled: false })
+      if (assistantId) {
+        await vapi.start(assistantId, {
+          recordingEnabled: false,
+          voice: { ...VAPI_VOICE },
+        })
+      }
       else await vapi.start(createInlineVapiAssistant())
     } catch (voiceError) {
       if (connectionTimeoutRef.current) {
