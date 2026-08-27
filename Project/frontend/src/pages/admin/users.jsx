@@ -8,7 +8,7 @@ import { queryKeys } from '../../lib/queryKeys'
 import { exportToPdf } from '../../lib/pdfExport'
 import { adminApi } from '../../services/adminApi'
 
-export default function UsersAdmin() {
+export default function UsersAdmin({ navigate }) {
   const [search, setSearch] = useState('')
   const [stageFilter, setStageFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -42,6 +42,10 @@ export default function UsersAdmin() {
       u.status === 'active' ? 'Active' : 'Suspended',
       '⋯',
     ]
+  })
+  rows.forEach((row, index) => {
+    const user = users[index]
+    row[row.length - 1] = <button className="button ghost small" key={user._id} onClick={() => navigate('admin-user-editor', user._id)}>Edit</button>
   })
 
   return (

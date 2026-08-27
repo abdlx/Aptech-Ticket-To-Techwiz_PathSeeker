@@ -6,7 +6,7 @@ import AdminTable from '../../components/admin/AdminTable'
 import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { adminApi } from '../../services/adminApi'
 
-export default function StoriesAdmin() {
+export default function StoriesAdmin({ navigate }) {
   const queryClient = useQueryClient()
   const [statusFilter, setStatusFilter] = useState('')
 
@@ -73,6 +73,10 @@ export default function StoriesAdmin() {
       ),
       '⋯',
     ]
+  })
+  rows.forEach((row, index) => {
+    const story = stories[index]
+    row[row.length - 1] = <button className="button ghost small" key={story._id} onClick={() => navigate('admin-story-review', story._id)}>Review</button>
   })
 
   return (

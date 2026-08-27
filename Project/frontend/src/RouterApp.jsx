@@ -30,7 +30,7 @@ const screenPaths = {
   'admin-login': '/admin/login', admin: '/admin', 'admin-users': '/admin/users', 'admin-user-editor': '/admin/users', 'admin-careers': '/admin/careers',
   'admin-career-editor': '/admin/careers', 'admin-content': '/admin/content', 'admin-content-editor': '/admin/content', 'admin-quiz': '/admin/quiz',
   'admin-stories': '/admin/stories', 'admin-story-review': '/admin/stories', 'admin-feedback': '/admin/feedback', 'admin-feedback-analytics': '/admin/feedback/analytics',
-  'admin-settings': '/admin/settings', 'admin-help': '/admin/help',
+  'admin-audit': '/admin/audit-logs', 'admin-settings': '/admin/settings', 'admin-help': '/admin/help',
 }
 
 function useLegacyNavigate() {
@@ -99,7 +99,8 @@ function AdminRoute() {
   else if (pathname === '/admin/careers/new' || /\/admin\/careers\/[^/]+/.test(pathname)) screen = 'admin-career-editor'
   else if (pathname === '/admin/content/new' || /\/admin\/content\/[^/]+/.test(pathname)) screen = 'admin-content-editor'
   else if (/\/admin\/stories\/[^/]+/.test(pathname)) screen = 'admin-story-review'
-  return <AdminPage screen={screen} navigate={navigate} />
+  const entityId = decodeURIComponent(pathname.split('/').filter(Boolean).at(-1) || '')
+  return <AdminPage screen={screen} navigate={navigate} entityId={entityId} />
 }
 
 export default function RouterApp() {

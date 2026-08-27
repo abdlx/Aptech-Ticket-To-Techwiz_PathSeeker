@@ -3,7 +3,7 @@ import * as auditLogService from '../services/auditLog.service.js'
 import AppError from '../utils/AppError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { parsePagination } from '../utils/pagination.js'
-import { isNonEmptyString, isSafeHttpUrl } from '../utils/validators.js'
+import { isNonEmptyString, isSafeHttpUrl, isValidEmail } from '../utils/validators.js'
 import {
   FEEDBACK_CATEGORIES,
   FEEDBACK_STATUSES,
@@ -24,15 +24,18 @@ export const uploadFile = asyncHandler(async (req, res) => {
 // --- Users -------------------------------------------------------------
 
 export const getUsers = asyncHandler(async (req, res) => {
-  const { q, stage, status } = req.query
+  const { q, stage, status, role } = req.query
   if (stage && !USER_STAGES.includes(stage)) {
     throw new AppError(400, `stage must be one of: ${USER_STAGES.join(', ')}`, 'VALIDATION_ERROR')
   }
   if (status && !USER_STATUSES.includes(status)) {
     throw new AppError(400, `status must be one of: ${USER_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
   }
+  if (role && !USER_ROLES.includes(role)) {
+    throw new AppError(400, `role must be one of: ${USER_ROLES.join(', ')}`, 'VALIDATION_ERROR')
+  }
   const { page, limit, skip } = parsePagination(req.query)
-  const { users, meta } = await adminService.listUsers({ q, stage, status, page, limit, skip })
+  const { users, meta } = await adminService.listUsers({ q, stage, status, role, page, limit, skip })
   res.status(200).json({ data: { users, meta } })
 })
 
@@ -42,22 +45,35 @@ export const getUserById = asyncHandler(async (req, res) => {
 })
 
 export const updateUser = asyncHandler(async (req, res) => {
-  const { role, status } = req.body
+  const { name, email, stage, role, status, emailVerified } = req.body
+  if (name !== undefined && !isNonEmptyString(name, { min: 2, max: 120 })) {
+    throw new AppError(400, 'name must be between 2 and 120 characters.', 'VALIDATION_ERROR')
+  }
+  if (email !== undefined && !isValidEmail(email)) {
+    throw new AppError(400, 'A valid email is required.', 'VALIDATION_ERROR')
+  }
+  if (stage !== undefined && stage !== null && !USER_STAGES.includes(stage)) {
+    throw new AppError(400, `stage must be one of: ${USER_STAGES.join(', ')}`, 'VALIDATION_ERROR')
+  }
   if (role && !USER_ROLES.includes(role)) {
     throw new AppError(400, `role must be one of: ${USER_ROLES.join(', ')}`, 'VALIDATION_ERROR')
   }
   if (status && !USER_STATUSES.includes(status)) {
     throw new AppError(400, `status must be one of: ${USER_STATUSES.join(', ')}`, 'VALIDATION_ERROR')
   }
-  const user = await adminService.updateUser(req.user.id, req.params.id, { role, status })
+  const user = await adminService.updateUser(req.user.id, req.params.id, { name, email, stage, role, status, emailVerified })
   res.status(200).json({ data: { user } })
 })
 
 // --- Careers -------------------------------------------------------------
 
 export const getCareers = asyncHandler(async (req, res) => {
+  const { q, status } = req.query
+  if (status && !PUBLICATION_STATUSES.includes(status)) {
+    throw new AppError(400, 'Invalid publication status.', 'VALIDATION_ERROR')
+  }
   const { page, limit, skip } = parsePagination(req.query)
-  const { careers, meta } = await adminService.listAllCareers({ page, limit, skip })
+  const { careers, meta } = await adminService.listAllCareers({ q, status, page, limit, skip })
   res.status(200).json({ data: { careers, meta } })
 })
 
@@ -148,8 +164,11 @@ export const archiveQuizVersion = asyncHandler(async (req, res) => {
 // --- Resources -------------------------------------------------------------
 
 export const getResources = asyncHandler(async (req, res) => {
+  const { q, status, type } = req.query
+  if (status && !PUBLICATION_STATUSES.includes(status)) throw new AppError(400, 'Invalid publication status.', 'VALIDATION_ERROR')
+  if (type && !RESOURCE_TYPES.includes(type)) throw new AppError(400, 'Invalid resource type.', 'VALIDATION_ERROR')
   const { page, limit, skip } = parsePagination(req.query)
-  const { resources, meta } = await adminService.listAllResources({ page, limit, skip })
+  const { resources, meta } = await adminService.listAllResources({ q, status, type, page, limit, skip })
   res.status(200).json({ data: { resources, meta } })
 })
 
@@ -195,8 +214,11 @@ export const setResourcePublication = asyncHandler(async (req, res) => {
 // --- Multimedia -------------------------------------------------------------
 
 export const getMedia = asyncHandler(async (req, res) => {
+  const { q, status, type } = req.query
+  if (status && !PUBLICATION_STATUSES.includes(status)) throw new AppError(400, 'Invalid publication status.', 'VALIDATION_ERROR')
+  if (type && !MULTIMEDIA_TYPES.includes(type)) throw new AppError(400, 'Invalid media type.', 'VALIDATION_ERROR')
   const { page, limit, skip } = parsePagination(req.query)
-  const { media, meta } = await adminService.listAllMedia({ page, limit, skip })
+  const { media, meta } = await adminService.listAllMedia({ q, status, type, page, limit, skip })
   res.status(200).json({ data: { media, meta } })
 })
 

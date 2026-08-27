@@ -26,6 +26,8 @@ recentlyViewedSchema.pre('validate', function deriveItemModel() {
 
 recentlyViewedSchema.index({ userId: 1, itemType: 1, itemId: 1 }, { unique: true })
 recentlyViewedSchema.index({ userId: 1, viewedAt: -1 })
+recentlyViewedSchema.index({ itemType: 1, viewedAt: -1 })
+recentlyViewedSchema.index({ itemType: 1, itemId: 1 })
 
 export const RecentlyViewed =
   mongoose.models.RecentlyViewed || mongoose.model('RecentlyViewed', recentlyViewedSchema)

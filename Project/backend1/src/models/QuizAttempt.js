@@ -64,6 +64,7 @@ quizAttemptSchema.pre('validate', function requireCompletionFields() {
 quizAttemptSchema.index({ userId: 1, createdAt: -1 })
 quizAttemptSchema.index({ userId: 1, status: 1 })
 quizAttemptSchema.index({ quizId: 1, userId: 1, status: 1 })
+quizAttemptSchema.index({ status: 1, completedAt: -1 })
 
 export const QuizAttempt =
   mongoose.models.QuizAttempt || mongoose.model('QuizAttempt', quizAttemptSchema)

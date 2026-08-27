@@ -290,7 +290,12 @@ export default function NaviDialog({ onClose, context, navigate }) {
   const ensureVapi = useCallback(async () => {
     if (vapiRef.current) return vapiRef.current
     const module = await import('@vapi-ai/web')
-    const VapiConstructor = module.default || module.Vapi || module
+    const VapiConstructor =
+      (typeof module.default === 'function' ? module.default : module.default?.default) ||
+      (typeof module === 'function' ? module : module.Vapi)
+    if (typeof VapiConstructor !== 'function') {
+      throw new Error('Could not initialize Vapi voice SDK.')
+    }
     const vapi = new VapiConstructor(publicKey)
     vapi.setVolume(naviMuted ? 0 : 1)
     vapi.on('call-start', () => {
@@ -319,12 +324,16 @@ export default function NaviDialog({ onClose, context, navigate }) {
     vapi.on('message', handleVapiMessage)
 
     const handleVoiceFailure = (voiceError) => {
+      console.warn('Vapi voice failure:', voiceError)
       if (connectionTimeoutRef.current) {
         clearTimeout(connectionTimeoutRef.current)
         connectionTimeoutRef.current = null
       }
       if (!mountedRef.current) return
-      const msg = voiceError?.message || 'Cloud voice could not connect. Switched to browser voice.'
+      const rawMsg = typeof voiceError === 'string'
+        ? voiceError
+        : (voiceError?.message || voiceError?.error?.message || voiceError?.error || voiceError?.metadata?.error)
+      const msg = (typeof rawMsg === 'string' && rawMsg.trim()) ? rawMsg : 'Cloud voice could not connect. Switched to browser voice.'
       setError(msg)
       setPreferredMode('browser')
       setMode('none')
@@ -338,6 +347,9 @@ export default function NaviDialog({ onClose, context, navigate }) {
       }
     }
 
+    vapi.on('call-start-progress', (progress) => {
+      console.log('Vapi connection progress:', progress)
+    })
     vapi.on('error', handleVoiceFailure)
     vapi.on('call-start-failed', handleVoiceFailure)
     vapiRef.current = vapi
@@ -415,7 +427,7 @@ export default function NaviDialog({ onClose, context, navigate }) {
     processedToolCallsRef.current.clear()
     transcriptSignaturesRef.current.clear()
 
-    // 6.5s timeout safeguard against hung WebRTC / Vapi connection
+    // 15s timeout safeguard against hung WebRTC / Vapi connection
     connectionTimeoutRef.current = setTimeout(() => {
       if (mountedRef.current) {
         setError('Cloud voice connection timed out. Switched to browser voice.')
@@ -430,7 +442,7 @@ export default function NaviDialog({ onClose, context, navigate }) {
           }
         }
       }
-    }, 6500)
+    }, 15000)
 
     try {
       const vapi = await ensureVapi()

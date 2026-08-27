@@ -1,12 +1,14 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import {
+  AuditLog,
   Career,
   Feedback,
   Multimedia,
   QuizAttempt,
   QuizQuestion,
   QuizVersion,
+  RecommendationSnapshot,
   RecentlyViewed,
   Resource,
   SuccessStory,
@@ -43,17 +45,18 @@ async function removeStoredAsset(asset) {
 // Users
 // ---------------------------------------------------------------------------
 
-export async function listUsers({ q, stage, status, page, limit, skip }) {
+export async function listUsers({ q, stage, status, role, page, limit, skip }) {
   const filter = {}
   if (stage) filter.stage = stage
   if (status) filter.status = status
+  if (role) filter.role = role
   if (q) {
     const regex = new RegExp(q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
     filter.$or = [{ name: regex }, { email: regex }]
   }
 
   const [users, total] = await Promise.all([
-    User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
     User.countDocuments(filter),
   ])
   return { users, meta: buildPaginationMeta({ page, limit, total }) }
@@ -67,7 +70,7 @@ export async function getUserById(id) {
   return user
 }
 
-export async function updateUser(adminUserId, id, { role, status }) {
+export async function updateUser(adminUserId, id, { name, email, stage, role, status, emailVerified }) {
   const user = await getUserById(id)
   if (user._id.toString() === adminUserId.toString() && status === 'suspended') {
     throw new AppError(400, 'You cannot suspend your own admin account.', 'SELF_LOCKOUT')
@@ -76,10 +79,17 @@ export async function updateUser(adminUserId, id, { role, status }) {
     const remaining = await User.countDocuments({ role: 'super_admin', status: 'active', _id: { $ne: user._id } })
     if (remaining < 1) throw new AppError(400, 'At least one active super admin must remain.', 'LAST_ADMIN')
   }
+  if (name !== undefined) user.name = name
+  if (email !== undefined) user.email = email
+  if (stage !== undefined) user.stage = stage || undefined
   if (role) user.role = role
   if (status) user.status = status
+  if (emailVerified !== undefined) {
+    user.emailVerified = Boolean(emailVerified)
+    user.emailVerifiedAt = user.emailVerified ? (user.emailVerifiedAt || new Date()) : undefined
+  }
   await user.save()
-  await logAction(adminUserId, 'user.update', 'User', user._id, { role, status })
+  await logAction(adminUserId, 'user.update', 'User', user._id, { name, email, stage, role, status, emailVerified })
   return user
 }
 
@@ -87,10 +97,18 @@ export async function updateUser(adminUserId, id, { role, status }) {
 // Careers (full CRUD — public browsing is read-only via catalog.service)
 // ---------------------------------------------------------------------------
 
-export async function listAllCareers({ page, limit, skip }) {
+export async function listAllCareers({ q, status, page, limit, skip }) {
+  const filter = {}
+  if (status) filter.status = status
+  if (q) filter.$text = { $search: q }
   const [careers, total] = await Promise.all([
-    Career.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('domainId', 'name slug'),
-    Career.countDocuments({}),
+    Career.find(filter)
+      .sort(q ? { score: { $meta: 'textScore' } } : { createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('domainId', 'name slug')
+      .lean(),
+    Career.countDocuments(filter),
   ])
   return { careers, meta: buildPaginationMeta({ page, limit, total }) }
 }
@@ -257,10 +275,18 @@ export async function archiveQuizVersion(adminUserId, version) {
 // Resources (full CRUD, uploads & lifecycle)
 // ---------------------------------------------------------------------------
 
-export async function listAllResources({ page, limit, skip }) {
+export async function listAllResources({ q, status, type, page, limit, skip }) {
+  const filter = {}
+  if (status) filter.status = status
+  if (type) filter.type = type
+  if (q) filter.$text = { $search: q }
   const [resources, total] = await Promise.all([
-    Resource.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit),
-    Resource.countDocuments({}),
+    Resource.find(filter)
+      .sort(q ? { score: { $meta: 'textScore' } } : { createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Resource.countDocuments(filter),
   ])
   return { resources, meta: buildPaginationMeta({ page, limit, total }) }
 }
@@ -325,10 +351,18 @@ export async function setResourcePublication(adminUserId, resourceId, status) {
 // Multimedia (full CRUD, uploads & lifecycle)
 // ---------------------------------------------------------------------------
 
-export async function listAllMedia({ page, limit, skip }) {
+export async function listAllMedia({ q, status, type, page, limit, skip }) {
+  const filter = {}
+  if (status) filter.status = status
+  if (type) filter.type = type
+  if (q) filter.$text = { $search: q }
   const [media, total] = await Promise.all([
-    Multimedia.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit),
-    Multimedia.countDocuments({}),
+    Multimedia.find(filter)
+      .sort(q ? { score: { $meta: 'textScore' } } : { createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Multimedia.countDocuments(filter),
   ])
   return { media, meta: buildPaginationMeta({ page, limit, total }) }
 }
@@ -405,14 +439,20 @@ export async function listAllStories({ status, page, limit, skip }) {
       .skip(skip)
       .limit(limit)
       .populate('domainId', 'name slug')
-      .populate('submittedBy', 'name email'),
+      .populate('submittedBy', 'name email')
+      .lean(),
     SuccessStory.countDocuments(filter),
   ])
   return { stories, meta: buildPaginationMeta({ page, limit, total }) }
 }
 
 export async function getStoryByIdAdmin(storyId) {
-  return getStoryOrThrow(storyId)
+  const story = await SuccessStory.findById(storyId)
+    .populate('domainId', 'name slug')
+    .populate('submittedBy', 'name email stage')
+    .populate('reviewerId', 'name email')
+  if (!story) throw new AppError(404, 'Story not found.', 'NOT_FOUND')
+  return story
 }
 
 async function getStoryOrThrow(storyId) {
@@ -576,35 +616,56 @@ export async function respondToFeedback(adminUserId, feedbackId, { response, sta
 }
 
 export async function getFeedbackAnalytics() {
-  const [byCategory, byStatus, total, messages, rating] = await Promise.all([
-    Feedback.aggregate([{ $group: { _id: '$category', count: { $sum: 1 } } }]),
-    Feedback.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
-    Feedback.countDocuments({}),
-    Feedback.find({}).select('message').lean(),
-    Feedback.aggregate([
-      { $match: { rating: { $exists: true } } },
-      { $group: { _id: null, average: { $avg: '$rating' }, count: { $sum: 1 } } },
-    ]),
+  const [result = {}] = await Feedback.aggregate([
+    {
+      $facet: {
+        byCategory: [{ $group: { _id: '$category', count: { $sum: 1 } } }, { $sort: { count: -1 } }],
+        byStatus: [{ $group: { _id: '$status', count: { $sum: 1 } } }, { $sort: { count: -1 } }],
+        summary: [{
+          $group: {
+            _id: null,
+            total: { $sum: 1 },
+            resolved: { $sum: { $cond: [{ $eq: ['$status', 'resolved'] }, 1, 0] } },
+            averageRating: { $avg: '$rating' },
+            ratedCount: { $sum: { $cond: [{ $ne: [{ $type: '$rating' }, 'missing'] }, 1, 0] } },
+            averageResponseMs: {
+              $avg: { $cond: [{ $and: ['$respondedAt', '$createdAt'] }, { $subtract: ['$respondedAt', '$createdAt'] }, null] },
+            },
+          },
+        }],
+        sentiment: [
+          { $project: { message: { $toLower: { $ifNull: ['$message', ''] } } } },
+          {
+            $project: {
+              tone: {
+                $switch: {
+                  branches: [
+                    { case: { $regexMatch: { input: '$message', regex: /(great|good|love|helpful|easy|useful|thanks|clear)/ } }, then: 'positive' },
+                    { case: { $regexMatch: { input: '$message', regex: /(bad|broken|bug|confusing|hard|error|problem|slow)/ } }, then: 'negative' },
+                  ],
+                  default: 'neutral',
+                },
+              },
+            },
+          },
+          { $group: { _id: '$tone', count: { $sum: 1 } } },
+        ],
+      },
+    },
   ])
-  const positive = ['great', 'good', 'love', 'helpful', 'easy', 'useful', 'thanks', 'clear']
-  const negative = ['bad', 'broken', 'bug', 'confusing', 'hard', 'error', 'problem', 'slow']
-  const sentiment = { positive: 0, neutral: 0, negative: 0 }
-  for (const item of messages) {
-    const text = String(item.message || '').toLowerCase()
-    const score =
-      positive.filter((word) => text.includes(word)).length -
-      negative.filter((word) => text.includes(word)).length
-    if (score > 0) sentiment.positive += 1
-    else if (score < 0) sentiment.negative += 1
-    else sentiment.neutral += 1
-  }
+  const summary = result.summary?.[0] || {}
+  const sentiment = Object.fromEntries((result.sentiment || []).map(({ _id, count }) => [_id, count]))
+  const total = summary.total || 0
   return {
     total,
-    byCategory,
-    byStatus,
-    sentiment,
-    averageRating: rating[0]?.average || 0,
-    ratedCount: rating[0]?.count || 0,
+    totalCount: total,
+    byCategory: result.byCategory || [],
+    byStatus: result.byStatus || [],
+    sentiment: { positive: sentiment.positive || 0, neutral: sentiment.neutral || 0, negative: sentiment.negative || 0 },
+    averageRating: Math.round((summary.averageRating || 0) * 10) / 10,
+    ratedCount: summary.ratedCount || 0,
+    resolutionRate: total ? Math.round(((summary.resolved || 0) / total) * 100) : 0,
+    avgResponseHours: Math.round(((summary.averageResponseMs || 0) / 3_600_000) * 10) / 10,
   }
 }
 
@@ -613,22 +674,49 @@ export async function getFeedbackAnalytics() {
 // ---------------------------------------------------------------------------
 
 export async function getUsageStats() {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  const now = new Date()
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
+  const activityStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1))
 
   const [
     totalUsers,
     activeUsers,
+    staffUsers,
     totalQuizAttempts,
     completedQuizAttempts,
     totalCareers,
+    userStages,
+    averageMatch,
     popularCareers,
     popularResources,
+    careerViewsByMonth,
+    quizCompletionsByMonth,
+    registrationsByMonth,
+    currentRegistrations,
+    previousRegistrations,
+    currentCompletions,
+    previousCompletions,
+    pendingStories,
+    openFeedback,
+    draftResources,
+    draftMedia,
+    recentActivity,
   ] = await Promise.all([
     User.countDocuments({ role: 'user' }),
     User.countDocuments({ role: 'user', status: 'active', lastLoginAt: { $gte: thirtyDaysAgo } }),
+    User.countDocuments({ role: { $ne: 'user' }, status: 'active' }),
     QuizAttempt.countDocuments({}),
     QuizAttempt.countDocuments({ status: 'completed' }),
     Career.countDocuments({ active: true }),
+    User.aggregate([
+      { $match: { role: 'user' } },
+      { $group: { _id: '$stage', count: { $sum: 1 } } },
+    ]),
+    RecommendationSnapshot.aggregate([
+      { $unwind: '$matches' },
+      { $group: { _id: null, average: { $avg: '$matches.compatibilityScore' }, samples: { $sum: 1 } } },
+    ]),
     RecentlyViewed.aggregate([
       { $match: { itemType: 'career' } },
       { $group: { _id: '$itemId', views: { $sum: 1 } } },
@@ -636,19 +724,93 @@ export async function getUsageStats() {
       { $limit: 5 },
       { $lookup: { from: 'careers', localField: '_id', foreignField: '_id', as: 'career' } },
       { $unwind: '$career' },
-      { $project: { _id: 0, careerId: '$career._id', title: '$career.title', views: 1 } },
+      { $lookup: { from: 'domains', localField: 'career.domainId', foreignField: '_id', as: 'domain' } },
+      { $project: {
+        _id: 0,
+        careerId: '$career._id',
+        slug: '$career.slug',
+        title: '$career.title',
+        growthRatePercent: '$career.growthRatePercent',
+        iconKey: '$career.iconKey',
+        colorTone: '$career.colorTone',
+        domain: { $arrayElemAt: ['$domain.name', 0] },
+        views: 1,
+      } },
     ]),
-    Resource.find({ active: true }).sort({ downloadCount: -1 }).limit(5).select('title downloadCount'),
+    Resource.find({ active: true })
+      .sort({ downloadCount: -1 })
+      .limit(5)
+      .select('title downloadCount type')
+      .lean(),
+    RecentlyViewed.aggregate([
+      { $match: { itemType: 'career', viewedAt: { $gte: activityStart } } },
+      { $group: { _id: { year: { $year: '$viewedAt' }, month: { $month: '$viewedAt' } }, value: { $sum: 1 } } },
+    ]),
+    QuizAttempt.aggregate([
+      { $match: { status: 'completed', completedAt: { $gte: activityStart } } },
+      { $group: { _id: { year: { $year: '$completedAt' }, month: { $month: '$completedAt' } }, value: { $sum: 1 } } },
+    ]),
+    User.aggregate([
+      { $match: { role: 'user', createdAt: { $gte: activityStart } } },
+      { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, value: { $sum: 1 } } },
+    ]),
+    User.countDocuments({ role: 'user', createdAt: { $gte: thirtyDaysAgo } }),
+    User.countDocuments({ role: 'user', createdAt: { $gte: sixtyDaysAgo, $lt: thirtyDaysAgo } }),
+    QuizAttempt.countDocuments({ status: 'completed', completedAt: { $gte: thirtyDaysAgo } }),
+    QuizAttempt.countDocuments({ status: 'completed', completedAt: { $gte: sixtyDaysAgo, $lt: thirtyDaysAgo } }),
+    SuccessStory.countDocuments({ status: { $in: ['pending', 'changes_requested'] } }),
+    Feedback.countDocuments({ status: { $in: ['open', 'in_review'] } }),
+    Resource.countDocuments({ status: 'draft' }),
+    Multimedia.countDocuments({ status: 'draft' }),
+    AuditLog.find({})
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .select('action targetType targetId createdAt actorId')
+      .populate('actorId', 'name role')
+      .lean(),
   ])
+
+  const stageCounts = Object.fromEntries(userStages.map(({ _id, count }) => [_id || 'unknown', count]))
+  const monthValue = (rows, date) => rows.find(
+    ({ _id }) => _id.year === date.getUTCFullYear() && _id.month === date.getUTCMonth() + 1,
+  )?.value || 0
+  const monthlyActivity = Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5 + index, 1))
+    return {
+      key: `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`,
+      label: date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }),
+      careerViews: monthValue(careerViewsByMonth, date),
+      quizCompletions: monthValue(quizCompletionsByMonth, date),
+      registrations: monthValue(registrationsByMonth, date),
+    }
+  })
+  const percentChange = (current, previous) => {
+    if (previous === 0) return current === 0 ? 0 : 100
+    return Math.round(((current - previous) / previous) * 1_000) / 10
+  }
 
   return {
     totalUsers,
     activeUsersLast30Days: activeUsers,
+    activeStaff: staffUsers,
     totalQuizAttempts,
     completedQuizAttempts,
+    completedAttempts: completedQuizAttempts,
     totalActiveCareers: totalCareers,
+    totalCareers,
+    avgMatchScore: Math.round((averageMatch[0]?.average || 0) * 10) / 10,
+    matchSamples: averageMatch[0]?.samples || 0,
+    userStages: stageCounts,
+    monthlyActivity,
+    trends: {
+      registrations: percentChange(currentRegistrations, previousRegistrations),
+      quizCompletions: percentChange(currentCompletions, previousCompletions),
+    },
+    queues: { pendingStories, openFeedback, draftResources, draftMedia },
     popularCareers,
     popularResources,
+    recentActivity,
+    generatedAt: now.toISOString(),
   }
 }
 

@@ -23,7 +23,6 @@ const successStorySchema = new Schema(
     publishedAt: { type: Date },
     featured: { type: Boolean, default: false },
     isDemo: { type: Boolean, default: false },
-    isDemo: { type: Boolean, default: false },
     moderationNote: { type: String, trim: true, maxlength: 2_000 },
     submittedAt: { type: Date },
   },

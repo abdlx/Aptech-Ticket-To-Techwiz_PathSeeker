@@ -16,6 +16,7 @@ const auditLogSchema = new Schema(
 auditLogSchema.index({ createdAt: -1 })
 auditLogSchema.index({ actorId: 1, createdAt: -1 })
 auditLogSchema.index({ targetType: 1, targetId: 1 })
+auditLogSchema.index({ targetType: 1, createdAt: -1 })
 
 export const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema)
 export default AuditLog

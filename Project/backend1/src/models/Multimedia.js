@@ -33,6 +33,7 @@ multimediaSchema.index({ active: 1, type: 1 })
 multimediaSchema.index({ status: 1, createdAt: -1 })
 multimediaSchema.index({ tags: 1 })
 multimediaSchema.index({ ratingAvg: -1 })
+multimediaSchema.index({ title: 'text', description: 'text', transcript: 'text' })
 
 export const Multimedia = mongoose.models.Multimedia || mongoose.model('Multimedia', multimediaSchema)
 export default Multimedia

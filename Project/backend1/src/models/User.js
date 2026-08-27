@@ -73,6 +73,8 @@ userSchema.pre('validate', function normalizeIdentity() {
 
 userSchema.index({ normalizedEmail: 1 }, { unique: true })
 userSchema.index({ role: 1, status: 1 })
+userSchema.index({ role: 1, stage: 1 })
+userSchema.index({ role: 1, createdAt: -1 })
 userSchema.index({ createdAt: -1 })
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema)
