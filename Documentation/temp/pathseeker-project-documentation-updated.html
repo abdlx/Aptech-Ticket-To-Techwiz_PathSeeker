@@ -1,0 +1,1883 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PathSeeker Career Passport - Comprehensive Project Documentation, Visual System Map, and Technical Reference">
+  <title>PathSeeker — Project Documentation & Visual Reference</title>
+  <style>
+    :root {
+      --ink: #172635;
+      --muted: #576877;
+      --green: #4d8260;
+      --green-dark: #2d553e;
+      --green-soft: #edf5ef;
+      --green-border: #c3d9c8;
+      --cream: #fbfaf7;
+      --paper: #ffffff;
+      --line: #dbe3dc;
+      --blue: #2f6999;
+      --blue-soft: #eaf2f8;
+      --purple: #6a57ba;
+      --purple-soft: #f1edfa;
+      --amber: #b8832a;
+      --amber-soft: #fcf4e4;
+      --rose: #b34a4c;
+      --rose-soft: #faeaea;
+      --dark-card: #192b22;
+      --dark-card-2: #15222e;
+    }
+    * { box-sizing: border-box; }
+    html { background: #d7ded9; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.8pt;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 20px;
+      color: #fff;
+      background: #172635;
+      box-shadow: 0 4px 20px rgba(23, 38, 53, 0.4);
+    }
+    .toolbar strong { font-size: 13px; font-weight: 700; }
+    .toolbar small { color: #b2c2ce; font-size: 11px; margin-right: 8px; }
+    .toolbar button {
+      padding: 7px 15px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .toolbar button:hover { background: rgba(255,255,255,0.2); }
+    .toolbar button.primary {
+      border-color: #5c9672;
+      background: #4d8260;
+    }
+    .toolbar button.primary:hover { background: #3c6b4e; }
+    
+    .document {
+      padding: 14mm 0 28mm;
+      counter-reset: sheet;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      margin: 0 auto 12mm;
+      padding: 14mm 16mm 14mm 18mm;
+      position: relative;
+      background: var(--paper);
+      box-shadow: 0 10px 35px rgba(23, 38, 53, 0.15);
+      break-after: page;
+      page-break-after: always;
+      counter-increment: sheet;
+      overflow: hidden;
+    }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+    .page::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5mm;
+      background: linear-gradient(180deg, #172635 0%, #2d553e 50%, var(--green) 100%);
+    }
+    .page-header {
+      height: 8.5mm;
+      margin-bottom: 4.5mm;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.3mm solid var(--line);
+      color: var(--muted);
+      font-size: 7pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .page-header .brand { color: var(--ink); font-weight: 800; }
+    .page-header .brand span { color: var(--green); }
+    .page-footer {
+      position: absolute;
+      left: 18mm;
+      right: 16mm;
+      bottom: 6mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2.2mm;
+      border-top: 0.25mm solid var(--line);
+      color: #728379;
+      font-size: 6.8pt;
+    }
+    .page-number::after { content: counter(sheet, decimal-leading-zero); }
+    
+    h1, h2, h3, h4 { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; line-height: 1.2; }
+    h1 { font-size: 30pt; letter-spacing: -0.035em; }
+    h2 { font-size: 17.5pt; letter-spacing: -0.025em; margin-bottom: 2.8mm; color: var(--ink); }
+    h3 { font-size: 10.5pt; margin: 2.8mm 0 1.5mm; color: var(--green-dark); }
+    h4 { font-size: 8.8pt; margin: 0 0 1mm; }
+    p { margin: 0 0 2.2mm; }
+    
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 2mm;
+      margin-bottom: 1.8mm;
+      color: var(--green-dark);
+      font-size: 6.8pt;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 5.5mm;
+      height: 0.8mm;
+      border-radius: 1mm;
+      background: var(--green);
+    }
+    .lede { color: #435462; font-size: 10pt; line-height: 1.42; margin-bottom: 3.2mm; }
+    .muted { color: var(--muted); }
+    .small { font-size: 7.2pt; line-height: 1.38; }
+    
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3.2mm; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.8mm; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2.4mm; }
+    
+    .card {
+      padding: 3mm 3.5mm;
+      border: 0.28mm solid var(--line);
+      border-radius: 2.5mm;
+      background: #fff;
+      break-inside: avoid;
+    }
+    .card.soft { background: #f6f9f6; }
+    .card.accent { border-color: var(--green-border); background: var(--green-soft); }
+    .card.dark { background: var(--dark-card); color: #edf5ef; border-color: var(--dark-card); }
+    .card.dark h3, .card.dark h4 { color: #a5d3b0; }
+    
+    .metric {
+      font-size: 18pt;
+      font-weight: 800;
+      color: var(--green-dark);
+      line-height: 1;
+      margin-bottom: 0.8mm;
+    }
+    .card.dark .metric { color: #9cd4a9; }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.6mm 2mm;
+      border-radius: 4mm;
+      font-size: 6.4pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge.green { background: var(--green-soft); color: var(--green-dark); border: 0.2mm solid var(--green-border); }
+    .badge.blue { background: var(--blue-soft); color: var(--blue); border: 0.2mm solid #bfd7ea; }
+    .badge.purple { background: var(--purple-soft); color: var(--purple); border: 0.2mm solid #d6ccf2; }
+    .badge.amber { background: var(--amber-soft); color: #825a18; border: 0.2mm solid #eed8b0; }
+    .badge.rose { background: var(--rose-soft); color: var(--rose); border: 0.2mm solid #f0c5c5; }
+    
+    .callout {
+      margin: 2.5mm 0;
+      padding: 2.5mm 3.5mm;
+      border-left: 1.1mm solid var(--green);
+      border-radius: 0 2.2mm 2.2mm 0;
+      background: #f1f6f1;
+      font-size: 7.8pt;
+      break-inside: avoid;
+    }
+    .callout.warning { border-left-color: var(--amber); background: var(--amber-soft); }
+    .callout.danger { border-left-color: var(--rose); background: var(--rose-soft); }
+    .callout strong { color: var(--green-dark); }
+    
+    table { width: 100%; border-collapse: collapse; margin: 1.8mm 0 2.8mm; break-inside: avoid; }
+    th, td { padding: 1.5mm 2.2mm; border-bottom: 0.25mm solid var(--line); text-align: left; vertical-align: middle; }
+    th { color: var(--green-dark); background: #eff5f0; font-size: 6.5pt; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+    td { font-size: 7.3pt; }
+    
+    ul, ol { margin: 1.2mm 0 2.4mm; padding-left: 4.2mm; }
+    li { margin-bottom: 0.9mm; font-size: 7.8pt; }
+    
+    /* Screenshots Styling - High Legibility */
+    .shot {
+      margin: 2mm 0 2.8mm;
+      overflow: hidden;
+      border: 0.3mm solid #cad6cc;
+      border-radius: 2.6mm;
+      background: #f4f7f4;
+      box-shadow: 0 1.5mm 4.5mm rgba(23, 38, 53, 0.09);
+      break-inside: avoid;
+    }
+    .shot-bar {
+      height: 5.4mm;
+      padding: 0 3mm;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.25mm solid #d5dfd6;
+      background: #f8faf8;
+      color: #55675c;
+      font-size: 6.5pt;
+      font-weight: 600;
+    }
+    .shot-bar .dots { display: flex; align-items: center; gap: 1.2mm; }
+    .shot-bar .dots i { width: 1.8mm; height: 1.8mm; border-radius: 50%; background: #b8c4ba; }
+    .shot-bar .url { font-family: Consolas, monospace; font-size: 6pt; color: #78897d; }
+    .shot img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1440 / 1000;
+      display: block;
+      object-fit: contain;
+      object-position: top center;
+      background: #eef2ee;
+      image-rendering: -webkit-optimize-contrast;
+    }
+
+    /* Mobile screenshots aspect ratio */
+    #mobile-accessibility .shot img,
+    .shot.mobile img {
+      aspect-ratio: 500 / 900;
+    }
+    
+    figcaption {
+      padding: 1.8mm 3mm;
+      color: #4a5c51;
+      background: #ffffff;
+      font-size: 6.9pt;
+      line-height: 1.35;
+      border-top: 0.25mm solid #e5ebe6;
+    }
+    figcaption strong { color: var(--ink); }
+    
+    /* Product Map Grid */
+    .product-map-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, auto);
+      gap: 2.2mm;
+      margin: 2mm 0 3mm;
+    }
+    .map-card {
+      border: 0.28mm solid #cad6cc;
+      border-radius: 2mm;
+      background: #ffffff;
+      overflow: hidden;
+      box-shadow: 0 1mm 2.5mm rgba(23, 38, 53, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .map-card-img {
+      height: 33mm;
+      overflow: hidden;
+      background: #eef2ee;
+      border-bottom: 0.25mm solid #dce4dd;
+      position: relative;
+    }
+    .map-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+    .map-card-body {
+      padding: 1.4mm 2mm 1.8mm;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .map-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6mm;
+    }
+    .map-card-num {
+      font-size: 5.8pt;
+      font-weight: 800;
+      color: var(--green);
+      font-family: Consolas, monospace;
+    }
+    .map-card-title {
+      font-size: 7.2pt;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .map-card-desc {
+      font-size: 5.8pt;
+      color: var(--muted);
+      line-height: 1.25;
+      margin-top: 0.4mm;
+    }
+    
+    /* Persona Journey Flow */
+    .journey-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+      margin: 2mm 0;
+    }
+    .journey-step {
+      display: grid;
+      grid-template-columns: 28mm 1fr 48mm;
+      align-items: center;
+      gap: 3mm;
+      padding: 2.2mm 3mm;
+      border: 0.28mm solid var(--line);
+      border-radius: 2mm;
+      background: #ffffff;
+    }
+    .journey-step.highlight {
+      border-color: var(--green-border);
+      background: #f7fbf8;
+    }
+    .journey-step-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6mm;
+    }
+    .journey-step-badge b {
+      font-size: 6.4pt;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .journey-step-badge span {
+      font-family: Consolas, monospace;
+      font-size: 5.8pt;
+      color: var(--muted);
+    }
+    .journey-step-content strong {
+      font-size: 7.8pt;
+      color: var(--ink);
+      display: block;
+      margin-bottom: 0.4mm;
+    }
+    .journey-step-content p {
+      font-size: 7pt;
+      color: #495a67;
+      margin: 0;
+      line-height: 1.32;
+    }
+    .journey-step-metric {
+      padding: 1.5mm 2mm;
+      border-radius: 1.5mm;
+      background: #edf3ee;
+      border: 0.2mm solid #cad9cc;
+      font-size: 6.4pt;
+      color: var(--green-dark);
+      text-align: right;
+    }
+    .journey-step-metric b { display: block; font-size: 8pt; color: var(--green-dark); }
+    
+    /* Feature Highlight Matrix for Stand Out */
+    .standout-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.8mm;
+      margin: 2mm 0 3mm;
+    }
+    .standout-item {
+      padding: 2.8mm 3.2mm;
+      border: 0.28mm solid #c8d8cb;
+      border-radius: 2.4mm;
+      background: #ffffff;
+      position: relative;
+    }
+    .standout-item::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1.2mm;
+      border-radius: 2mm 0 0 2mm;
+      background: var(--green);
+    }
+    .standout-item.blue::before { background: var(--blue); }
+    .standout-item.amber::before { background: var(--amber); }
+    .standout-item.purple::before { background: var(--purple); }
+    .standout-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2mm;
+    }
+    .standout-header h4 {
+      font-size: 8.4pt;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .standout-item p {
+      font-size: 7.1pt;
+      color: #485864;
+      line-height: 1.36;
+      margin-bottom: 1.2mm;
+    }
+    .standout-footer {
+      font-family: Consolas, monospace;
+      font-size: 6.2pt;
+      color: #5b7062;
+      background: #f2f7f3;
+      padding: 0.8mm 1.6mm;
+      border-radius: 1mm;
+      display: inline-block;
+    }
+    
+    .toc { margin-top: 3mm; }
+    .toc-row {
+      display: grid;
+      grid-template-columns: 8mm auto 1fr 9mm;
+      align-items: center;
+      gap: 2mm;
+      min-height: 7.4mm;
+      border-bottom: 0.25mm solid var(--line);
+      font-size: 7.8pt;
+    }
+    .toc-row b { color: var(--green-dark); font-size: 7.2pt; }
+    .toc-row i { height: 0.25mm; background: repeating-linear-gradient(90deg, #c7d1ca 0 1mm, transparent 1mm 2mm); }
+    .toc-row span:last-child { text-align: right; font-weight: 700; color: var(--ink); }
+    
+    .diagram-box {
+      padding: 2.5mm 3mm;
+      border: 0.3mm solid var(--line);
+      border-radius: 2.2mm;
+      background: #f8faf8;
+      font-family: Consolas, monospace;
+      font-size: 7pt;
+      line-height: 1.45;
+      color: #3b4e42;
+    }
+    .formula-box {
+      padding: 2.5mm 3mm;
+      border-radius: 2.2mm;
+      color: #ebf5ee;
+      background: var(--dark-card);
+      font-family: Consolas, monospace;
+      font-size: 7.3pt;
+      line-height: 1.5;
+      margin: 1.8mm 0 2.5mm;
+    }
+    
+    .cover { padding: 0; background: linear-gradient(145deg, #172635 0%, #203c2e 65%, #305741 100%); color: #fff; }
+    .cover::before { width: 6.5mm; background: var(--green); }
+    .cover-inner {
+      min-height: 297mm;
+      height: 297mm;
+      padding: 22mm 20mm 20mm 24mm;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .cover-brand { display: flex; align-items: center; gap: 3.5mm; font-size: 15pt; font-weight: 800; }
+    .cover-brand svg { width: 12mm; height: 12mm; }
+    .cover-brand span span { color: #96c4a1; }
+    .cover-main { margin: auto 0; }
+    .cover .eyebrow { color: #a9d4b3; }
+    .cover h1 { font-size: 34pt; color: #fff; line-height: 1.1; margin-bottom: 2.5mm; }
+    .cover h1 em { color: #9cd1a9; font-style: normal; }
+    .cover .lede { color: #d6e2db; max-width: 145mm; font-size: 10.8pt; line-height: 1.45; }
+    .cover-badge-row { display: flex; gap: 2.2mm; margin: 3.5mm 0 5mm; }
+    .cover-pill {
+      padding: 1.2mm 3.2mm;
+      border: 0.3mm solid rgba(255,255,255,0.25);
+      border-radius: 20mm;
+      background: rgba(255,255,255,0.08);
+      font-size: 6.8pt;
+      font-weight: 700;
+      color: #c9e4d0;
+      letter-spacing: 0.04em;
+    }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5mm;
+      padding-top: 4.5mm;
+      border-top: 0.3mm solid rgba(255,255,255,0.22);
+    }
+    .cover-meta span { display: block; color: #a3b6ab; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; }
+    .cover-meta strong { display: block; margin-top: 0.8mm; color: #fff; font-size: 8.5pt; }
+    
+    .cover-team {
+      margin: 3.5mm 0 4.5mm;
+      padding: 2.8mm 3.5mm;
+      border: 0.28mm solid rgba(255,255,255,0.22);
+      border-radius: 2.5mm;
+      background: rgba(255,255,255,0.06);
+    }
+    .cover-team-title {
+      font-size: 6.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a9d4b3;
+      font-weight: 800;
+      margin-bottom: 1.8mm;
+    }
+    .cover-team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.8mm 4.5mm;
+    }
+    .cover-member strong {
+      display: block;
+      color: #fff;
+      font-size: 7.4pt;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .cover-member span {
+      display: block;
+      color: #c9e4d0;
+      font-size: 6.4pt;
+      font-family: Consolas, monospace;
+    }
+    
+    .section-number {
+      position: absolute;
+      right: 12mm;
+      top: 11mm;
+      color: #edf3ee;
+      font-size: 46pt;
+      font-weight: 900;
+      line-height: 1;
+      user-select: none;
+      z-index: 0;
+    }
+    
+    .signoff { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin-top: 4.5mm; }
+    .signoff div { padding-top: 6mm; border-bottom: 0.3mm solid #98a79d; }
+    .signoff span { display: block; margin-bottom: 1.2mm; color: var(--muted); font-size: 6.5pt; text-transform: uppercase; }
+    
+    @media print {
+      @page { size: A4 portrait; margin: 0; }
+      html, body { width: 210mm; background: #fff; }
+      .toolbar { display: none !important; }
+      .document { padding: 0; }
+      .page { width: 210mm; height: 297mm; min-height: 297mm; margin: 0; box-shadow: none; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <strong>PathSeeker — Project Documentation &amp; Visual Reference</strong>
+    <small>StackVerse · Lead: Mirza Abdullah (1600671) · TechWiz 2026</small>
+    <button onclick="saveEditedCopy('pathseeker-project-documentation.html')">Download HTML</button>
+    <button class="primary" onclick="window.print()">Print / Save PDF</button>
+  </div>
+
+  <main class="document">
+
+    <!-- ==========================================
+         PAGE 01: COVER
+         ========================================== -->
+    <section class="page cover" id="cover">
+      <div class="cover-inner">
+        <div class="cover-brand">
+          <svg class="cover-brand-icon" viewBox="0 0 1500 1500" width="44" height="44" style="width:12mm;height:12mm;border-radius:2.5mm;" role="img" aria-label="PathSeeker logo">
+            <defs>
+              <linearGradient id="doc1-logo-green" x1="220" y1="160" x2="1280" y2="1370" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#7ca287"/>
+                <stop offset="0.52" stop-color="#628f72"/>
+                <stop offset="1" stop-color="#416d55"/>
+              </linearGradient>
+              <radialGradient id="doc1-logo-highlight" cx="0" cy="0" r="1" gradientTransform="translate(390 300) rotate(44) scale(860)" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#ffffff" stop-opacity="0.18"/>
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <rect x="58" y="58" width="1384" height="1384" rx="350" fill="url(#doc1-logo-green)"/>
+            <rect x="58" y="58" width="1384" height="1384" rx="350" fill="url(#doc1-logo-highlight)"/>
+            <g transform="translate(135 135) scale(0.82)">
+              <g transform="matrix(3.155315,0,0,3.155315,-441.771323,-1854.071299)" fill="#f7f6f1">
+                <g transform="matrix(0.905851,0,0,0.842175,-751.716998,175.976069)">
+                  <path d="M1345.219,542.865L1401.505,488.716L1401.69,601.373L1401.69,806.804C1366.921,1078.927 1334.383,905.851 1323.889,835.516C1321.556,819.856 1320.385,804.044 1320.385,788.211C1320.381,763.456 1320.378,721.006 1320.377,679.853C1290.748,708.448 1260.174,737.954 1242.349,755.153C1230.956,766.149 1218.766,776.287 1205.878,785.484C1147.984,826.779 1000.855,923.564 1172.507,709.565L1345.219,542.865Z"/>
+                </g>
+                <g transform="matrix(0.853654,0,0,0.91521,48.661591,78.039827)">
+                  <path d="M292.387,1076.248C292.387,1076.248 307.941,986.81 340.994,898.345C340.994,898.345 361.41,837.099 391.546,875.985C391.546,875.985 434.904,917.788 402.532,954.729C402.532,954.729 337.106,1042.223 292.387,1076.248"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+          <span>Path<span>Seeker</span></span>
+        </div>
+        <div class="cover-main">
+          <div class="eyebrow">Aptech TechWiz Submission · Full-Stack Web Application</div>
+          <h1>Career <em>Passport</em><br>Project Documentation</h1>
+          <p class="lede">An intelligent, explainable career-guidance platform uniting psychometric self-discovery, BLS occupational intelligence, PDF workbooks, expert multimedia, community narratives, interactive simulation, and conversational guidance.</p>
+          <div class="cover-badge-row">
+            <span class="cover-pill">MERN ARCHITECTURE</span>
+            <span class="cover-pill">EXPLAINABLE FIT &amp; READINESS</span>
+            <span class="cover-pill">NAVI AI VOICE AGENT</span>
+            <span class="cover-pill">WCAG 2.1 AA/AAA</span>
+          </div>
+          <div class="cover-team">
+            <div class="cover-team-title">Development Team &amp; Student Identifiers · StackVerse</div>
+            <div class="cover-team-grid">
+              <div class="cover-member">
+                <strong>MIRZA ABDULLAH BAIG</strong>
+                <span>ID: 1600671 · Lead Frontend / Backend / Voice</span>
+              </div>
+              <div class="cover-member">
+                <strong>HAMZA SHOAIB</strong>
+                <span>ID: 1598434 · Team Backend</span>
+              </div>
+              <div class="cover-member">
+                <strong>GHULAM MOIN UDDIN</strong>
+                <span>ID: 1612301 · Team Voice</span>
+              </div>
+              <div class="cover-member">
+                <strong>MUHAMMAD FARUKH</strong>
+                <span>ID: 1612368 · Team Voice</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cover-meta">
+          <div><span>Competition</span><strong>Aptech TechWiz</strong></div>
+          <div><span>Project Team</span><strong>StackVerse</strong></div>
+          <div><span>Submission Date</span><strong>27 August 2026 · v1.0</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 02: DOCUMENT CONTROL & CONTENTS
+         ========================================== -->
+    <section class="page" id="doc-control">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>DOCUMENT CONTROL &amp; TABLE OF CONTENTS</span></div>
+      <span class="section-number">01</span>
+      <div class="eyebrow">Document Governance</div>
+      <h2>Document Control &amp; Navigation</h2>
+      <div class="grid-2">
+        <div class="card accent">
+          <h3>Document Purpose</h3>
+          <p class="small">This document provides comprehensive academic and technical documentation for the PathSeeker Career Passport platform, covering system scope, user experience with high-resolution visual evidence, data models, APIs, and SRS traceability.</p>
+        </div>
+        <div class="card">
+          <h3>Authority Order</h3>
+          <p class="small">1. <code>PathSeeker_Career_Passport_SRS_Clean.md</code> (Governing Requirements)<br>2. Verified Source (<code>Project/frontend</code> &amp; <code>backend1</code>)<br>3. Automated Test Evidence (47 passing automated tests).</p>
+        </div>
+      </div>
+
+      <h3>Table of Contents</h3>
+      <div class="toc">
+        <div class="toc-row"><b>01</b><span>Document Control &amp; Reading Guide</span><i></i><span>02</span></div>
+        <div class="toc-row"><b>02</b><span>Executive Summary &amp; Core Value</span><i></i><span>03</span></div>
+        <div class="toc-row"><b>03</b><span>Problem Definition &amp; Target Personas</span><i></i><span>04</span></div>
+        <div class="toc-row"><b>04</b><span>Persona Journey: Alex's Pathway from Confusion to Direction</span><i></i><span>05</span></div>
+        <div class="toc-row"><b>05</b><span>System Architecture &amp; Technology Stack</span><i></i><span>06</span></div>
+        <div class="toc-row"><b>06</b><span>Complete Product Map: 16-Screen System Overview</span><i></i><span>07</span></div>
+        <div class="toc-row"><b>07</b><span>Product Walkthrough: Welcome, Authentication &amp; Onboarding</span><i></i><span>08</span></div>
+        <div class="toc-row"><b>08</b><span>Product Walkthrough: Personalized Dashboard &amp; Career Passport</span><i></i><span>09</span></div>
+        <div class="toc-row"><b>09</b><span>Product Walkthrough: Assessment Quiz &amp; Recommendations Engine</span><i></i><span>10</span></div>
+        <div class="toc-row"><b>10</b><span>Product Walkthrough: Career Bank, Deep Detail &amp; Skill Simulator</span><i></i><span>11</span></div>
+        <div class="toc-row"><b>11</b><span>Product Walkthrough: Curated PDF Resources, Media &amp; Saved Notes</span><i></i><span>12</span></div>
+        <div class="toc-row"><b>12</b><span>Product Walkthrough: Community Stories &amp; Feedback</span><i></i><span>13</span></div>
+        <div class="toc-row"><b>13</b><span>Product Walkthrough: Navi Assistant &amp; Voice Guidance Mode</span><i></i><span>14</span></div>
+        <div class="toc-row"><b>14</b><span>Product Walkthrough: Admin Control Center &amp; Workspaces</span><i></i><span>15</span></div>
+        <div class="toc-row"><b>15</b><span>Mobile Experience &amp; Accessibility Engineering</span><i></i><span>16</span></div>
+        <div class="toc-row"><b>16</b><span>Data Architecture &amp; MongoDB Domain Model</span><i></i><span>17</span></div>
+        <div class="toc-row"><b>17</b><span>Career Intelligence &amp; Deterministic Scoring Formulas</span><i></i><span>18</span></div>
+        <div class="toc-row"><b>18</b><span>API Catalogue &amp; Security Controls</span><i></i><span>19</span></div>
+        <div class="toc-row"><b>19</b><span>Why PathSeeker Stands Out: Technical &amp; Architectural Differentiators</span><i></i><span>20</span></div>
+        <div class="toc-row"><b>20</b><span>Test Evidence &amp; SRS Requirement Traceability Matrix</span><i></i><span>21</span></div>
+        <div class="toc-row"><b>21</b><span>Installation, Deployment &amp; Evaluation Sign-Off</span><i></i><span>22</span></div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · CONTROLLED PROJECT DOCUMENT</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 03: EXECUTIVE SUMMARY
+         ========================================== -->
+    <section class="page" id="executive-summary">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>EXECUTIVE SUMMARY</span></div>
+      <span class="section-number">02</span>
+      <div class="eyebrow">Product Vision</div>
+      <h2>Executive Summary: From Confusion to Direction</h2>
+      <p class="lede">PathSeeker is a modern full-stack Career Passport web application designed to guide students, graduates, and professionals from career uncertainty to confident, evidence-based career decisions.</p>
+
+      <div class="grid-4" style="margin-bottom: 3.5mm;">
+        <div class="card metric"><div class="metric">21+</div><span class="small muted">Responsive Web Screens</span></div>
+        <div class="card metric"><div class="metric">15</div><span class="small muted">Sourced BLS Careers</span></div>
+        <div class="card metric"><div class="metric">6+6</div><span class="small muted">PDFs &amp; Expert Media</span></div>
+        <div class="card metric"><div class="metric">47</div><span class="small muted">Passing Automated Tests</span></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card soft">
+          <h3>The Challenge</h3>
+          <ul>
+            <li><strong>Fragmented Information:</strong> Job market facts, salary statistics, and courses are scattered across opaque portals.</li>
+            <li><strong>Black-Box Advice:</strong> Existing guidance engines give arbitrary job titles without explaining <em>why</em> a role matches.</li>
+            <li><strong>Skill Blind Spots:</strong> Learners don't know the exact skills required to bridge the gap to their target roles.</li>
+          </ul>
+        </div>
+        <div class="card accent">
+          <h3>The PathSeeker Solution</h3>
+          <ul>
+            <li><strong>Durable Career Passport:</strong> Captures archetype, normalized trait signals, and verified profile skills.</li>
+            <li><strong>Explainable Compatibility &amp; Readiness:</strong> Separate scores for intrinsic fit vs. immediate skill preparation.</li>
+            <li><strong>Interactive Simulator:</strong> What-if skill growth modeling without mutating underlying records.</li>
+            <li><strong>Integrated Content:</strong> Direct access to 51 pages of PDF guides and curated Google Career Certificates videos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Core Architectural Tenets</h3>
+      <div class="grid-3">
+        <div class="card">
+          <div class="badge green">DETERMINISTIC</div>
+          <h4 style="margin-top:1.5mm">Auditable Intelligence</h4>
+          <p class="small muted">Scoring formulas are mathematical and version-locked on the server; zero hallucination.</p>
+        </div>
+        <div class="card">
+          <div class="badge blue">ACCESSIBLE</div>
+          <h4 style="margin-top:1.5mm">Inclusive by Default</h4>
+          <p class="small muted">Theme switching, 85–130% font scaling, reduced motion, and complete keyboard navigation.</p>
+        </div>
+        <div class="card">
+          <div class="badge amber">HUMAN-CENTERED</div>
+          <h4 style="margin-top:1.5mm">Navi Guidance</h4>
+          <p class="small muted">Contextual assistant supporting voice and text mode for intuitive navigation and exploration.</p>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · EXECUTIVE OVERVIEW</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 04: PROBLEM DEFINITION & PERSONAS
+         ========================================== -->
+    <section class="page" id="problem-personas">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PROBLEM DEFINITION &amp; TARGET PERSONAS</span></div>
+      <span class="section-number">03</span>
+      <div class="eyebrow">Context &amp; User Research</div>
+      <h2>Target Personas &amp; Boundary Model</h2>
+      
+      <div class="grid-4" style="margin-bottom: 3.5mm;">
+        <div class="card accent">
+          <div class="badge green">SUPER ADMIN</div>
+          <h3 style="margin-top:1.5mm">Sarah Malik</h3>
+          <p class="small"><strong>Stage:</strong> Platform Administrator<br><strong>Credentials:</strong> <code>admin@pathseeker.local</code> · <code>PathSeeker-Demo-2026!</code><br><strong>Profile:</strong> Master administrator with catalog curation, user role governance, and audit inspection.</p>
+        </div>
+        <div class="card">
+          <div class="badge blue">STUDENT</div>
+          <h3 style="margin-top:1.5mm">Alex Morgan</h3>
+          <p class="small"><strong>Stage:</strong> Undergraduate (Psychology, Karachi)<br><strong>Credentials:</strong> <code>demo.student@pathseeker.local</code> · <code>PathSeeker-Demo-2026!</code><br><strong>Profile:</strong> Exploring people-centered tech careers, seeking clear skill prerequisites and role clarity.</p>
+        </div>
+        <div class="card">
+          <div class="badge amber">GRADUATE</div>
+          <h3 style="margin-top:1.5mm">Zara Noor</h3>
+          <p class="small"><strong>Stage:</strong> CS Graduate (Lahore)<br><strong>Credentials:</strong> <code>demo.graduate@pathseeker.local</code> · <code>PathSeeker-Demo-2026!</code><br><strong>Profile:</strong> Building practical full-stack skills and identifying bridge competencies to land entry dev roles.</p>
+        </div>
+        <div class="card">
+          <div class="badge purple">PROFESSIONAL</div>
+          <h3 style="margin-top:1.5mm">Daniel Kim</h3>
+          <p class="small"><strong>Stage:</strong> Finance Professional (Islamabad)<br><strong>Credentials:</strong> <code>demo.professional@pathseeker.local</code> · <code>PathSeeker-Demo-2026!</code><br><strong>Profile:</strong> Transitioning to Data Analytics, evaluating remote salary benchmarks and certification ROI.</p>
+        </div>
+      </div>
+
+      <h3>Actor Model &amp; System Capabilities</h3>
+      <table>
+        <thead><tr><th>Actor</th><th>Authentication</th><th>Core Responsibilities &amp; Capabilities</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Visitor</strong></td>
+            <td>Anonymous</td>
+            <td>Browse welcome page, inspect public career library, explore PDF resources, engage public Navi intro.</td>
+          </tr>
+          <tr>
+            <td><strong>Learner / Student</strong></td>
+            <td>Authenticated User</td>
+            <td>Complete onboarding, take quiz, view Career Passport, simulate skill growth, save bookmarks/notes, submit stories &amp; feedback.</td>
+          </tr>
+          <tr>
+            <td><strong>Content Editor</strong></td>
+            <td>Staff Role</td>
+            <td>Create and edit occupational profiles, manage PDF resource files and expert media URLs, draft quiz questions.</td>
+          </tr>
+          <tr>
+            <td><strong>Support &amp; Moderator</strong></td>
+            <td>Staff Role</td>
+            <td>Review community success story submissions, triage feedback, write responses, manage help center articles.</td>
+          </tr>
+          <tr>
+            <td><strong>Administrator</strong></td>
+            <td>Super Admin</td>
+            <td>Manage user accounts and roles, toggle maintenance mode, publish immutable quiz versions, inspect audit logs.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warning">
+        <strong>Ethical AI &amp; Safety Boundary:</strong> PathSeeker provides educational career recommendations based on U.S. BLS statistical data (2024–2034). It is not an employment guarantee, licensing certification, or legal counseling service.
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · PERSONAS &amp; SCOPE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 05: PERSONA JOURNEY (NEW PAGE)
+         ========================================== -->
+    <section class="page" id="persona-journey">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PERSONA JOURNEY · ALEX MORGAN</span></div>
+      <span class="section-number">04</span>
+      <div class="eyebrow">End-to-End User Experience</div>
+      <h2>Persona Pathway: From Uncertainty to Career Clarity</h2>
+      <p class="lede">Following student persona <strong>Alex Morgan</strong> (Undergraduate Psychology Student) through the entire PathSeeker lifecycle, demonstrating how abstract requirements translate into concrete user empowerment.</p>
+
+      <div class="journey-timeline">
+        <div class="journey-step">
+          <div class="journey-step-badge">
+            <span class="badge blue">STEP 01</span>
+            <span>/onboarding</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Guided Onboarding Wizard</strong>
+            <p>Alex selects stage <em>Undergraduate</em>, selects primary interests (<em>Human Behavior, Design, Technology</em>), and rates initial baseline skills (Figma: 3/10, Research: 5/10).</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>Stage Saved</b>
+            Profile Baseline Set
+          </div>
+        </div>
+
+        <div class="journey-step">
+          <div class="journey-step-badge">
+            <span class="badge green">STEP 02</span>
+            <span>/quiz</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Interest Assessment &amp; Snapshot Creation</strong>
+            <p>Alex completes the 8-question adaptive assessment. Backend creates an immutable snapshot locking question weights and response tokens for auditability.</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>8 Answers</b>
+            Attempt #1 Frozen
+          </div>
+        </div>
+
+        <div class="journey-step highlight">
+          <div class="journey-step-badge">
+            <span class="badge purple">STEP 03</span>
+            <span>/passport</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Career Passport Archetype Awarded</strong>
+            <p>Deterministic engine calculates trait vectors: Artistic (85%) &amp; Investigative (80%). Awards the <strong>"Insight Explorer"</strong> archetype with a 71% profile evidence signal.</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>Insight Explorer</b>
+            Evidence Score: 71%
+          </div>
+        </div>
+
+        <div class="journey-step highlight">
+          <div class="journey-step-badge">
+            <span class="badge amber">STEP 04</span>
+            <span>/recommendations</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Explainable Top Match: UX Designer</strong>
+            <p>Algorithm computes <strong>94% Compatibility</strong> (deep trait fit with empathy + analytical problem solving) alongside <strong>48% Technical Readiness</strong>.</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>94% Fit / 48% Ready</b>
+            Top Match Ranked #1
+          </div>
+        </div>
+
+        <div class="journey-step">
+          <div class="journey-step-badge">
+            <span class="badge rose">STEP 05</span>
+            <span>/careers/ux-designer</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Skill Gap Breakdown &amp; Target Setting</strong>
+            <p>System automatically extracts priority gaps: Figma (Current 3 → Target 8, Gap -5), Prototyping (Current 2 → Target 7, Gap -5), User Research (Current 5 → Target 7, Gap -2).</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>Priority Gaps</b>
+            Figma &amp; Prototyping
+          </div>
+        </div>
+
+        <div class="journey-step">
+          <div class="journey-step-badge">
+            <span class="badge blue">STEP 06</span>
+            <span>/resources</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Curated PDF Guide &amp; Expert Media Study</strong>
+            <p>Alex reads the <em>"Tech Resume &amp; Portfolio Builder"</em> (8-page PDF) in the built-in reader and watches Google's <em>"A Day in the Life: UX Designer"</em> video.</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>Workbook &amp; Video</b>
+            Direct Learning Linked
+          </div>
+        </div>
+
+        <div class="journey-step highlight">
+          <div class="journey-step-badge">
+            <span class="badge green">STEP 07</span>
+            <span>/careers/...#sim</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Interactive Skill Simulation ("What-If" Modeling)</strong>
+            <p>Alex slides Figma from 3 → 8 and Prototyping from 2 → 7. The simulator recalculates readiness from <strong>48% → 86%</strong> instantly without altering database records.</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>Readiness: 86%</b>
+            Stateless Simulation
+          </div>
+        </div>
+
+        <div class="journey-step">
+          <div class="journey-step-badge">
+            <span class="badge purple">STEP 08</span>
+            <span>/saved</span>
+          </div>
+          <div class="journey-step-content">
+            <strong>Action Plan, Bookmarks &amp; Personal Notes</strong>
+            <p>Alex bookmarks UX Designer and writes a private learning note: <em>"Target Google UX Certificate sprint by Oct 2026"</em>. Weekly target set on Dashboard.</p>
+          </div>
+          <div class="journey-step-metric">
+            <b>Goal Saved</b>
+            Active Roadmap Set
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · PERSONA JOURNEY</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 06: SYSTEM ARCHITECTURE
+         ========================================== -->
+    <section class="page" id="architecture">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>SYSTEM ARCHITECTURE &amp; STACK</span></div>
+      <span class="section-number">05</span>
+      <div class="eyebrow">Full-Stack Design</div>
+      <h2>Layered MERN Architecture &amp; Request Flow</h2>
+      
+      <div class="diagram-box" style="margin-bottom: 3.2mm;">
+        <b>[Client Layer]</b> React 18 + Vite (SPA) ── TanStack Query v5 (Server Cache) ── Zustand (UI/Preferences)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (HTTP JSON API + HttpOnly Cookie Auth)<br>
+        <b>[API Gateway]</b> Express.js ── Helmet ── CORS Allowlist ── Rate Limiters ── Context / Logging<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (Controller Layer ── Input Validation ── Session Middleware)<br>
+        <b>[Domain Services]</b> AuthService · PassportService · RecommendationEngine · CatalogService · Moderation<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ (Mongoose ODM Models &amp; Schemas)<br>
+        <b>[Data &amp; Storage]</b> MongoDB 7+ (Indexed Collections) + Local Upload Storage + Vapi Voice Webhooks
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h4>Frontend (Vite + React)</h4>
+          <p class="small muted">Modular component system, React Router 6, TanStack Query for data fetching, React Hook Form with Zod validation, responsive CSS tokens.</p>
+        </div>
+        <div class="card">
+          <h4>Backend (Node + Express)</h4>
+          <p class="small muted">RESTful API architecture, layered controller-service pattern, bcrypt password hashing, cryptographic token generation, comprehensive error handling.</p>
+        </div>
+        <div class="card">
+          <h4>Database (MongoDB)</h4>
+          <p class="small muted">27 Mongoose models, compound text &amp; unique indexes, time-to-live expiration for sessions/tokens, append-only recommendation snapshots.</p>
+        </div>
+      </div>
+
+      <h3>End-to-End Request Lifecycle</h3>
+      <div class="flow">
+        <div class="flow-step"><b>1</b><strong>User Action:</strong> Learner selects an answer choice in the career assessment or adjusts a skill slider.</div>
+        <div class="flow-step"><b>2</b><strong>API Dispatch:</strong> TanStack Query mutation fires with JSON payload and active session credentials.</div>
+        <div class="flow-step"><b>3</b><strong>Protection &amp; Auth:</strong> Express middleware verifies CSRF/CORS, rate limits, and decodes opaque session cookie.</div>
+        <div class="flow-step"><b>4</b><strong>Service Execution:</strong> Controller delegates to domain service which performs deterministic calculation and updates MongoDB.</div>
+        <div class="flow-step"><b>5</b><strong>State Reconciliation:</strong> Fresh data payload returns to browser, triggering query cache invalidation and toast alert.</div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · TECHNICAL ARCHITECTURE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 07: COMPLETE PRODUCT MAP (NEW PAGE)
+         ========================================== -->
+    <section class="page" id="product-map">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>COMPLETE PRODUCT MAP · 16-SCREEN SYSTEM OVERVIEW</span></div>
+      <span class="section-number">06</span>
+      <div class="eyebrow">Application Scope &amp; Scale</div>
+      <h2>Complete Product Map: 16 Core Web Experiences</h2>
+      <p class="lede">A high-density visual index of all 16 primary responsive web modules implemented across PathSeeker, communicating production completeness across public, learner, and administrative subsystems.</p>
+
+      <div class="product-map-grid">
+        <!-- 1. Login & Auth -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/02-signup.png" alt="Auth screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">01 / AUTH</span><span class="badge blue">Public</span></div>
+            <div class="map-card-title">Registration &amp; Auth</div>
+            <div class="map-card-desc">Password strength rules &amp; OTP email verification.</div>
+          </div>
+        </div>
+
+        <!-- 2. Onboarding -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/03-onboarding.png" alt="Onboarding screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">02 / WIZARD</span><span class="badge green">Learner</span></div>
+            <div class="map-card-title">Guided Onboarding</div>
+            <div class="map-card-desc">Academic stage, interests &amp; baseline skills setup.</div>
+          </div>
+        </div>
+
+        <!-- 3. Dashboard -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/04-dashboard.png" alt="Dashboard screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">03 / HUB</span><span class="badge green">Learner</span></div>
+            <div class="map-card-title">Learner Dashboard</div>
+            <div class="map-card-desc">Career Passport archetype, match cards &amp; goals.</div>
+          </div>
+        </div>
+
+        <!-- 4. Quiz Assessment -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/05-quiz.png" alt="Quiz screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">04 / QUIZ</span><span class="badge green">Learner</span></div>
+            <div class="map-card-title">Interest Assessment</div>
+            <div class="map-card-desc">Adaptive card assessment with snapshot locking.</div>
+          </div>
+        </div>
+
+        <!-- 5. Recommendations -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/06-recommendations.png" alt="Recommendations screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">05 / MATCH</span><span class="badge green">Learner</span></div>
+            <div class="map-card-title">Recommendations</div>
+            <div class="map-card-desc">Explainable Fit % vs. Technical Readiness %.</div>
+          </div>
+        </div>
+
+        <!-- 6. Career Bank -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/07-career-bank.png" alt="Career Bank screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">06 / BANK</span><span class="badge blue">Public</span></div>
+            <div class="map-card-title">Career Bank Catalog</div>
+            <div class="map-card-desc">15 BLS careers with domain &amp; salary filters.</div>
+          </div>
+        </div>
+
+        <!-- 7. Career Detail -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/08-career-detail.png" alt="Career Detail screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">07 / DETAIL</span><span class="badge blue">Public</span></div>
+            <div class="map-card-title">Career Detail Deep-Dive</div>
+            <div class="map-card-desc">BLS wages, growth projections &amp; core duties.</div>
+          </div>
+        </div>
+
+        <!-- 8. Skill Simulator -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/08-career-detail.png" alt="Simulator screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">08 / SIM</span><span class="badge purple">Interactive</span></div>
+            <div class="map-card-title">Skill Gap Simulator</div>
+            <div class="map-card-desc">Dynamic what-if modeling without data mutation.</div>
+          </div>
+        </div>
+
+        <!-- 9. Resources & PDFs -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/09-resources.png" alt="Resources screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">09 / DOCS</span><span class="badge green">Learner</span></div>
+            <div class="map-card-title">PDF Resource Library</div>
+            <div class="map-card-desc">6 original PDF workbooks &amp; expert media links.</div>
+          </div>
+        </div>
+
+        <!-- 10. Saved & Notes -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/10-saved-notes.png" alt="Saved Notes screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">10 / SAVED</span><span class="badge green">Learner</span></div>
+            <div class="map-card-title">Saved Notes &amp; Matrix</div>
+            <div class="map-card-desc">Polymorphic bookmarks &amp; private career notes.</div>
+          </div>
+        </div>
+
+        <!-- 11. Success Stories -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/11-success-stories.png" alt="Stories screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">11 / SOCIAL</span><span class="badge blue">Public</span></div>
+            <div class="map-card-title">Success Stories Hub</div>
+            <div class="map-card-desc">Community transition journeys &amp; milestones.</div>
+          </div>
+        </div>
+
+        <!-- 12. Feedback & Support -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/13-feedback.png" alt="Feedback screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">12 / HELP</span><span class="badge blue">Public</span></div>
+            <div class="map-card-title">Feedback &amp; Triage</div>
+            <div class="map-card-desc">Categorized sentiment &amp; admin replies.</div>
+          </div>
+        </div>
+
+        <!-- 13. Navi Voice Assistant -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/14-voice-mode.png" alt="Navi Voice screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">13 / AI</span><span class="badge amber">Voice AI</span></div>
+            <div class="map-card-title">Navi Voice Assistant</div>
+            <div class="map-card-desc">Conversational speech agent with live state moods.</div>
+          </div>
+        </div>
+
+        <!-- 14. Admin Overview -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/15-admin-overview.png" alt="Admin screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">14 / OPS</span><span class="badge rose">Admin</span></div>
+            <div class="map-card-title">Admin KPI Overview</div>
+            <div class="map-card-desc">Real-time system telemetry &amp; active user metrics.</div>
+          </div>
+        </div>
+
+        <!-- 15. Admin Quiz Builder -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/desktop/19-admin-quiz-builder.png" alt="Quiz Builder screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">15 / OPS</span><span class="badge rose">Admin</span></div>
+            <div class="map-card-title">Admin Quiz Builder</div>
+            <div class="map-card-desc">Immutable versioning &amp; trait weight mapping.</div>
+          </div>
+        </div>
+
+        <!-- 16. Mobile View -->
+        <div class="map-card">
+          <div class="map-card-img"><img src="../../Project/frontend/screenshots/mobile/02-dashboard-mobile.png" alt="Mobile Dashboard screen"></div>
+          <div class="map-card-body">
+            <div class="map-card-header"><span class="map-card-num">16 / MOB</span><span class="badge purple">Mobile</span></div>
+            <div class="map-card-title">Mobile Dashboard</div>
+            <div class="map-card-desc">Touch-optimized responsive viewport &amp; cards.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · COMPLETE PRODUCT MAP</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 08: WALKTHROUGH 1 - WELCOME, SIGNUP, ONBOARDING
+         ========================================== -->
+    <section class="page" id="walkthrough-1">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · AUTHENTICATION</span></div>
+      <span class="section-number">07</span>
+      <div class="eyebrow">Entry Experience</div>
+      <h2>Welcome, Authentication &amp; Guided Onboarding</h2>
+      
+      <div class="grid-2">
+        <figure class="shot half">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 01 · Welcome</span><span class="url">/</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/01-welcome.png" alt="PathSeeker Welcome screen">
+          <figcaption><strong>Figure 01: Welcome Page.</strong> Clean value proposition with direct entry to Quiz, Career Bank, and Navi voice guidance.</figcaption>
+        </figure>
+
+        <figure class="shot half">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 02 · Registration</span><span class="url">/signup</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/02-signup.png" alt="PathSeeker Signup screen">
+          <figcaption><strong>Figure 02: Signup Page.</strong> Strict password strength validation, password visibility toggle, and instant client feedback.</figcaption>
+        </figure>
+      </div>
+
+      <figure class="shot half" style="margin-top: 1mm;">
+        <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 03 · Guided Onboarding Wizard</span><span class="url">/onboarding</span></div>
+        <img src="../../Project/frontend/screenshots/desktop/03-onboarding.png" alt="PathSeeker Onboarding screen">
+        <figcaption><strong>Figure 03: Onboarding Flow.</strong> Captures academic stage, top interests, career aspirations, and current self-rated skills.</figcaption>
+      </figure>
+
+      <div class="grid-2">
+        <div class="card soft">
+          <h4>Security Invariants</h4>
+          <p class="small muted">Passwords are hashed using bcrypt with salt rounds = 12. Email verification OTPs use single-use cryptographic tokens with a 15-minute expiry.</p>
+        </div>
+        <div class="card soft">
+          <h4>Onboarding Progression</h4>
+          <p class="small muted">Step-by-step state saved in session storage allowing learners to complete onboarding seamlessly even after page refreshes.</p>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · ENTRY</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 09: WALKTHROUGH 2 - DASHBOARD & PASSPORT (DEDICATED LARGE)
+         ========================================== -->
+    <section class="page" id="walkthrough-2">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · DASHBOARD &amp; PASSPORT</span></div>
+      <span class="section-number">08</span>
+      <div class="eyebrow">Learner Command Center</div>
+      <h2>Personalized Dashboard &amp; Career Passport</h2>
+      <p class="lede">The primary learner landing experience synthesizes assessment traits, top recommendations, weekly learning milestones, and bookmark shortcuts into an actionable Career Passport.</p>
+
+      <figure class="shot hero">
+        <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 04 · Learner Dashboard &amp; Career Passport</span><span class="url">/dashboard</span></div>
+        <img src="../../Project/frontend/screenshots/desktop/04-dashboard.png" alt="PathSeeker Dashboard screen">
+        <figcaption><strong>Figure 04: Learner Dashboard &amp; Career Passport.</strong> High-impact overview showing the student's primary archetype ("Insight Explorer"), 71% profile evidence signal, top career recommendations, weekly study tracker, and quick action cards.</figcaption>
+      </figure>
+
+      <div class="grid-3" style="margin-top: 1mm;">
+        <div class="card accent">
+          <h4>Career Passport Archetype</h4>
+          <p class="small muted">Categorizes learners into 6 distinct behavioral archetypes (e.g. <em>Insight Explorer</em>, <em>Imaginative Builder</em>) based on dominant trait vectors.</p>
+        </div>
+        <div class="card">
+          <h4>Evidence Signals (7 Milestones)</h4>
+          <p class="small muted">Calculates a transparent 0–100% completion score across education, skills, interests, goals, quiz attempts, bookmarks, and notes.</p>
+        </div>
+        <div class="card">
+          <h4>Instant Recommendations</h4>
+          <p class="small muted">Surfaces top 3 career pathways with compatibility percentages and direct one-click links to deep-dive roadmaps and skill simulators.</p>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · DASHBOARD</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 10: WALKTHROUGH 3 - QUIZ & RECOMMENDATIONS (DEDICATED LARGE)
+         ========================================== -->
+    <section class="page" id="walkthrough-3">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · ASSESSMENT &amp; MATCHING</span></div>
+      <span class="section-number">09</span>
+      <div class="eyebrow">Psychometric Discovery &amp; Match Engine</div>
+      <h2>Interest Assessment &amp; Recommendations Explorer</h2>
+      <p class="lede">PathSeeker separates assessment into two distinct phases: taking the snapshot-locked psychometric assessment and exploring mathematically explainable recommendations.</p>
+
+      <figure class="shot large">
+        <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 06 · Recommendations &amp; Explainable Matching</span><span class="url">/recommendations</span></div>
+        <img src="../../Project/frontend/screenshots/desktop/06-recommendations.png" alt="PathSeeker Recommendations screen">
+        <figcaption><strong>Figure 05: Recommendations Explorer.</strong> High-legibility showcase displaying ranked career cards with dual Compatibility % vs. Readiness % metrics, exact match factors, and missing skill badges.</figcaption>
+      </figure>
+
+      <div class="grid-2" style="margin-top: 1mm;">
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 05 · Assessment Quiz</span><span class="url">/quiz</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/05-quiz.png" alt="PathSeeker Quiz screen">
+          <figcaption class="small"><strong>Card Quiz:</strong> Resumable progress with audio voice input.</figcaption>
+        </figure>
+
+        <div class="card soft">
+          <h4>Snapshot Integrity &amp; Versioning</h4>
+          <p class="small muted">Assessment attempts create frozen records in MongoDB linking the active question version. Content editors can update future quiz questions without mutating or invalidating historical student results.</p>
+          <div class="badge green" style="margin-top: 1mm;">IMMUTABLE AUDIT TRAIL</div>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · INTELLIGENCE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 11: WALKTHROUGH 4 - CAREER BANK, DETAIL & SIMULATOR (DEDICATED LARGE)
+         ========================================== -->
+    <section class="page" id="walkthrough-4">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · OCCUPATIONAL INTELLIGENCE</span></div>
+      <span class="section-number">10</span>
+      <div class="eyebrow">Occupational Catalog &amp; Simulation</div>
+      <h2>Career Bank, Deep Detail &amp; Skill Simulator</h2>
+      <p class="lede">Comprehensive occupational intelligence powered by U.S. Bureau of Labor Statistics data (2024–2034) featuring an interactive skill simulator for real-time what-if modeling.</p>
+
+      <figure class="shot hero">
+        <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 08 · Career Detail Deep-Dive &amp; Skill Simulator</span><span class="url">/careers/ux-designer</span></div>
+        <img src="../../Project/frontend/screenshots/desktop/08-career-detail.png" alt="PathSeeker Career Detail screen">
+        <figcaption><strong>Figure 06: Career Detail &amp; Skill Simulator.</strong> Full occupational overview featuring BLS median salary ($98,540/yr), 16% growth demand, core work duties, and the interactive skill growth simulator.</figcaption>
+      </figure>
+
+      <div class="grid-3" style="margin-top: 1mm;">
+        <div class="card accent">
+          <h4>BLS Occupational Data</h4>
+          <p class="small muted">Median annual wages, 10-year growth percentages, entry education levels, and on-the-job training requirements sourced from BLS 2024–2034.</p>
+        </div>
+        <div class="card">
+          <h4>Stateless Skill Simulator</h4>
+          <p class="small muted">Learners adjust skill sliders to immediately observe recalculated readiness without altering their verified profile records (persisted: false).</p>
+        </div>
+        <div class="card">
+          <h4>Multi-Facet Career Bank</h4>
+          <p class="small muted">Filterable by domain, salary brackets ($50k–$150k+), growth rate, education level, and required skill tags across 15 sourced careers.</p>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · CAREERS</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 12: WALKTHROUGH 5 - RESOURCES, MEDIA & SAVED
+         ========================================== -->
+    <section class="page" id="walkthrough-5">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · LEARNING &amp; SAVED</span></div>
+      <span class="section-number">11</span>
+      <div class="eyebrow">Learning Center</div>
+      <h2>Curated PDF Resources, Expert Media &amp; Notes</h2>
+      
+      <div class="grid-2">
+        <figure class="shot half">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 09 · Resource Library</span><span class="url">/resources</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/09-resources.png" alt="PathSeeker Resources screen">
+          <figcaption><strong>Figure 07: Resource Library.</strong> 6 original PDF workbooks (51 pages total) with built-in viewer and verified download counters.</figcaption>
+        </figure>
+
+        <figure class="shot half">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 10 · Saved Workspace</span><span class="url">/saved</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/10-saved-notes.png" alt="PathSeeker Saved Notes screen">
+          <figcaption><strong>Figure 08: Saved Workspace.</strong> Polymorphic bookmarking for careers, articles, and videos with editable private learner notes.</figcaption>
+        </figure>
+      </div>
+
+      <h3>Resource Verification &amp; Provenance Matrix</h3>
+      <table>
+        <thead><tr><th>Resource Title</th><th>Format</th><th>Pages / Duration</th><th>Audience &amp; Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Career Transition Roadmap Workbook</strong></td><td>Original PDF</td><td>12 Pages</td><td>Action planning, milestone scheduling, and risk mitigation.</td></tr>
+          <tr><td><strong>Tech Resume &amp; Portfolio Builder</strong></td><td>Original PDF</td><td>8 Pages</td><td>Structuring developer/designer portfolios and GitHub repos.</td></tr>
+          <tr><td><strong>A Day in the Life: UX Designer</strong></td><td>Expert Video</td><td>14 mins</td><td>Google Career Certificates overview of daily design sprints.</td></tr>
+          <tr><td><strong>Demystifying Cloud Engineering</strong></td><td>Expert Video</td><td>18 mins</td><td>Industry overview of cloud architecture and AWS/GCP certs.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · LEARNING</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 13: WALKTHROUGH 6 - STORIES & FEEDBACK
+         ========================================== -->
+    <section class="page" id="walkthrough-6">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · COMMUNITY</span></div>
+      <span class="section-number">12</span>
+      <div class="eyebrow">Community &amp; Continuous Improvement</div>
+      <h2>Success Stories Hub &amp; Learner Feedback</h2>
+
+      <div class="grid-2">
+        <figure class="shot half">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 11 · Success Stories Hub</span><span class="url">/stories</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/11-success-stories.png" alt="PathSeeker Success Stories screen">
+          <figcaption><strong>Figure 09: Success Stories.</strong> Inspiring transition journeys submitted by community members with domain tags and milestone timelines.</figcaption>
+        </figure>
+
+        <figure class="shot half">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 13 · Feedback &amp; Support</span><span class="url">/feedback</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/13-feedback.png" alt="PathSeeker Feedback screen">
+          <figcaption><strong>Figure 10: Feedback Modal.</strong> Star ratings, categorized sentiment (Bug, Suggestion, Praise), and admin response tracking.</figcaption>
+        </figure>
+      </div>
+
+      <div class="grid-2">
+        <div class="card soft">
+          <h4>Story Moderation Lifecycle</h4>
+          <p class="small muted">Draft → Submitted → Under Staff Review → Approved / Changes Requested → Published. Ensures all public stories meet community safety guidelines.</p>
+        </div>
+        <div class="card soft">
+          <h4>Feedback Triage Loop</h4>
+          <p class="small muted">Submissions appear in admin queue. When staff replies, the user receives an in-app notification and can view the resolution directly.</p>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · COMMUNITY</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 14: WALKTHROUGH 7 - NAVI VOICE & ASSISTANT (DEDICATED LARGE)
+         ========================================== -->
+    <section class="page" id="walkthrough-7">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · NAVI VOICE AI</span></div>
+      <span class="section-number">13</span>
+      <div class="eyebrow">Conversational Guidance</div>
+      <h2>Navi Assistant &amp; Voice Guidance Mode</h2>
+      <p class="lede">An interactive guidance character with full voice interaction, animated contextual moods (Listening, Thinking, Speaking), and automatic deep-route navigation.</p>
+
+      <figure class="shot hero">
+        <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 14 · Navi Assistant in Live Voice Mode</span><span class="url">/assistant (Voice Mode)</span></div>
+        <img src="../../Project/frontend/screenshots/desktop/14-voice-mode.png" alt="PathSeeker Voice Mode screen">
+        <figcaption><strong>Figure 11: Navi AI Assistant in Voice Guidance Mode.</strong> Full-screen voice dialog featuring reactive mood visualizers, real-time speech synthesis, intent detection, and automated in-app screen redirection.</figcaption>
+      </figure>
+
+      <div class="grid-3" style="margin-top: 1mm;">
+        <div class="card accent">
+          <h4>Intent Detection &amp; Navigation</h4>
+          <p class="small muted">Understands queries like <em>"What careers fit creative thinkers?"</em> or <em>"Show me Cloud Architect salaries"</em> and automatically deep-links to the exact view.</p>
+        </div>
+        <div class="card">
+          <h4>Conversational Mutations</h4>
+          <p class="small muted">Allows learners to add skills to their profile, adjust career goals, or bookmark resources conversationally with session verification.</p>
+        </div>
+        <div class="card">
+          <h4>Vapi &amp; Local Fallback</h4>
+          <p class="small muted">Connects to Vapi WebSockets for high-speed voice streaming when configured, with robust browser Web Speech API fallback.</p>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · NAVI</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 15: WALKTHROUGH 8 - ADMIN CONTROL CENTER (DEDICATED LARGE)
+         ========================================== -->
+    <section class="page" id="walkthrough-8">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>PRODUCT WALKTHROUGH · ADMIN CONTROL</span></div>
+      <span class="section-number">14</span>
+      <div class="eyebrow">Operations &amp; Governance</div>
+      <h2>Admin Control Center &amp; Management Workspaces</h2>
+      <p class="lede">A full administrative subsystem providing 6 dedicated control modules for catalog management, user role governance, quiz versioning, story moderation, feedback triage, and system telemetry.</p>
+
+      <figure class="shot large">
+        <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 15 · Admin Analytics &amp; Telemetry Dashboard</span><span class="url">/admin</span></div>
+        <img src="../../Project/frontend/screenshots/desktop/15-admin-overview.png" alt="Admin Overview screen">
+        <figcaption><strong>Figure 12: Admin Dashboard.</strong> Real-time operational KPIs covering 30-day active learners, completed assessments, career views, feedback triage queue, and system health status.</figcaption>
+      </figure>
+
+      <div class="grid-3" style="margin-top: 1mm;">
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 16 · Users</span><span class="url">/admin/users</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/16-admin-users.png" alt="Admin Users screen">
+          <figcaption class="small">Role governance &amp; status locks.</figcaption>
+        </figure>
+
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 17 · Careers</span><span class="url">/admin/careers</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/17-admin-careers.png" alt="Admin Careers screen">
+          <figcaption class="small">BLS wage &amp; skill prerequisites CRUD.</figcaption>
+        </figure>
+
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Screen 19 · Quiz Builder</span><span class="url">/admin/quiz</span></div>
+          <img src="../../Project/frontend/screenshots/desktop/19-admin-quiz-builder.png" alt="Admin Quiz Builder screen">
+          <figcaption class="small">Version publishing &amp; weights.</figcaption>
+        </figure>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WALKTHROUGH · ADMIN</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 16: MOBILE & ACCESSIBILITY
+         ========================================== -->
+    <section class="page" id="mobile-accessibility">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>MOBILE EXPERIENCE &amp; ACCESSIBILITY</span></div>
+      <span class="section-number">15</span>
+      <div class="eyebrow">Inclusive Presentation</div>
+      <h2>Responsive Viewports &amp; Accessibility Tokens</h2>
+
+      <div class="grid-4">
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Mobile Welcome</span><span class="url">/</span></div>
+          <img src="../../Project/frontend/screenshots/mobile/01-welcome-mobile.png" alt="Mobile Welcome">
+          <figcaption class="small">Single-column hero</figcaption>
+        </figure>
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Mobile Dashboard</span><span class="url">/dashboard</span></div>
+          <img src="../../Project/frontend/screenshots/mobile/02-dashboard-mobile.png" alt="Mobile Dashboard">
+          <figcaption class="small">Adaptive cards</figcaption>
+        </figure>
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Mobile Quiz</span><span class="url">/quiz</span></div>
+          <img src="../../Project/frontend/screenshots/mobile/03-quiz-mobile.png" alt="Mobile Quiz">
+          <figcaption class="small">Touch-friendly options</figcaption>
+        </figure>
+        <figure class="shot compact">
+          <div class="shot-bar"><span class="dots"><i></i><i></i><i></i> Mobile Voice Navi</span><span class="url">/assistant</span></div>
+          <img src="../../Project/frontend/screenshots/mobile/04-voice-mode-mobile.png" alt="Mobile Voice">
+          <figcaption class="small">Slide-up sheet</figcaption>
+        </figure>
+      </div>
+
+      <h3>Accessibility Compliance Highlights</h3>
+      <table>
+        <thead><tr><th>Feature</th><th>Implementation Details</th><th>Standard Met</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dynamic Font Scaling</strong></td><td>Custom scale slider adjusting base tokens from 85% to 130% without layout breakage.</td><td>WCAG 2.1 AA (1.4.4)</td></tr>
+          <tr><td><strong>Reduced Motion</strong></td><td>Honors <code>prefers-reduced-motion</code> media query; disables intense animations.</td><td>WCAG 2.1 AAA (2.3.3)</td></tr>
+          <tr><td><strong>Keyboard Navigation</strong></td><td>Visible focus indicators (<code>:focus-visible</code>), skip links, and ARIA dialog traps.</td><td>WCAG 2.1 AA (2.1.1)</td></tr>
+          <tr><td><strong>Contrast Ratios</strong></td><td>Sage/Navy palette engineered to exceed 4.8:1 contrast for normal body text.</td><td>WCAG 2.1 AA (1.4.3)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="page-footer"><span>PATHSEEKER · MOBILE &amp; ACCESSIBILITY</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 17: DATA ARCHITECTURE
+         ========================================== -->
+    <section class="page" id="data-architecture">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>DATA ARCHITECTURE &amp; SCHEMAS</span></div>
+      <span class="section-number">16</span>
+      <div class="eyebrow">Database Design</div>
+      <h2>MongoDB Collections &amp; Relational Integrity</h2>
+
+      <table>
+        <thead><tr><th>Collection / Model</th><th>Key Fields &amp; Data Types</th><th>Index &amp; Integrity Constraints</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>User</strong></td>
+            <td><code>_id, name, email, passwordHash, role, stage, status, isVerified, lastLoginAt</code></td>
+            <td>Unique sparse index on normalized <code>email</code>. Password excluded by default.</td>
+          </tr>
+          <tr>
+            <td><strong>UserProfile</strong></td>
+            <td><code>userId, headline, educationLevel, skills[{skillId, level}], interests[], goal</code></td>
+            <td>1:1 relation to User. Indexed on <code>userId</code>. References Skill catalog.</td>
+          </tr>
+          <tr>
+            <td><strong>Career</strong></td>
+            <td><code>slug, title, domainId, summary, salaryMedian, growthOutlook, requiredSkills[], published</code></td>
+            <td>Unique on <code>slug</code>. Compound text search on <code>title, summary, tags</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>CareerPassport</strong></td>
+            <td><code>userId, attemptId, archetype, traits{}, domainScores{}, completionScore, version</code></td>
+            <td>Unique per attempt. Time-indexed on <code>createdAt</code> for historical progression.</td>
+          </tr>
+          <tr>
+            <td><strong>RecommendationSnapshot</strong></td>
+            <td><code>passportId, recommendations[{careerId, matchScore, readinessScore, reasons[]}]</code></td>
+            <td>Immutable append-only record linking exact scores to assessment snapshot.</td>
+          </tr>
+          <tr>
+            <td><strong>Bookmark</strong></td>
+            <td><code>userId, itemType, itemId, personalNote, createdAt</code></td>
+            <td>Compound unique index on <code>(userId, itemType, itemId)</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Relational Entity Flow</h3>
+      <div class="diagram-box">
+        <b>User (1)</b> ── <b>UserProfile (1)</b> ── <b>Skills (N)</b><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <b>QuizAttempt (N)</b> ── <b>CareerPassport (1)</b> ── <b>RecommendationSnapshot (1)</b><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <b>Bookmarks (N)</b> ── [Career / Resource / Media]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <b>SuccessStories (N)</b> &amp; <b>Feedback (N)</b>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · DATA ARCHITECTURE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 18: CAREER INTELLIGENCE ALGORITHMS
+         ========================================== -->
+    <section class="page" id="career-intelligence">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>CAREER INTELLIGENCE ALGORITHMS</span></div>
+      <span class="section-number">17</span>
+      <div class="eyebrow">Deterministic Scoring</div>
+      <h2>Passport Calculation &amp; Recommendation Engine</h2>
+
+      <h3>1. Career Passport Scoring Formulas</h3>
+      <div class="formula-box">
+        TraitScore(T) = (SelectedOptionCount(T) / MaxPossibleOptions(T)) * 100<br>
+        DomainScore(D) = (AccumulatedDomainWeight(D) / MaxPossibleDomainWeight(D)) * 100<br>
+        CompletionScore = (PresentProfileSignals / 7) * 100
+      </div>
+
+      <h3>2. Career Match &amp; Readiness Formulas</h3>
+      <div class="formula-box">
+        Compatibility% = (TraitAlignment * 0.55) + (InterestAffinity * 0.25) + (SkillOverlap * 0.20)<br>
+        Readiness% = WeightedAverage( min(1.0, UserSkillLevel(s) / RequiredSkillLevel(s)) )<br>
+        ConfidenceScore = 55 + min(40, TotalEvidenceDataPoints * 4)
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h4>Compatibility (Fit)</h4>
+          <p class="small muted">Reflects how naturally the user's personality traits and intrinsic interests match the daily realities of the career.</p>
+        </div>
+        <div class="card accent">
+          <h4>Readiness (Preparedness)</h4>
+          <p class="small muted">Evaluates technical mastery across critical, important, and nice-to-have skill prerequisites (0–10 scale).</p>
+        </div>
+        <div class="card">
+          <h4>Skill-Gap Priority</h4>
+          <p class="small muted">Calculated as: <code>Gap * ImportanceWeight * 20</code>, automatically sorting which competencies the learner must prioritize.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <strong>Stateless Simulation Invariant:</strong> Simulator calculations occur on-the-fly and return <code>persisted: false</code>, guaranteeing that experimenting with skills never corrupts verified learner records.
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · INTELLIGENCE ENGINE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 19: APIS & SECURITY
+         ========================================== -->
+    <section class="page" id="api-security">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>API CATALOGUE &amp; SECURITY CONTROLS</span></div>
+      <span class="section-number">18</span>
+      <div class="eyebrow">HTTP API &amp; Hardening</div>
+      <h2>Endpoints &amp; Threat Mitigation Matrix</h2>
+
+      <div class="grid-2">
+        <div>
+          <h3>Core Endpoints</h3>
+          <table>
+            <thead><tr><th>Route</th><th>Method</th><th>Scope</th></tr></thead>
+            <tbody>
+              <tr><td><code>/api/auth/register</code></td><td>POST</td><td>Public</td></tr>
+              <tr><td><code>/api/auth/login</code></td><td>POST</td><td>Public</td></tr>
+              <tr><td><code>/api/users/me/dashboard</code></td><td>GET</td><td>Authenticated</td></tr>
+              <tr><td><code>/api/users/me/passport</code></td><td>GET</td><td>Authenticated</td></tr>
+              <tr><td><code>/api/quiz-attempts</code></td><td>POST/GET</td><td>Authenticated</td></tr>
+              <tr><td><code>/api/careers</code></td><td>GET</td><td>Public</td></tr>
+              <tr><td><code>/api/resources/:id/download</code></td><td>GET</td><td>Authenticated</td></tr>
+              <tr><td><code>/api/admin/users</code></td><td>GET/PATCH</td><td>Admin Role</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h3>Threat Mitigation Matrix</h3>
+          <table>
+            <thead><tr><th>Threat</th><th>Defensive Control</th></tr></thead>
+            <tbody>
+              <tr><td><strong>XSS / Token Theft</strong></td><td>Opaque session ID in <code>HttpOnly, SameSite=Lax, Secure</code> cookie; tokens unreadable by JavaScript.</td></tr>
+              <tr><td><strong>Brute Force</strong></td><td>Strict Express rate limiters on <code>/api/auth/*</code> and <code>/api/assistant/*</code>.</td></tr>
+              <tr><td><strong>Privilege Escalation</strong></td><td>Authoritative <code>requireRole('admin')</code> middleware verified on every server request.</td></tr>
+              <tr><td><strong>NoSQL Injection</strong></td><td>Mongoose schema typing + sanitization of query parameters.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · APIS &amp; SECURITY</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 20: WHY PATHSEEKER STANDS OUT (NEW PAGE)
+         ========================================== -->
+    <section class="page" id="why-pathseeker-stands-out">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>TECHNICAL DIFFERENTIATORS · WHY PATHSEEKER STANDS OUT</span></div>
+      <span class="section-number">19</span>
+      <div class="eyebrow">Engineering Excellence</div>
+      <h2>Why PathSeeker Stands Out: Core Technical Differentiators</h2>
+      <p class="lede">PathSeeker rejects marketing superficiality in favor of verifiable software engineering rigor. Below are the 8 architectural and functional differentiators that set PathSeeker apart from standard student projects.</p>
+
+      <div class="standout-grid">
+        <!-- 1. Compatibility vs Readiness -->
+        <div class="standout-item">
+          <div class="standout-header">
+            <h4>1. Explainable Dual-Metric Intelligence</h4>
+            <span class="badge green">SCORING ENGINE</span>
+          </div>
+          <p>Traditional tools conflate interest with qualification. PathSeeker decouples <strong>Compatibility %</strong> (intrinsic behavioral &amp; psychological fit) from <strong>Readiness %</strong> (immediate prerequisite mastery), explaining exactly <em>why</em> a role is recommended.</p>
+          <div class="standout-footer">Formula: (Trait*0.55) + (Interest*0.25) + (Skill*0.20)</div>
+        </div>
+
+        <!-- 2. Immutable Snapshots -->
+        <div class="standout-item blue">
+          <div class="standout-header">
+            <h4>2. Immutable Assessment Snapshots</h4>
+            <span class="badge blue">DATA INTEGRITY</span>
+          </div>
+          <p>Assessment attempts freeze question text, option choices, and trait weights at the exact time of submission. Admins can update future question banks without corrupting or invalidating historical student records.</p>
+          <div class="standout-footer">Model: QuizAttemptSchema.attemptSnapshot (ReadOnly)</div>
+        </div>
+
+        <!-- 3. Stateless Simulator -->
+        <div class="standout-item purple">
+          <div class="standout-header">
+            <h4>3. Stateless Interactive Skill Simulator</h4>
+            <span class="badge purple">SIMULATION</span>
+          </div>
+          <p>Enables learners to test "What-if" skill growth scenarios in real time. Calculations execute dynamically on the client and server returning <code>persisted: false</code>, preventing accidental data pollution.</p>
+          <div class="standout-footer">Endpoint: POST /api/careers/:id/simulate (Ephemeral)</div>
+        </div>
+
+        <!-- 4. Navi Voice AI -->
+        <div class="standout-item amber">
+          <div class="standout-header">
+            <h4>4. Navi Conversational Voice AI Mode</h4>
+            <span class="badge amber">VOICE AGENT</span>
+          </div>
+          <p>Full hands-free conversational agent supporting real-time voice speech synthesis, intent detection, animated mood visualizers (Listening, Thinking, Speaking), and automatic application deep-linking.</p>
+          <div class="standout-footer">Stack: Vapi WebSockets + Web Speech API fallback</div>
+        </div>
+
+        <!-- 5. BLS Data -->
+        <div class="standout-item">
+          <div class="standout-header">
+            <h4>5. BLS-Backed Occupational Rigor</h4>
+            <span class="badge green">AUTHENTIC DATA</span>
+          </div>
+          <p>Zero generic placeholder careers. All 15 occupational profiles incorporate authentic U.S. Bureau of Labor Statistics (2024–2034) median wage percentiles, 10-year growth demand, and education prerequisites.</p>
+          <div class="standout-footer">Source: U.S. Bureau of Labor Statistics (2024–2034)</div>
+        </div>
+
+        <!-- 6. Accessibility -->
+        <div class="standout-item blue">
+          <div class="standout-header">
+            <h4>6. WCAG 2.1 AA/AAA Accessibility</h4>
+            <span class="badge blue">INCLUSIVITY</span>
+          </div>
+          <p>Engineered for all learners: theme switching (Sage Light / Forest Dark), fluid font scaling (85%–130%), <code>prefers-reduced-motion</code> compliance, visible focus rings, and ARIA dialog modal traps.</p>
+          <div class="standout-footer">Standard: WCAG 2.1 AA/AAA Compliant Tokens</div>
+        </div>
+
+        <!-- 7. Admin Subsystem -->
+        <div class="standout-item purple">
+          <div class="standout-header">
+            <h4>7. Comprehensive 6-Module Admin Center</h4>
+            <span class="badge purple">GOVERNANCE</span>
+          </div>
+          <p>Production-ready governance: User role management, career catalog editor, immutable quiz version publishing, success story moderation workflow, feedback triage queue, and system audit logs.</p>
+          <div class="standout-footer">Scope: 6 Dedicated Workspaces with Role Guards</div>
+        </div>
+
+        <!-- 8. 47 Automated Tests -->
+        <div class="standout-item amber">
+          <div class="standout-header">
+            <h4>8. 47 Passing Automated Tests &amp; Zero Lints</h4>
+            <span class="badge amber">RELIABILITY</span>
+          </div>
+          <p>Verified through 36 backend integration and unit test suites plus 11 frontend test suites, 0 ESLint errors, strict Zod schema validation, and complete reproducibility across all environments.</p>
+          <div class="standout-footer">Evidence: 36 Backend + 11 Frontend Suites Passed</div>
+        </div>
+      </div>
+
+      <div class="page-footer"><span>PATHSEEKER · WHY PATHSEEKER STANDS OUT</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 21: TESTING & SRS TRACEABILITY
+         ========================================== -->
+    <section class="page" id="verification-traceability">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>TEST EVIDENCE &amp; SRS TRACEABILITY</span></div>
+      <span class="section-number">20</span>
+      <div class="eyebrow">Verification Baseline</div>
+      <h2>Automated Test Evidence &amp; SRS Matrix</h2>
+
+      <div class="grid-4" style="margin-bottom: 3.5mm;">
+        <div class="card dark"><div class="metric">36</div><span class="small">Backend Tests Passed</span></div>
+        <div class="card dark"><div class="metric">11</div><span class="small">Frontend Tests Passed</span></div>
+        <div class="card dark"><div class="metric">0</div><span class="small">ESLint Errors</span></div>
+        <div class="card dark"><div class="metric">51/51</div><span class="small">PDF Pages Verified</span></div>
+      </div>
+
+      <h3>SRS Requirement Traceability Matrix</h3>
+      <table>
+        <thead><tr><th>Req ID</th><th>Requirement Description</th><th>Delivered Implementation &amp; Component</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>FR-01</strong></td><td>Authentication &amp; User Accounts</td><td>OTP registration, bcrypt hash, session management, password recovery.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-02</strong></td><td>Personalized Dashboard</td><td>Passport archetype, match cards, bookmarks, weekly goals, activity log.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-03</strong></td><td>Career Bank &amp; Multi-Filtering</td><td>15 careers, salary range, domain filters, search autocomplete.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-04</strong></td><td>Interest Quiz &amp; Scoring</td><td>Published versioning, snapshot attempts, trait &amp; domain points.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-05</strong></td><td>Multimedia Learning Center</td><td>6 Google Certificate videos, privacy-enhanced embeds, learner ratings.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-06</strong></td><td>Success Stories Hub</td><td>User submission, image upload, editorial moderation, featured stories.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-07</strong></td><td>Resource Library</td><td>6 original PDFs (51 pages), in-browser viewer, download counters.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-08</strong></td><td>Feedback &amp; Notifications</td><td>Categorized sentiment, staff triage queue, response notifications.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-09</strong></td><td>Bookmarks &amp; Notes</td><td>Polymorphic saved items, private notes, career comparison matrix.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-10</strong></td><td>Admin Control Center</td><td>User roles, career editor, quiz versioning, feedback resolution, logs.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-11</strong></td><td>Advanced Intelligence</td><td>Deterministic matching, readiness scoring, stateless simulator.</td><td class="badge green">VERIFIED</td></tr>
+          <tr><td><strong>FR-12</strong></td><td>Accessibility Standards</td><td>Theme switcher, font scaling, reduced motion, full keyboard nav.</td><td class="badge green">VERIFIED</td></tr>
+        </tbody>
+      </table>
+
+      <div class="page-footer"><span>PATHSEEKER · TRACEABILITY MATRIX</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- ==========================================
+         PAGE 22: INSTALLATION & SIGN-OFF
+         ========================================== -->
+    <section class="page" id="installation-signoff">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>INSTALLATION &amp; SIGN-OFF</span></div>
+      <span class="section-number">21</span>
+      <div class="eyebrow">Evaluator Runbook</div>
+      <h2>Deployment Instructions &amp; Formal Approval</h2>
+
+      <h3>Quick Start Commands</h3>
+      <div class="diagram-box">
+        # 1. Start Backend API &amp; Seed Database<br>
+        cd Project/backend1<br>
+        npm ci ; npm run seed ; npm start<br><br>
+        # 2. Start Frontend Client<br>
+        cd ../frontend<br>
+        npm ci ; npm run dev<br><br>
+        # Seeded Accounts (Common Password: PathSeeker-Demo-2026!):<br>
+        # • Super Admin: admin@pathseeker.local<br>
+        # • Student: demo.student@pathseeker.local<br>
+        # • Graduate: demo.graduate@pathseeker.local<br>
+        # • Professional: demo.professional@pathseeker.local
+      </div>
+
+      <div class="grid-2" style="margin-top: 3.5mm;">
+        <div class="card accent">
+          <h4>Evaluator Deliverables</h4>
+          <p class="small">✔ Complete source code repository<br>✔ Verified database seed package<br>✔ Full-coverage documentation (HTML &amp; MD)<br>✔ 25 high-resolution screenshot proofs</p>
+        </div>
+        <div class="card">
+          <h4>Project Summary</h4>
+          <p class="small">PathSeeker delivers on all SRS mandates with architectural elegance, mathematical transparency, high visual craft, and rigorous security.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 5mm;">Formal Approval &amp; Evaluation Sign-Off</h3>
+      <div class="signoff">
+        <div><span>Prepared by (Student)</span><strong>Mirza Abdullah</strong></div>
+        <div><span>Technical Lead (StackVerse)</span><strong>StackVerse Team</strong></div>
+        <div><span>Evaluator / Campus</span><strong>Aptech TechWiz Jury</strong></div>
+      </div>
+      <div class="signoff">
+        <div><span>Date</span><strong>27 August 2026</strong></div>
+        <div><span>Date</span><strong>27 August 2026</strong></div>
+        <div><span>Date</span><strong>27 August 2026</strong></div>
+      </div>
+
+      <div class="callout" style="margin-top: 5.5mm;">
+        <strong>Closing Reflection:</strong> <em>"PathSeeker replaces career uncertainty with clarity, helping every learner understand their strengths and take actionable steps towards their future."</em>
+      </div>
+
+      <div class="page-footer"><span>END OF DOCUMENT · PATHSEEKER · VERSION 1.0</span><span class="page-number">PAGE </span></div>
+    </section>
+
+  </main>
+
+  <script>
+    function saveEditedCopy(filename) {
+      const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  </script>
+</body>
+</html>

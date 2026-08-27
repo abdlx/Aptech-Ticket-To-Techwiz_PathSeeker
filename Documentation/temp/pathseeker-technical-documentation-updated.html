@@ -1,0 +1,2599 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PathSeeker Career Passport - Technical Design, Implementation, Testing & SRS Traceability Reference">
+  <title>PathSeeker — Technical Design & SRS Traceability Reference</title>
+  <style>
+    :root {
+      --ink: #172635;
+      --muted: #5e6d7d;
+      --green: #628f72;
+      --deep: #375e48;
+      --soft: #eaf1eb;
+      --paper: #ffffff;
+      --line: #dfe5df;
+      --blue: #4a759c;
+      --purple: #7463c2;
+      --amber: #b88636;
+      --rose: #b55d5e;
+      --dark-bg: #1c2e24;
+      --dark-card: #22372c;
+    }
+    * { box-sizing: border-box; }
+    html { background: #dfe5e1; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 8.7pt;
+      line-height: 1.42;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 18px;
+      color: #fff;
+      background: #172635;
+      box-shadow: 0 4px 20px rgba(23,38,53,0.35);
+    }
+    .toolbar strong { font-size: 13px; font-weight: 700; }
+    .toolbar small { color: #b2c2ce; font-size: 11px; margin-right: 8px; }
+    .toolbar button {
+      padding: 7px 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .toolbar button:hover { background: rgba(255,255,255,0.2); }
+    .toolbar button.primary { border-color: var(--green); background: var(--green); }
+    .toolbar button.primary:hover { background: #527c61; }
+
+    .document { padding: 12mm 0 24mm; counter-reset: sheet; }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 10mm;
+      padding: 15mm 16mm 15mm 18mm;
+      position: relative;
+      overflow: hidden;
+      background: var(--paper);
+      box-shadow: 0 8px 30px rgba(40,55,45,0.14);
+      break-after: page;
+      page-break-after: always;
+      counter-increment: sheet;
+    }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+    .page::before {
+      content: "";
+      width: 5.5mm;
+      position: absolute;
+      inset: 0 auto 0 0;
+      background: linear-gradient(180deg, #172635 0 52%, var(--green) 52% 100%);
+    }
+
+    .page-header {
+      height: 9mm;
+      margin-bottom: 5mm;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-bottom: 0.3mm solid var(--line);
+      color: var(--muted);
+      font-size: 7.2pt;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+    .brand { color: var(--ink); font-weight: 800; }
+    .brand span { color: var(--green); }
+    .page-footer {
+      position: absolute;
+      left: 18mm;
+      right: 16mm;
+      bottom: 6.5mm;
+      display: flex;
+      justify-content: space-between;
+      padding-top: 2mm;
+      border-top: 0.25mm solid var(--line);
+      color: #7c8881;
+      font-size: 6.8pt;
+    }
+    .page-number::after { content: counter(sheet, decimal-leading-zero); }
+
+    h1, h2, h3, h4 { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.18; color: var(--ink); }
+    h1 { font-size: 34pt; letter-spacing: -0.035em; }
+    h2 { margin-bottom: 2.5mm; font-size: 16.5pt; letter-spacing: -0.02em; font-weight: 700; }
+    h3 { margin: 3mm 0 1.6mm; font-size: 10pt; font-weight: 700; color: var(--deep); }
+    h4 { margin: 0 0 1mm; font-size: 8.6pt; font-weight: 700; }
+    p { margin: 0 0 2.2mm; }
+    .muted { color: var(--muted); }
+    .small { font-size: 7.2pt; }
+    .eyebrow {
+      margin-bottom: 1.8mm;
+      color: var(--deep);
+      font-size: 6.9pt;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .lede { max-width: 165mm; color: #4b5a66; font-size: 9.8pt; line-height: 1.42; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3.2mm; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.8mm; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2.4mm; }
+    
+    .card { padding: 3mm; border: 0.28mm solid var(--line); border-radius: 2.2mm; break-inside: avoid; background: #fff; }
+    .card.soft { background: #f6f9f6; }
+    .card.accent { border-color: #c7d8cb; background: var(--soft); }
+    .card.dark { color: #eef5f0; background: var(--dark-card); border-color: var(--dark-card); }
+    .card.dark h3, .card.dark h4 { color: #fff; }
+    .metric { font-size: 16pt; font-weight: 800; color: var(--deep); line-height: 1.1; }
+    .card.dark .metric { color: #a4cca9; }
+    
+    .badge { display: inline-block; padding: 0.6mm 1.8mm; border-radius: 6mm; color: var(--deep); background: var(--soft); font-size: 6.5pt; font-weight: 800; }
+    .badge.blue { color: #2e567d; background: #eaf2f9; }
+    .badge.purple { color: #5846a8; background: #f1eeff; }
+    .badge.amber { color: #7e5616; background: #fdf3e2; }
+    .badge.rose { color: #883e3f; background: #fceeee; }
+
+    .callout {
+      margin: 2.5mm 0;
+      padding: 2.5mm 3.2mm;
+      border-left: 0.9mm solid var(--green);
+      border-radius: 0 2mm 2mm 0;
+      background: #f2f7f3;
+      font-size: 7.5pt;
+      break-inside: avoid;
+    }
+    .callout.warning { border-left-color: var(--amber); background: #fdf8ef; }
+    .callout.danger { border-left-color: var(--rose); background: #fdf1f1; }
+    .callout.accent { border-left-color: var(--blue); background: #f0f6fa; }
+
+    table { width: 100%; border-collapse: collapse; margin: 1.8mm 0 2.5mm; break-inside: avoid; }
+    th, td { padding: 1.4mm 1.8mm; border-bottom: 0.22mm solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--deep); background: #f0f5f1; font-size: 6.3pt; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 800; }
+    td { font-size: 7pt; }
+    ul, ol { margin: 1.2mm 0 2.2mm; padding-left: 4.2mm; }
+    li { margin-bottom: 0.6mm; font-size: 7.2pt; }
+    code {
+      padding: 0.2mm 0.8mm;
+      border-radius: 0.8mm;
+      color: #274f38;
+      background: #ebf3ec;
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.88em;
+    }
+    pre {
+      margin: 1.8mm 0;
+      padding: 2.2mm 2.8mm;
+      border-radius: 2mm;
+      background: #1e2c24;
+      color: #e2ede5;
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 6.6pt;
+      line-height: 1.38;
+      overflow-x: auto;
+      break-inside: avoid;
+    }
+
+    .toc-row {
+      min-height: 7mm;
+      display: grid;
+      grid-template-columns: 8mm auto 1fr 8mm;
+      align-items: center;
+      gap: 1.8mm;
+      border-bottom: 0.22mm solid var(--line);
+      font-size: 7.4pt;
+    }
+    .toc-row b { color: var(--deep); font-size: 6.9pt; }
+    .toc-row i { height: 0.22mm; background: repeating-linear-gradient(90deg, #c9d1cc 0 1mm, transparent 1mm 2mm); }
+    .toc-row span:last-child { text-align: right; font-weight: 700; color: #586775; }
+
+    .diagram {
+      margin: 2.2mm 0;
+      padding: 3.2mm;
+      border: 0.28mm solid var(--line);
+      border-radius: 2.2mm;
+      background: #f9fbf9;
+      break-inside: avoid;
+    }
+    .architecture {
+      display: grid;
+      grid-template-columns: 1fr 6mm 1fr 6mm 1fr 6mm 1fr;
+      align-items: center;
+      gap: 1.2mm;
+    }
+    .architecture .node {
+      min-height: 18mm;
+      padding: 2.2mm 1.5mm;
+      display: grid;
+      align-content: center;
+      text-align: center;
+      border: 0.28mm solid #ccd9cf;
+      border-radius: 2mm;
+      background: #fff;
+    }
+    .architecture .node strong { color: var(--deep); font-size: 7.5pt; }
+    .architecture .arrow { text-align: center; color: var(--green); font-size: 12pt; font-weight: 800; }
+
+    .flow { display: grid; gap: 1.6mm; margin: 1.8mm 0; }
+    .flow-step {
+      min-height: 8mm;
+      padding: 1.8mm 2.2mm 1.8mm 10.5mm;
+      position: relative;
+      border: 0.28mm solid var(--line);
+      border-radius: 2mm;
+      background: #fff;
+      font-size: 7.1pt;
+    }
+    .flow-step b:first-child {
+      width: 5.8mm;
+      height: 5.8mm;
+      position: absolute;
+      left: 2.2mm;
+      top: 1.5mm;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--green);
+      font-size: 6.4pt;
+    }
+    .tree {
+      font: 6.8pt/1.52 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      color: #405046;
+      background: #f5f8f5;
+      padding: 2.2mm 3mm;
+      border-radius: 2mm;
+      border: 0.25mm solid var(--line);
+    }
+    .tree b { color: var(--deep); }
+
+    /* DFD Styles */
+    .dfd-box {
+      border: 0.3mm solid #b5c7ba;
+      border-radius: 2mm;
+      padding: 2.5mm;
+      background: #fff;
+      text-align: center;
+    }
+    .dfd-process {
+      border: 0.35mm solid var(--deep);
+      border-radius: 20mm;
+      background: var(--soft);
+      padding: 2.5mm 3.5mm;
+      text-align: center;
+      font-weight: 700;
+      color: var(--deep);
+    }
+    .dfd-store {
+      border-top: 0.35mm solid var(--ink);
+      border-bottom: 0.35mm solid var(--ink);
+      border-left: none;
+      border-right: none;
+      padding: 1.8mm 2.5mm;
+      background: #fcfdfc;
+      font-family: SFMono-Regular, Consolas, monospace;
+      font-size: 6.8pt;
+      font-weight: 700;
+      color: #274f38;
+      text-align: center;
+    }
+
+    /* ERD Visual Cards */
+    .erd-cluster {
+      border: 0.28mm solid var(--line);
+      border-radius: 2mm;
+      padding: 2.5mm;
+      background: #f8faf8;
+    }
+    .erd-cluster-title {
+      font-size: 7.2pt;
+      font-weight: 800;
+      color: var(--deep);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.8mm;
+      border-bottom: 0.25mm solid #d5e0d7;
+      padding-bottom: 1mm;
+    }
+    .erd-card {
+      border: 0.25mm solid #ccd9cf;
+      border-radius: 1.8mm;
+      background: #fff;
+      margin-bottom: 1.8mm;
+      overflow: hidden;
+      break-inside: avoid;
+    }
+    .erd-card-header {
+      background: #eef4f0;
+      padding: 1.2mm 2.2mm;
+      font-weight: 800;
+      font-size: 7.2pt;
+      color: var(--deep);
+      border-bottom: 0.22mm solid #ccd9cf;
+      display: flex;
+      justify-content: space-between;
+    }
+    .erd-card-body {
+      padding: 1.4mm 2.2mm;
+      font-family: SFMono-Regular, Consolas, monospace;
+      font-size: 6.4pt;
+      line-height: 1.45;
+      color: #38493f;
+    }
+    .erd-pk { color: #b88636; font-weight: 800; }
+    .erd-fk { color: #4a759c; font-weight: 700; }
+
+    .cover {
+      padding: 0;
+      color: #fff;
+      background: linear-gradient(145deg, #172635 0 58%, #2d4f3b 100%);
+    }
+    .cover::before { width: 6.5mm; background: var(--green); }
+    .cover-inner {
+      min-height: 297mm;
+      padding: 20mm 20mm 18mm 25mm;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .cover-brand { display: flex; align-items: center; gap: 3mm; font-size: 15pt; font-weight: 800; }
+    .cover-brand svg { width: 11mm; height: 11mm; border-radius: 2.5mm; }
+    .cover-brand span span { color: #98c4a4; }
+    .cover-main { margin: auto 0; }
+    .cover .eyebrow { color: #a9cab2; }
+    .cover h1 { max-width: 160mm; font-size: 31pt; color: #fff; }
+    .cover h1 em { color: #9ec9a5; font-style: normal; }
+    .cover .lede { max-width: 140mm; margin-top: 4.5mm; color: #d8e4dc; font-size: 10.2pt; }
+    .cover-code {
+      margin-top: 7mm;
+      padding: 3mm 4mm;
+      display: inline-block;
+      border: 0.28mm solid rgba(255,255,255,0.22);
+      border-radius: 2.2mm;
+      color: #c4dcce;
+      background: rgba(255,255,255,0.06);
+      font: 7.4pt SFMono-Regular, Consolas, monospace;
+    }
+    .cover-team {
+      margin-top: 5mm;
+      padding: 2.8mm 3.5mm;
+      border: 0.25mm solid rgba(255,255,255,0.2);
+      border-radius: 2mm;
+      background: rgba(255,255,255,0.05);
+    }
+    .cover-team-title {
+      font-size: 6.6pt;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a9cab2;
+      font-weight: 800;
+      margin-bottom: 1.8mm;
+    }
+    .cover-team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.8mm 3.5mm;
+    }
+    .cover-member strong {
+      display: block;
+      color: #fff;
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .cover-member span {
+      display: block;
+      color: #c0d8c8;
+      font-size: 6.6pt;
+      font-family: SFMono-Regular, Consolas, monospace;
+    }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4mm;
+      padding-top: 4mm;
+      border-top: 0.28mm solid rgba(255,255,255,0.25);
+    }
+    .cover-meta span { display: block; color: #aebcb3; font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; }
+    .cover-meta strong { display: block; margin-top: 0.8mm; color: #fff; font-size: 8.2pt; }
+    
+    .section-number {
+      position: absolute;
+      right: 12mm;
+      top: 12mm;
+      color: #ebf2ec;
+      font-size: 48pt;
+      font-weight: 800;
+      line-height: 1;
+      user-select: none;
+    }
+    .status { font-weight: 800; }
+    .pass { color: #2e6b3f; }
+    .partial { color: #9c681b; }
+    .external { color: #594ca1; }
+    .gap { color: #9e4344; }
+    
+    .formula {
+      padding: 2.6mm 3.2mm;
+      border-radius: 2mm;
+      color: #ebf5ee;
+      background: #1e3126;
+      font: 7.3pt/1.48 SFMono-Regular, Consolas, monospace;
+      margin: 1.8mm 0;
+    }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 1.2mm; margin: 1.5mm 0; }
+    .pill { padding: 0.8mm 1.8mm; border-radius: 8mm; background: #eef4ef; color: #375e48; font-size: 6.6pt; font-weight: 700; }
+
+    @media print {
+      @page { size: A4 portrait; margin: 0; }
+      html, body { width: 210mm; background: #fff; }
+      .toolbar { display: none !important; }
+      .document { padding: 0; }
+      .page {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        max-height: 297mm;
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        box-sizing: border-box;
+      }
+      .page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <strong>PathSeeker Technical Documentation (Documentation 2)</strong>
+    <small>Technical Design, Implementation, Testing & SRS Traceability Reference</small>
+    <button onclick="saveEditedCopy('pathseeker-technical-documentation.html')">Download HTML</button>
+    <button class="primary" onclick="window.print()">Print / Save PDF</button>
+  </div>
+  <main class="document">
+
+    <!-- PAGE 00: COVER -->
+    <section class="page cover" id="cover">
+      <div class="cover-inner">
+        <div class="cover-brand">
+          <svg class="cover-brand-icon" viewBox="0 0 1500 1500" width="44" height="44" style="width:11mm;height:11mm;border-radius:2.5mm;" role="img" aria-label="PathSeeker logo">
+            <defs>
+              <linearGradient id="ps-logo-green" x1="220" y1="160" x2="1280" y2="1370" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#7ca287"/>
+                <stop offset="0.52" stop-color="#628f72"/>
+                <stop offset="1" stop-color="#416d55"/>
+              </linearGradient>
+              <radialGradient id="ps-logo-highlight" cx="0" cy="0" r="1" gradientTransform="translate(390 300) rotate(44) scale(860)" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#ffffff" stop-opacity="0.18"/>
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <rect x="58" y="58" width="1384" height="1384" rx="350" fill="url(#ps-logo-green)"/>
+            <rect x="58" y="58" width="1384" height="1384" rx="350" fill="url(#ps-logo-highlight)"/>
+            <g transform="translate(135 135) scale(0.82)">
+              <g transform="matrix(3.155315,0,0,3.155315,-441.771323,-1854.071299)" fill="#f7f6f1">
+                <g transform="matrix(0.905851,0,0,0.842175,-751.716998,175.976069)">
+                  <path d="M1345.219,542.865L1401.505,488.716L1401.69,601.373L1401.69,806.804C1366.921,1078.927 1334.383,905.851 1323.889,835.516C1321.556,819.856 1320.385,804.044 1320.385,788.211C1320.381,763.456 1320.378,721.006 1320.377,679.853C1290.748,708.448 1260.174,737.954 1242.349,755.153C1230.956,766.149 1218.766,776.287 1205.878,785.484C1147.984,826.779 1000.855,923.564 1172.507,709.565L1345.219,542.865Z"/>
+                </g>
+                <g transform="matrix(0.853654,0,0,0.91521,48.661591,78.039827)">
+                  <path d="M292.387,1076.248C292.387,1076.248 307.941,986.81 340.994,898.345C340.994,898.345 361.41,837.099 391.546,875.985C391.546,875.985 434.904,917.788 402.532,954.729C402.532,954.729 337.106,1042.223 292.387,1076.248"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+          <span>Path<span>Seeker</span></span>
+        </div>
+        <div class="cover-main">
+          <div class="eyebrow">Engineering Reference · MERN Architecture</div>
+          <h1>Technical Design, <em>Implementation</em>,<br>Testing &amp; SRS Traceability</h1>
+          <p class="lede">The authoritative technical reference answering how every requirement was designed, implemented, secured, persisted, scored, tested, and deployed across the full-stack PathSeeker platform.</p>
+          <div class="cover-code">DOCUMENT PS-DOC-002 &nbsp;·&nbsp; VERSION 1.0 &nbsp;·&nbsp; TECHNICAL SPECIFICATION &amp; TRACEABILITY</div>
+          <div class="cover-team">
+            <div class="cover-team-title">Development Team &amp; Student Identifiers · StackVerse</div>
+            <div class="cover-team-grid">
+              <div class="cover-member">
+                <strong>MIRZA ABDULLAH BAIG</strong>
+                <span>ID: 1600671 · Lead Frontend / Backend / Voice</span>
+              </div>
+              <div class="cover-member">
+                <strong>HAMZA SHOAIB</strong>
+                <span>ID: 1598434 · Team Backend</span>
+              </div>
+              <div class="cover-member">
+                <strong>GHULAM MOIN UDDIN</strong>
+                <span>ID: 1612301 · Team Voice</span>
+              </div>
+              <div class="cover-member">
+                <strong>MUHAMMAD FARUKH</strong>
+                <span>ID: 1612368 · Voice</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cover-meta">
+          <div><span>Prepared for</span><strong>Aptech TechWiz Competition</strong></div>
+          <div><span>Project Team</span><strong>StackVerse</strong></div>
+          <div><span>Baseline Date</span><strong>27 August 2026</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 01: DOCUMENT CONTROL -->
+    <section class="page" id="control">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>01 · DOCUMENT CONTROL</span></div>
+      <span class="section-number">01</span>
+      <div class="eyebrow">Document Governance</div>
+      <h2>Document Control &amp; Authority Hierarchy</h2>
+      <div class="grid-2">
+        <div class="card accent">
+          <h3>Document Purpose</h3>
+          <p>This document serves as the formal <strong>Technical Design, Implementation, Testing &amp; SRS Traceability Reference (Documentation 2)</strong> for the PathSeeker Career Passport platform. While Documentation 1 provides the evaluator-facing visual product walkthrough, Documentation 2 provides complete engineering evidence.</p>
+        </div>
+        <div class="card">
+          <h3>Authority Hierarchy</h3>
+          <p>1. <code>PathSeeker_Career_Passport_SRS_Clean.md</code> defines required outcomes.<br>
+          2. Live source code in <code>Project/backend1</code> and <code>Project/frontend</code> defines delivered behavior.<br>
+          3. Automated test suites define verified invariants. Where disparities exist, this document records them transparently.</p>
+        </div>
+      </div>
+      <h3>Controlled Document Record</h3>
+      <table>
+        <tbody>
+          <tr><th>Document Title</th><td>PathSeeker — Technical Design, Testing &amp; SRS Traceability Reference</td><th>Identifier</th><td>PS-DOC-002</td></tr>
+          <tr><th>Version / Status</th><td>Version 1.0 (Implementation Baseline)</td><th>Team StackVerse</th><td>MIRZA ABDULLAH BAIG (1600671) · HAMZA SHOAIB (1598434)<br>GHULAM MOIN UDDIN (1612301) · MUHAMMAD FARUKH (1612368)</td></tr>
+          <tr><th>System Architecture</th><td>MERN (MongoDB 7+, Express 4.19, React 18 + Vite, Node.js 20+)</td><th>Target Scope</th><td><code>Project/frontend</code>, <code>Project/backend1</code></td></tr>
+          <tr><th>Primary SRS Authority</th><td colspan="3"><code>PathSeeker_Career_Passport_SRS_Clean.md</code> (Full 12 Functional + Quality Requirements)</td></tr>
+          <tr><th>Evidence Baseline</th><td colspan="3">36 Backend Automated Tests Passed, 11 Frontend Tests Passed, 0 Lint Errors, 51/51 PDF Pages Rendered</td></tr>
+        </tbody>
+      </table>
+      <h3>Standard Status Vocabulary</h3>
+      <div class="grid-4">
+        <div class="card"><b class="status pass">VERIFIED</b><p class="small muted">Fully implemented and validated with automated test suites.</p></div>
+        <div class="card"><b class="status pass">IMPLEMENTED</b><p class="small muted">Present in codebase and manually verified in runtime.</p></div>
+        <div class="card"><b class="status partial">PARTIAL</b><p class="small muted">Core implemented; extended/optional formats bounded.</p></div>
+        <div class="card"><b class="status external">EXTERNAL</b><p class="small muted">Requires third-party credentials or hosted environment.</p></div>
+      </div>
+      <div class="callout"><b>Documentation Boundary Rule:</b> In accordance with TechWiz documentation guidelines, this engineering specification documents exact module boundaries, Mongoose schema invariants, Express REST contracts, deterministic math formulas, and test assertions without dumping raw file source code.</div>
+      <div class="page-footer"><span>PATHSEEKER · TECHNICAL DOCUMENTATION PS-DOC-002</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 02: TABLE OF CONTENTS -->
+    <section class="page" id="contents">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>02 · CONTENTS</span></div>
+      <span class="section-number">02</span>
+      <div class="eyebrow">Table of Contents</div>
+      <h2>Technical Reference Contents</h2>
+      <div class="grid-2">
+        <div>
+          <div class="toc-row"><b>01</b><span>Document Control &amp; Authority</span><i></i><span>02</span></div>
+          <div class="toc-row"><b>02</b><span>Table of Contents</span><i></i><span>03</span></div>
+          <div class="toc-row"><b>03</b><span>Executive Summary &amp; System Metrics</span><i></i><span>04</span></div>
+          <div class="toc-row"><b>04</b><span>Actors, Boundaries &amp; Learner Flow</span><i></i><span>05</span></div>
+          <div class="toc-row"><b>05</b><span>Formal SRS Requirement Mapping</span><i></i><span>06</span></div>
+          <div class="toc-row"><b>06</b><span>Quality &amp; Non-Functional Requirements</span><i></i><span>07</span></div>
+          <div class="toc-row"><b>07</b><span>End-to-End System Architecture</span><i></i><span>08</span></div>
+          <div class="toc-row"><b>07A</b><span>DFD Level 0 — Context Data Flow Diagram</span><i></i><span>09</span></div>
+          <div class="toc-row"><b>07B</b><span>DFD Level 1 — Decomposed System Flows</span><i></i><span>10</span></div>
+          <div class="toc-row"><b>08</b><span>Frontend Design &amp; State Management</span><i></i><span>11</span></div>
+          <div class="toc-row"><b>09</b><span>Backend Design &amp; Application Services</span><i></i><span>12</span></div>
+          <div class="toc-row"><b>10</b><span>Comprehensive REST API Catalogue (1)</span><i></i><span>13</span></div>
+          <div class="toc-row"><b>11</b><span>Comprehensive REST API Catalogue (2)</span><i></i><span>14</span></div>
+        </div>
+        <div>
+          <div class="toc-row"><b>11A</b><span>Graphical Database ERD</span><i></i><span>15</span></div>
+          <div class="toc-row"><b>12</b><span>MongoDB Data Architecture &amp; Identity</span><i></i><span>16</span></div>
+          <div class="toc-row"><b>13</b><span>MongoDB Data Architecture &amp; Intelligence</span><i></i><span>17</span></div>
+          <div class="toc-row"><b>14</b><span>MongoDB Data Architecture &amp; Community</span><i></i><span>18</span></div>
+          <div class="toc-row"><b>15</b><span>Authentication &amp; Session Lifecycle</span><i></i><span>19</span></div>
+          <div class="toc-row"><b>16</b><span>Career Intelligence &amp; Scoring Engine</span><i></i><span>20</span></div>
+          <div class="toc-row"><b>17</b><span>Product Workflows &amp; Admin Subsystem</span><i></i><span>21</span></div>
+          <div class="toc-row"><b>18</b><span>Navi Conversational &amp; Voice Assistant</span><i></i><span>22</span></div>
+          <div class="toc-row"><b>19</b><span>Security Threat Model &amp; Error Contracts</span><i></i><span>23</span></div>
+          <div class="toc-row"><b>20</b><span>Formal Test Case Specification (1)</span><i></i><span>24</span></div>
+          <div class="toc-row"><b>21</b><span>Formal Test Case Specification (2)</span><i></i><span>25</span></div>
+          <div class="toc-row"><b>22</b><span>Installation Runbook &amp; Deployment</span><i></i><span>26</span></div>
+          <div class="toc-row"><b>23</b><span>SRS Traceability Matrix</span><i></i><span>27</span></div>
+          <div class="toc-row"><b>24</b><span>Limitations &amp; Approval Record</span><i></i><span>28</span></div>
+        </div>
+      </div>
+      <h3>Audience &amp; Evaluation Guide</h3>
+      <div class="grid-3">
+        <div class="card"><span class="badge">ACADEMIC EVALUATOR</span><p>Focus on Section 05 (Formal SRS Mapping), Section 07A/B (DFDs), Section 11A (ERD), Section 16 (Scoring), and Section 23 (Traceability).</p></div>
+        <div class="card"><span class="badge blue">SOFTWARE ARCHITECT</span><p>Inspect Section 07 (Architecture), Section 08-09 (Full-Stack Design), Section 10-11 (API Catalogue), and Section 12-14 (Data Models).</p></div>
+        <div class="card"><span class="badge amber">DEVOPS &amp; SECURITY</span><p>Review Section 15 (Auth Lifecycle), Section 19 (Threat Model), and Section 22 (Installation &amp; Deployment Runbook).</p></div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · CONTENTS MAP</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 03: EXECUTIVE OVERVIEW -->
+    <section class="page" id="overview">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>03 · EXECUTIVE OVERVIEW</span></div>
+      <span class="section-number">03</span>
+      <div class="eyebrow">Engineering Summary</div>
+      <h2>Transforming Career Uncertainty into Actionable Evidence</h2>
+      <p class="lede">PathSeeker is a functional, full-stack Career Passport web platform engineered to bridge the disconnect between self-assessment and occupational realities for students, graduates, and professionals.</p>
+      <div class="grid-2" style="margin-top:4mm">
+        <div class="card">
+          <h3>Architectural Problem Space</h3>
+          <ul>
+            <li><strong>Opaque Recommendations:</strong> Legacy platforms provide black-box job titles without mathematical justifications.</li>
+            <li><strong>Fragmented Competency Taxonomies:</strong> Labor statistics, skill prerequisites, and workbooks are siloed across disconnected websites.</li>
+            <li><strong>Missing Preparation Visibility:</strong> Learners cannot see their quantitative readiness delta or test what-if learning scenarios.</li>
+            <li><strong>Content Inflexibility:</strong> Educational institutions cannot publish customized curriculum resources without code redeployment.</li>
+          </ul>
+        </div>
+        <div class="card accent">
+          <h3>Delivered Engineering Solution</h3>
+          <ul>
+            <li><strong>Durable Career Passport:</strong> Persists versioned psychometric traits, verified skills, and occupational goals.</li>
+            <li><strong>Deterministic Scoring Engine:</strong> Computes explainable Compatibility, Readiness, and Confidence based on U.S. BLS 2024–2034 data.</li>
+            <li><strong>Stateless Growth Simulator:</strong> Allows testing skill upgrades without altering stored profiles or historical assessments.</li>
+            <li><strong>Modular Admin &amp; Resource Hub:</strong> Empowers content editors to manage careers, quizzes, original PDFs, and video media with full auditability.</li>
+          </ul>
+        </div>
+      </div>
+      <h3>Verified Implementation Metrics</h3>
+      <div class="grid-4">
+        <div class="card dark"><div class="metric">15</div><p class="small">Sourced Career Profiles (BLS Data)</p></div>
+        <div class="card dark"><div class="metric">10</div><p class="small">Curated Career Domains</p></div>
+        <div class="card dark"><div class="metric">6 + 6</div><p class="small">Original PDFs (51 Pages) &amp; Videos</p></div>
+        <div class="card dark"><div class="metric">27</div><p class="small">Mongoose Schema Models</p></div>
+      </div>
+      <div class="callout warning"><b>Occupational Data Scope Disclaimer:</b> Occupational compensation figures, growth projections, and education paths are sourced directly from the U.S. Bureau of Labor Statistics (BLS 2024–2034) reference dataset. Local job market salaries, regional regulations, and institutional licensing requirements vary.</div>
+      <div class="page-footer"><span>PATHSEEKER · EXECUTIVE OVERVIEW</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 04: SCOPE, ACTORS & USE CASES -->
+    <section class="page" id="scope">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>04 · SCOPE &amp; ACTORS</span></div>
+      <span class="section-number">04</span>
+      <div class="eyebrow">System Boundaries</div>
+      <h2>Actors, Permissions &amp; Primary Learner Journey</h2>
+      <table>
+        <thead>
+          <tr><th>Actor</th><th>Role Key</th><th>Primary Capabilities &amp; Access Scope</th><th>Auth Guard</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Visitor</b></td><td><code>anonymous</code></td><td>Browse landing page, public careers, published stories, help articles, and public Navi text queries.</td><td>Public access</td></tr>
+          <tr><td><b>Learner (Student)</b></td><td><code>user</code> (stage: student)</td><td>Guided onboarding, psychometric quiz, career passport, recommendations, skill simulator, bookmarking, PDF downloads.</td><td><code>requireAuth</code></td></tr>
+          <tr><td><b>Learner (Graduate)</b></td><td><code>user</code> (stage: graduate)</td><td>Career exploration, comparison sets, success story submissions, feedback triage, private notes.</td><td><code>requireAuth</code></td></tr>
+          <tr><td><b>Learner (Professional)</b></td><td><code>user</code> (stage: professional)</td><td>Skill gap analysis, career switching simulation, advanced filtering, notifications.</td><td><code>requireAuth</code></td></tr>
+          <tr><td><b>Content Editor</b></td><td><code>content_editor</code> / <code>staff</code></td><td>Create/edit careers, multimedia records, PDF resources, quiz questions, and help articles.</td><td><code>requireRole('staff')</code></td></tr>
+          <tr><td><b>Support Manager</b></td><td><code>support_manager</code> / <code>staff</code></td><td>Moderate user-submitted stories, review and respond to feedback tickets, inspect analytics.</td><td><code>requireRole('staff')</code></td></tr>
+          <tr><td><b>Administrator</b></td><td><code>admin</code> / <code>super_admin</code></td><td>User role &amp; status governance, publication state changes, system settings, immutable audit logs.</td><td><code>requireRole('admin')</code></td></tr>
+        </tbody>
+      </table>
+      <div class="grid-2" style="margin-top:3.5mm">
+        <div class="card accent">
+          <h3>In-Scope Functional Boundary</h3>
+          <p>Secure identity &amp; session lifecycle; editable profile with resume upload; multi-factor career filtering; versioned psychometric assessment; deterministic recommendations; interactive growth simulator; PDF viewer; community stories with moderation; support feedback; Navi assistant; role-based administration; full accessibility.</p>
+        </div>
+        <div class="card">
+          <h3>Explicit Out-of-Scope Boundary</h3>
+          <p>Monetary transactions / payment processing; automated resume background checks; legally binding employment placement; autonomous machine-learned hiring algorithms; live global real-time salary scraping; third-party video platform bandwidth hosting.</p>
+        </div>
+      </div>
+      <h3>Primary Learner Journey Architecture</h3>
+      <div class="flow">
+        <div class="flow-step"><b>1</b><strong>Register &amp; Verify Identity:</strong> Account creation with email validation, bcrypt password hashing, 6-digit cryptographic OTP generation, and HttpOnly session issuance.</div>
+        <div class="flow-step"><b>2</b><strong>Establish Learner Profile:</strong> Complete onboarding wizard recording education history, self-rated skills (0–10 scale), interest tags, career stage, and target aspirations.</div>
+        <div class="flow-step"><b>3</b><strong>Complete Psychometric Assessment:</strong> Execute versioned assessment (Quiz v1) with resumable server-side attempt state and immutable question snapshots.</div>
+        <div class="flow-step"><b>4</b><strong>Generate Durable Passport &amp; Matches:</strong> Server evaluates trait scores, assigns archetype, calculates compatibility/readiness, and stores an immutable recommendation snapshot.</div>
+        <div class="flow-step"><b>5</b><strong>Explore, Simulate &amp; Upskill:</strong> Analyze career details, simulate skill growth, save bookmarks with private notes, download original PDF roadmaps, and track notifications.</div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · ACTOR &amp; JOURNEY MODEL</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 05: FORMAL SRS REQUIREMENT MAPPING -->
+    <section class="page" id="functional">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>05 · SRS MAPPING</span></div>
+      <span class="section-number">05</span>
+      <div class="eyebrow">SRS Requirement Identification</div>
+      <h2>Formal Requirement-to-Code Mapping</h2>
+      <table>
+        <thead>
+          <tr><th>SRS ID</th><th>Requirement Name</th><th>Frontend Module</th><th>Backend Module &amp; Service</th><th>MongoDB Models</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>FR-01</b></td>
+            <td>Auth &amp; User Lifecycle</td>
+            <td><code>AuthContext</code>, <code>LoginPage</code>, <code>SignupPage</code>, <code>VerifyEmailPage</code></td>
+            <td><code>auth.routes.js</code>, <code>auth.service.js</code>, <code>session.service.js</code></td>
+            <td><code>User</code>, <code>Session</code>, <code>VerificationToken</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-02</b></td>
+            <td>Personalized Dashboard</td>
+            <td><code>DashboardPage.jsx</code>, <code>DashboardOverview</code></td>
+            <td><code>personalization.routes.js</code>, <code>dashboard.service.js</code></td>
+            <td><code>UserProfile</code>, <code>CareerPassport</code>, <code>RecentlyViewed</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-03</b></td>
+            <td>Career Bank &amp; Filtering</td>
+            <td><code>CareersPage.jsx</code>, <code>CareerDetailView</code>, <code>CareerFilters</code></td>
+            <td><code>catalog.routes.js</code>, <code>catalog.service.js</code></td>
+            <td><code>Career</code>, <code>Domain</code>, <code>Skill</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-04</b></td>
+            <td>Interest Assessment Quiz</td>
+            <td><code>QuizPage.jsx</code>, <code>QuizHistoryPage.jsx</code>, <code>QuizCard</code></td>
+            <td><code>quizAttempts.routes.js</code>, <code>quiz.service.js</code></td>
+            <td><code>Quiz</code>, <code>QuizQuestion</code>, <code>QuizAttempt</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-05</b></td>
+            <td>Multimedia Center</td>
+            <td><code>MediaPage.jsx</code>, <code>MediaDetailPage.jsx</code>, <code>VideoEmbed</code></td>
+            <td><code>media.routes.js</code>, <code>content.service.js</code></td>
+            <td><code>Multimedia</code>, <code>MediaRating</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-06</b></td>
+            <td>Success Stories Hub</td>
+            <td><code>SuccessStoriesPage.jsx</code>, <code>SubmitStoryPage.jsx</code></td>
+            <td><code>story.routes.js</code>, <code>admin.service.js</code></td>
+            <td><code>SuccessStory</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-07</b></td>
+            <td>Resource Library &amp; PDF</td>
+            <td><code>ResourcesPage.jsx</code>, <code>ResourceViewerPage.jsx</code></td>
+            <td><code>resource.routes.js</code>, <code>content.service.js</code></td>
+            <td><code>Resource</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-08</b></td>
+            <td>Feedback &amp; Analytics</td>
+            <td><code>FeedbackPage.jsx</code>, <code>NotificationsPage.jsx</code></td>
+            <td><code>feedback.routes.js</code>, <code>notification.service.js</code></td>
+            <td><code>Feedback</code>, <code>Notification</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-09</b></td>
+            <td>Bookmarks, Notes &amp; Compare</td>
+            <td><code>SavedPage.jsx</code>, <code>ComparePage.jsx</code>, <code>BookmarkButton</code></td>
+            <td><code>personalization.routes.js</code>, <code>personalization.service.js</code></td>
+            <td><code>Bookmark</code>, <code>Comparison</code>, <code>SavedFilter</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-10</b></td>
+            <td>Admin Control Center</td>
+            <td><code>/admin/*</code> (Users, Careers, Quizzes, Stories, Feedback)</td>
+            <td><code>admin.routes.js</code>, <code>admin.service.js</code>, <code>auditLog.service.js</code></td>
+            <td><code>User</code>, <code>Settings</code>, <code>AuditLog</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-11</b></td>
+            <td>Advanced Career Intelligence</td>
+            <td><code>PassportPage.jsx</code>, <code>RecommendationsPage.jsx</code>, <code>Simulator</code></td>
+            <td><code>personalization.routes.js</code>, <code>careerIntelligence.service.js</code></td>
+            <td><code>CareerPassport</code>, <code>RecommendationSnapshot</code></td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><b>FR-12</b></td>
+            <td>Accessibility &amp; Navi Agent</td>
+            <td><code>AccessibilityContext</code>, <code>NaviDialog.jsx</code>, <code>NaviWidget</code></td>
+            <td><code>assistant.routes.js</code>, <code>assistant.service.js</code></td>
+            <td><code>UserProfile</code> (accessibilityPreferences)</td>
+            <td><span class="status pass">VERIFIED</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout"><b>Assessment Question Scope Clarification:</b> While the database schema dynamically supports multiple question formats (multiple-choice, likert scale, ranking), the delivered baseline quiz (Quiz v1) implements 8 comprehensive multiple-choice psychometric questions designed for transparent archetype scoring.</div>
+      <div class="page-footer"><span>PATHSEEKER · SRS FUNCTIONAL TRACE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 06: QUALITY REQUIREMENTS -->
+    <section class="page" id="quality">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>06 · QUALITY ATTRIBUTES</span></div>
+      <span class="section-number">06</span>
+      <div class="eyebrow">Non-Functional Engineering</div>
+      <h2>Quality Attributes &amp; Architectural Invariants</h2>
+      <table>
+        <thead>
+          <tr><th>Quality Attribute</th><th>Architectural Design Response</th><th>Verification &amp; Evidence</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>NFR-01: Safety &amp; Content Integrity</b></td>
+            <td>Curated local PDF roadmaps with SHA integrity; external media restricted to verified Google Career Certificates YouTube IDs.</td>
+            <td><code>seeds.test.js</code> and <code>content.service.js</code> verify all 6 video URLs and 6 PDF file paths resolve.</td>
+          </tr>
+          <tr>
+            <td><b>NFR-02: Accessibility (WCAG 2.1 AA)</b></td>
+            <td>Semantic HTML5 elements, ARIA landmarks, WCAG-compliant color contrast, font scaling (85%–130%), system dark/light sync, reduced motion.</td>
+            <td><code>AccessibilityContext.jsx</code>, 25 visual regression contact sheets, and keyboard navigation test passes.</td>
+          </tr>
+          <tr>
+            <td><b>NFR-03: Performance &amp; Latency</b></td>
+            <td>Vite code splitting, React lazy routing, TanStack Query stale-time caching (30s), compound MongoDB indexes on search fields.</td>
+            <td>Vite production bundle generates clean chunk distributions; API queries resolve in &lt;50ms locally.</td>
+          </tr>
+          <tr>
+            <td><b>NFR-04: Security &amp; Data Privacy</b></td>
+            <td>Bcrypt hashing (cost 12), SHA-256 token hashing, HttpOnly SameSite cookies, Helmet security headers, Express rate limiting, role RBAC.</td>
+            <td><code>auth.service.js</code>, <code>auth.middleware.js</code>, and <code>models.test.js</code> security assertions.</td>
+          </tr>
+          <tr>
+            <td><b>NFR-05: System Availability &amp; Health</b></td>
+            <td>Isolated process readiness (<code>/api/health</code>) and database connectivity probes (<code>/api/health/db</code>); graceful degraded states.</td>
+            <td><code>app.smoke.test.js</code> validates 200 on health and 503 error handling on database disconnect.</td>
+          </tr>
+          <tr>
+            <td><b>NFR-06: Determinism &amp; Auditability</b></td>
+            <td>Pure deterministic scoring math (no black-box AI); immutable attempt snapshots; full administrative audit logging.</td>
+            <td><code>career-intelligence.test.js</code> asserts identical inputs yield identical archetypes and scores.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>System Operating Constraints</h3>
+      <div class="grid-3">
+        <div class="card">
+          <h4>Runtime &amp; Execution</h4>
+          <p class="small muted">Node.js 20.x LTS or higher, npm 10.x+, MongoDB 7.0+ community or Atlas instance with write access.</p>
+        </div>
+        <div class="card">
+          <h4>Client Compatibility</h4>
+          <p class="small muted">Standards-compliant ECMAScript 2022 browsers: Chrome 110+, Firefox 115+, Safari 16+, Edge 110+.</p>
+        </div>
+        <div class="card">
+          <h4>External Fallbacks</h4>
+          <p class="small muted">Console fallback for transactional emails if Resend API key is omitted; deterministic text Navi if Vapi voice is inactive.</p>
+        </div>
+      </div>
+      <div class="callout accent"><b>Architectural Separation Rule:</b> Client state (Zustand) is strictly limited to ephemeral UI states, onboarding draft steps, and accessibility preferences. All authoritative scoring, matching algorithms, session states, and user records reside exclusively on the server.</div>
+      <div class="page-footer"><span>PATHSEEKER · QUALITY REQUIREMENTS</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 07: SYSTEM ARCHITECTURE -->
+    <section class="page" id="architecture">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>07 · ARCHITECTURE</span></div>
+      <span class="section-number">07</span>
+      <div class="eyebrow">System Topography</div>
+      <h2>Layered MERN Architectural Pattern</h2>
+      <div class="diagram architecture">
+        <div class="node">
+          <strong>React 18 SPA</strong>
+          <span class="small muted">Vite, TanStack Query, React Hook Form, Zustand</span>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="node">
+          <strong>Express API Gateway</strong>
+          <span class="small muted">Helmet, CORS, Rate Limit, Cookie Session Auth</span>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="node">
+          <strong>Service &amp; Domain Engine</strong>
+          <span class="small muted">Career Intelligence, Catalog, Moderation, Navi</span>
+        </div>
+        <div class="arrow">⇄</div>
+        <div class="node">
+          <strong>MongoDB Database</strong>
+          <span class="small muted">27 Mongoose Schemas, TTL &amp; Compound Text Indexes</span>
+        </div>
+      </div>
+      <h3>End-to-End Request Execution Lifecycle</h3>
+      <div class="flow">
+        <div class="flow-step"><b>1</b><strong>Client Navigation &amp; Query Dispatch:</strong> React Router lazy-loads destination view; TanStack Query dispatches HTTP request via <code>apiClient.js</code> with credentials and cancellation token.</div>
+        <div class="flow-step"><b>2</b><strong>Gateway Interception &amp; Middleware:</strong> Express passes request through <code>helmet()</code>, CORS allowlist check, <code>express.json({ limit: '1mb' })</code>, <code>cookieParser()</code>, and request correlation ID generator.</div>
+        <div class="flow-step"><b>3</b><strong>Authentication &amp; RBAC Verification:</strong> <code>requireAuth</code> extracts session cookie, computes SHA-256 hash, queries <code>Session</code> collection, reloads <code>User</code>, and <code>requireRole</code> enforces role permissions.</div>
+        <div class="flow-step"><b>4</b><strong>Controller &amp; Service Logic:</strong> Controller validates input DTO against Zod schema; domain service executes business invariants, calculates deterministic metrics, and coordinates Mongoose models.</div>
+        <div class="flow-step"><b>5</b><strong>MongoDB Persistence &amp; Population:</strong> Mongoose executes indexed queries, applies schema pre-save hooks, populates foreign relationships, and persists immutable snapshots.</div>
+        <div class="flow-step"><b>6</b><strong>Enveloped Response &amp; Cache Reconcile:</strong> Server returns standard JSON envelope <code>{ data: ... }</code>; TanStack Query updates memory cache and triggers reactive UI re-renders.</div>
+      </div>
+      <h3>Production Infrastructure Topology</h3>
+      <div class="grid-3">
+        <div class="card accent">
+          <h4>Frontend Hosting</h4>
+          <p class="small muted">Vite-compiled static single-page application served via CDN (Vercel, Netlify, or Nginx) over HTTPS.</p>
+        </div>
+        <div class="card">
+          <h4>Backend API Service</h4>
+          <p class="small muted">Containerized Node.js Express process hosted on cloud platform (Render, Railway, or VPS) with environment secrets.</p>
+        </div>
+        <div class="card">
+          <h4>Database &amp; External</h4>
+          <p class="small muted">MongoDB Atlas 7+ replica set with automated backups; Resend API for email delivery; Vapi WebSocket for voice agent.</p>
+        </div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · SYSTEM ARCHITECTURE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 08 (NEW 07A): DFD LEVEL 0 (CONTEXT DIAGRAM) -->
+    <section class="page" id="dfd-0">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>07A · DFD LEVEL 0</span></div>
+      <span class="section-number">07A</span>
+      <div class="eyebrow">Data Flow Architecture</div>
+      <h2>Formal DFD Level 0 — Context Diagram</h2>
+      <p class="small muted">The Level 0 Context Diagram defines the authoritative system boundary, external human and machine entities, and primary data packets exchanged with the core PathSeeker application.</p>
+      
+      <!-- Visual DFD Level 0 Diagram -->
+      <div class="diagram" style="padding:4.5mm 3.5mm">
+        <div style="display:grid; grid-template-columns: 46mm 1fr 46mm; gap:3.5mm; align-items:center;">
+          <!-- Left Entities -->
+          <div style="display:grid; gap:3mm;">
+            <div class="dfd-box">
+              <strong>Learner / Visitor</strong>
+              <div class="small muted">Students, Graduates, Professionals</div>
+            </div>
+            <div class="dfd-box">
+              <strong>External Voice Gateway</strong>
+              <div class="small muted">Vapi WebSocket Service</div>
+            </div>
+          </div>
+
+          <!-- Center Process & Flows -->
+          <div style="display:grid; justify-items:center; gap:2.5mm; padding:2mm;">
+            <div style="font-size:6.5pt; color:var(--deep); font-weight:700; text-align:center;">
+              &darr; Credentials, Onboarding, Quiz Answers, Feedback &darr;
+            </div>
+            <div class="dfd-process" style="width:100%; max-width:65mm; padding:4mm 2mm;">
+              <div style="font-size:8.8pt; color:var(--deep); font-weight:800;">Process 0.0</div>
+              <div style="font-size:9.5pt; color:var(--ink); font-weight:800;">PathSeeker Career Passport System</div>
+              <div class="small muted" style="font-size:6.6pt; margin-top:1mm;">MERN Core · Deterministic Engine</div>
+            </div>
+            <div style="font-size:6.5pt; color:var(--deep); font-weight:700; text-align:center;">
+              &uarr; Passports, Ranked Matches, PDFs, Video Media, Notifications &uarr;
+            </div>
+          </div>
+
+          <!-- Right Entities -->
+          <div style="display:grid; gap:3mm;">
+            <div class="dfd-box">
+              <strong>Staff / Content Editor</strong>
+              <div class="small muted">Story Reviewers, Quiz Editors</div>
+            </div>
+            <div class="dfd-box">
+              <strong>System Administrator</strong>
+              <div class="small muted">User Governance, Settings, Audits</div>
+            </div>
+            <div class="dfd-box">
+              <strong>External Email Gateway</strong>
+              <div class="small muted">Resend Transactional API</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Context Data Flow Dictionary</h3>
+      <table>
+        <thead>
+          <tr><th>Data Flow Identifier</th><th>Source Entity / Process</th><th>Destination</th><th>Contained Data Packet</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>DF-01: Auth_Credentials</code></td>
+            <td>Learner / Visitor</td>
+            <td>Process 0.0</td>
+            <td>Registration DTO (name, email, bcrypt hash, stage), Login DTO, OTP verification code.</td>
+          </tr>
+          <tr>
+            <td><code>DF-02: Assessment_Answers</code></td>
+            <td>Learner</td>
+            <td>Process 0.0</td>
+            <td>Selected question options, self-rated skills (1..10), career aspirations, interest tags.</td>
+          </tr>
+          <tr>
+            <td><code>DF-03: Passport_Intelligence</code></td>
+            <td>Process 0.0</td>
+            <td>Learner</td>
+            <td>Archetype label, normalized trait scores, compatibility %, readiness %, skill gap delta.</td>
+          </tr>
+          <tr>
+            <td><code>DF-04: Content_Management</code></td>
+            <td>Staff / Content Editor</td>
+            <td>Process 0.0</td>
+            <td>Career definitions, required skills, BLS salary benchmarks, PDF workbooks, video URLs.</td>
+          </tr>
+          <tr>
+            <td><code>DF-05: System_Governance</code></td>
+            <td>System Administrator</td>
+            <td>Process 0.0</td>
+            <td>User status transitions, role promotions/demotions, maintenance mode flags, audit log queries.</td>
+          </tr>
+          <tr>
+            <td><code>DF-06: Email_Dispatch</code></td>
+            <td>Process 0.0</td>
+            <td>External Email (Resend)</td>
+            <td>6-digit numeric OTP token, password reset secure URL, moderation decision alerts.</td>
+          </tr>
+          <tr>
+            <td><code>DF-07: Voice_Streams</code></td>
+            <td>Process 0.0 / Frontend</td>
+            <td>External Voice (Vapi)</td>
+            <td>Bidirectional WebSocket PCM audio packets, transcript tokens, Navi assistant prompt.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · DFD LEVEL 0 CONTEXT DIAGRAM</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 09 (NEW 07B): DFD LEVEL 1 (DECOMPOSED DIAGRAM) -->
+    <section class="page" id="dfd-1">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>07B · DFD LEVEL 1</span></div>
+      <span class="section-number">07B</span>
+      <div class="eyebrow">Data Flow Architecture</div>
+      <h2>Formal DFD Level 1 — Decomposed System Flow</h2>
+      <p class="small muted">DFD Level 1 decomposes Process 0.0 into 7 functional sub-processes interacting with 8 dedicated MongoDB data stores.</p>
+      
+      <!-- Visual DFD Level 1 Subsystem Flow -->
+      <div class="diagram" style="padding:3.5mm">
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:2.5mm; margin-bottom:3mm;">
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>1.0 Auth &amp; Session</b><br><span class="small muted">Bcrypt, OTP, HttpOnly</span>
+          </div>
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>2.0 Profile &amp; Onboarding</b><br><span class="small muted">Skills, Education, Assets</span>
+          </div>
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>3.0 Quiz &amp; Attempt</b><br><span class="small muted">Snapshots &amp; Answer Sync</span>
+          </div>
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>4.0 Intelligence Engine</b><br><span class="small muted">Compatibility &amp; Gap Math</span>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2.5mm; margin-bottom:3mm;">
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>5.0 Catalog &amp; Resources</b><br><span class="small muted">Careers, PDFs &amp; Media</span>
+          </div>
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>6.0 Personalization</b><br><span class="small muted">Bookmarks, Notes, Compare</span>
+          </div>
+          <div class="dfd-process" style="font-size:7.2pt; border-radius:3mm; padding:2mm;">
+            <b>7.0 Admin &amp; Moderation</b><br><span class="small muted">Stories, Triage, Audits</span>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:2mm;">
+          <div class="dfd-store">D1: users &amp; sessions</div>
+          <div class="dfd-store">D2: user_profiles</div>
+          <div class="dfd-store">D3: quiz_attempts</div>
+          <div class="dfd-store">D4: career_passports</div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:2mm; margin-top:1.5mm;">
+          <div class="dfd-store">D5: careers &amp; skills</div>
+          <div class="dfd-store">D6: bookmarks &amp; notes</div>
+          <div class="dfd-store">D7: resources &amp; media</div>
+          <div class="dfd-store">D8: audit_logs &amp; settings</div>
+        </div>
+      </div>
+
+      <h3>Sub-Process Functional Decomposition Specification</h3>
+      <table>
+        <thead>
+          <tr><th>Process Number</th><th>Sub-Process Name</th><th>Primary Inputs</th><th>Target Data Store</th><th>Output Artifacts</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>1.0</b></td>
+            <td>Authentication &amp; Session Control</td>
+            <td>Registration DTO, Login Credentials, OTP Code</td>
+            <td><code>D1: users, sessions, verification_tokens</code></td>
+            <td>HttpOnly Session Cookie, Authenticated User Context, Revocation Stamps</td>
+          </tr>
+          <tr>
+            <td><b>2.0</b></td>
+            <td>Profile &amp; Onboarding Engine</td>
+            <td>Education List, Self-Rated Skills, Resume PDF</td>
+            <td><code>D2: user_profiles</code></td>
+            <td>Completed Profile Document, Onboarding Progress State</td>
+          </tr>
+          <tr>
+            <td><b>3.0</b></td>
+            <td>Psychometric Quiz &amp; Attempt Tracking</td>
+            <td>Published Quiz Version, Chosen Option Keys</td>
+            <td><code>D3: quizzes, quiz_attempts</code></td>
+            <td>Frozen Question Snapshots, Completed Attempt Status Record</td>
+          </tr>
+          <tr>
+            <td><b>4.0</b></td>
+            <td>Career Intelligence &amp; Scoring Engine</td>
+            <td>Attempt Answers, Profile Skills, Career Requirements</td>
+            <td><code>D4: career_passports, recommendation_snapshots</code></td>
+            <td>Archetype Mapping, Normalized Trait Signals, Top 10 Ranked Matches, Skill Gap Deltas</td>
+          </tr>
+          <tr>
+            <td><b>5.0</b></td>
+            <td>Catalog Search &amp; Resource Hub</td>
+            <td>Filter Criteria, Search Query, Category Filter</td>
+            <td><code>D5: careers, domains, skills</code> · <code>D7: resources, media</code></td>
+            <td>Filtered Career Bank Results, PDF Document Streams, Embedded Media Metadata</td>
+          </tr>
+          <tr>
+            <td><b>6.0</b></td>
+            <td>Personalization &amp; Decision Workspace</td>
+            <td>Item IDs, Private Notes, Comparison Lists</td>
+            <td><code>D6: bookmarks, recently_viewed, saved_filters, comparisons</code></td>
+            <td>User Activity Trail, Side-by-Side Comparison Matrices, Exportable Roadmaps</td>
+          </tr>
+          <tr>
+            <td><b>7.0</b></td>
+            <td>Moderation &amp; System Administration</td>
+            <td>Story Submissions, Feedback Tickets, Role Updates</td>
+            <td><code>D8: audit_logs, settings</code> · <code>D7: success_stories, feedback</code></td>
+            <td>Approved Success Stories, Learner Notifications, Immutable Audit Records</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · DFD LEVEL 1 DECOMPOSITION</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 10: FRONTEND DESIGN -->
+    <section class="page" id="frontend">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>08 · FRONTEND DESIGN</span></div>
+      <span class="section-number">08</span>
+      <div class="eyebrow">Presentation Layer Architecture</div>
+      <h2>React Route Boundaries, State Ownership &amp; UX</h2>
+      <div class="grid-2">
+        <div class="card accent">
+          <h3>Route Boundary Topology</h3>
+          <ul>
+            <li><strong>Public Route Boundary:</strong> Welcome, Login, Signup, Verify Email, Forgot Password, Reset Password, Admin Login, Public Careers/Resources.</li>
+            <li><strong>Learner Workspace (<code>/app/*</code>):</strong> Onboarding Wizard, Dashboard, Assessment &amp; History, Career Bank, Comparisons, Saved Items, Stories, Feedback, Profile.</li>
+            <li><strong>Staff Workspace (<code>/admin/*</code>):</strong> Overview, Users, Careers, Quizzes, Resources, Media, Stories, Feedback Triage, Settings, Audit Logs.</li>
+            <li><strong>Fallback Boundaries:</strong> 403 Forbidden, 404 Not Found, Server Error Boundary with reload triggers.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Provider Hierarchy</h3>
+          <pre><code>&lt;ErrorBoundary&gt;
+  &lt;QueryClientProvider client={queryClient}&gt;
+    &lt;AccessibilityProvider&gt;
+      &lt;AuthProvider&gt;
+        &lt;RouterProvider router={router} /&gt;
+        &lt;Toaster position="top-right" /&gt;
+      &lt;/AuthProvider&gt;
+    &lt;/AccessibilityProvider&gt;
+  &lt;/QueryClientProvider&gt;
+&lt;/ErrorBoundary&gt;</code></pre>
+        </div>
+      </div>
+      <h3>Multi-Tier State Ownership Matrix</h3>
+      <table>
+        <thead>
+          <tr><th>State Domain</th><th>State Owner</th><th>Data Managed</th><th>Persistence Tier</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Server Records</b></td><td>TanStack Query v5</td><td>User profile, careers, domains, skills, passports, attempts, bookmarks, admin lists.</td><td>MongoDB &amp; In-Memory Cache (30s stale time)</td></tr>
+          <tr><td><b>Session Identity</b></td><td><code>AuthContext</code></td><td>Authenticated user object, role, email verification status, login/logout methods.</td><td>HttpOnly Cookie + Memory sync via <code>/auth/me</code></td></tr>
+          <tr><td><b>Workflow Drafts</b></td><td>Zustand Store</td><td>Multi-step onboarding form data, active quiz draft choices, comparison drawer list.</td><td><code>sessionStorage</code> (cleared on completion)</td></tr>
+          <tr><td><b>User Preferences</b></td><td><code>AccessibilityContext</code></td><td>Theme (light/dark/system), font scaling (85%–130%), reduced motion flag, Navi mute.</td><td><code>localStorage</code> (key: <code>ps_accessibility_prefs</code>)</td></tr>
+          <tr><td><b>Form States</b></td><td>React Hook Form + Zod</td><td>Input validations, field errors, touched states, submission flags for forms.</td><td>Component Lifecycle (Ephemeral)</td></tr>
+        </tbody>
+      </table>
+      <h3>Client Resilience &amp; Fault Tolerance</h3>
+      <div class="grid-3">
+        <div class="card">
+          <h4>Request Timeout (15s)</h4>
+          <p class="small muted"><code>apiClient.js</code> attaches <code>AbortController</code> with a 15-second timeout, distinguishing network aborts from user navigation.</p>
+        </div>
+        <div class="card">
+          <h4>Bounded Retries</h4>
+          <p class="small muted">Failed GET queries retry up to 2 times with exponential backoff, strictly ignoring 400, 401, 403, and 404 client errors.</p>
+        </div>
+        <div class="card">
+          <h4>Standardized Error Toast</h4>
+          <p class="small muted">Extracts safe user message and correlation ID from backend error payloads, displaying actionable Sonner notifications.</p>
+        </div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · FRONTEND DESIGN</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 11: BACKEND DESIGN -->
+    <section class="page" id="backend">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>09 · BACKEND DESIGN</span></div>
+      <span class="section-number">09</span>
+      <div class="eyebrow">API &amp; Application Layer</div>
+      <h2>Express Application Design &amp; Domain Boundaries</h2>
+      <table>
+        <thead>
+          <tr><th>Domain</th><th>Route &amp; Controller Modules</th><th>Service Layer Module</th><th>Core Business Responsibilities</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Identity &amp; Auth</b></td>
+            <td><code>auth.routes.js</code><br><code>auth.controller.js</code></td>
+            <td><code>auth.service.js</code><br><code>session.service.js</code></td>
+            <td>Registration validation, bcrypt hashing, 6-digit OTP verification, session generation, credential checks, password recovery.</td>
+          </tr>
+          <tr>
+            <td><b>Learner Profile</b></td>
+            <td><code>profile.routes.js</code><br><code>profile.controller.js</code></td>
+            <td><code>profile.service.js</code></td>
+            <td>User profile CRUD, multi-step onboarding progression, avatar upload, resume document storage and indexing.</td>
+          </tr>
+          <tr>
+            <td><b>Assessment</b></td>
+            <td><code>quizAttempts.routes.js</code><br><code>quiz.controller.js</code></td>
+            <td><code>quiz.service.js</code></td>
+            <td>Published quiz retrieval, resumable attempt lifecycle, answer patching, question snapshot freezing, submission.</td>
+          </tr>
+          <tr>
+            <td><b>Career Intelligence</b></td>
+            <td><code>personalization.routes.js</code><br><code>careerIntelligence.controller.js</code></td>
+            <td><code>careerIntelligence.service.js</code></td>
+            <td>Deterministic trait/domain scoring, archetype mapping, compatibility/readiness calculation, immutable recommendation snapshots.</td>
+          </tr>
+          <tr>
+            <td><b>Career Catalog</b></td>
+            <td><code>catalog.routes.js</code><br><code>catalog.controller.js</code></td>
+            <td><code>catalog.service.js</code></td>
+            <td>Faceted filtering, text search with spelling tolerance, career slug resolution, related career suggestions.</td>
+          </tr>
+          <tr>
+            <td><b>Personalization</b></td>
+            <td><code>personalization.routes.js</code><br><code>personalization.controller.js</code></td>
+            <td><code>personalization.service.js</code></td>
+            <td>Polymorphic bookmarks, private career notes, recently viewed history, saved searches, comparison sets.</td>
+          </tr>
+          <tr>
+            <td><b>Content &amp; Media</b></td>
+            <td><code>resource.routes.js</code>, <code>media.routes.js</code><br><code>content.controller.js</code></td>
+            <td><code>content.service.js</code></td>
+            <td>PDF workbook delivery, download counters, expert video metadata, community 1–5 star ratings.</td>
+          </tr>
+          <tr>
+            <td><b>Community &amp; Support</b></td>
+            <td><code>story.routes.js</code>, <code>feedback.routes.js</code><br><code>story.controller.js</code></td>
+            <td><code>admin.service.js</code><br><code>help.service.js</code></td>
+            <td>Success story submissions, staff moderation triage, user feedback ticketing, in-app notifications.</td>
+          </tr>
+          <tr>
+            <td><b>Administration</b></td>
+            <td><code>admin.routes.js</code><br><code>admin.controller.js</code></td>
+            <td><code>admin.service.js</code><br><code>auditLog.service.js</code></td>
+            <td>User governance, career/resource/quiz CRUD, publication lifecycle (draft/published/archived), audit trails.</td>
+          </tr>
+          <tr>
+            <td><b>Navi Assistant</b></td>
+            <td><code>assistant.routes.js</code><br><code>assistant.controller.js</code></td>
+            <td><code>assistant.service.js</code></td>
+            <td>Deterministic intent classification, navigation actions, search grounding, authenticated profile updates.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Cross-Cutting Middleware Architecture</h3>
+      <div class="grid-4">
+        <div class="card">
+          <h4>Correlation Context</h4>
+          <p class="small muted">Attaches unique UUID <code>requestId</code> to <code>req</code> and response header for audit tracing.</p>
+        </div>
+        <div class="card">
+          <h4>Security Headers</h4>
+          <p class="small muted"><code>helmet()</code> enforces CSP, HSTS, X-Content-Type-Options, and Frameguard defenses.</p>
+        </div>
+        <div class="card">
+          <h4>Rate Limiting</h4>
+          <p class="small muted"><code>authRateLimiter</code> and <code>assistantRateLimiter</code> prevent brute-force attacks.</p>
+        </div>
+        <div class="card">
+          <h4>Global Error Handler</h4>
+          <p class="small muted">Catches unhandled errors, formats safe JSON payload, logs stack traces server-side.</p>
+        </div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · BACKEND DESIGN</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 12: API CATALOGUE PART 1 -->
+    <section class="page" id="api-1">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>10 · API CATALOGUE (1)</span></div>
+      <span class="section-number">10</span>
+      <div class="eyebrow">REST Interface Specification</div>
+      <h2>Core Application API Endpoints</h2>
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Endpoint Route</th><th>Auth / Role</th><th>Request Body / Params</th><th>Response Data</th><th>Failure Codes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/register</code></td>
+            <td>Anonymous</td>
+            <td><code>{ name, email, password, stage }</code></td>
+            <td><code>{ user: { _id, email, role }, requiresVerification: true }</code></td>
+            <td>400, 409 (Email exists)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/verify-email</code></td>
+            <td>Anonymous</td>
+            <td><code>{ email, otp }</code></td>
+            <td><code>{ message: "Email verified", user: { ... } }</code></td>
+            <td>400 (Invalid/expired OTP)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/resend-verification</code></td>
+            <td>Anonymous</td>
+            <td><code>{ email }</code></td>
+            <td><code>{ message: "Verification code sent" }</code></td>
+            <td>400, 429 (Cooldown)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/login</code></td>
+            <td>Anonymous</td>
+            <td><code>{ email, password }</code></td>
+            <td><code>{ user: { ... } }</code> + Sets HttpOnly Session Cookie</td>
+            <td>400, 401 (Invalid creds)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/admin/login</code></td>
+            <td>Anonymous</td>
+            <td><code>{ email, password }</code></td>
+            <td><code>{ user: { role: 'admin'|'staff' } }</code> + Session Cookie</td>
+            <td>401, 403 (Not staff)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/forgot-password</code></td>
+            <td>Anonymous</td>
+            <td><code>{ email }</code></td>
+            <td><code>{ message: "Password reset instructions sent" }</code></td>
+            <td>400, 404</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/reset-password</code></td>
+            <td>Anonymous</td>
+            <td><code>{ email, token, newPassword }</code></td>
+            <td><code>{ message: "Password updated successfully" }</code></td>
+            <td>400 (Expired token)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/auth/logout</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ message: "Logged out successfully" }</code> + Clears Cookie</td>
+            <td>401</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/auth/me</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ user: { _id, name, email, role, stage, status } }</code></td>
+            <td>401 (Session expired)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/users/me/profile</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ profile: { headline, education, skills, interests } }</code></td>
+            <td>401, 404</td>
+          </tr>
+          <tr>
+            <td><code>PATCH</code></td>
+            <td><code>/api/users/me/profile</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ headline, education, skills, interests, goals }</code></td>
+            <td><code>{ profile: { ...updatedProfile } }</code></td>
+            <td>400, 401</td>
+          </tr>
+          <tr>
+            <td><code>PATCH</code></td>
+            <td><code>/api/users/me/profile/onboarding</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ step, status, data }</code></td>
+            <td><code>{ onboarding: { status, currentStep } }</code></td>
+            <td>400, 401</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/users/me/profile/avatar</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>multipart/form-data</code> (file)</td>
+            <td><code>{ avatarUrl: "/uploads/avatars/..." }</code></td>
+            <td>400 (Invalid type/size)</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/users/me/profile/resume</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>multipart/form-data</code> (file)</td>
+            <td><code>{ resume: { url, originalName, size } }</code></td>
+            <td>400 (Non-PDF or &gt;5MB)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/users/me/dashboard</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ user, profile, passport, topMatches, bookmarks, recent }</code></td>
+            <td>401</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/users/me/passport</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ passport: { archetype, traitScores, domainScores }, snapshot }</code></td>
+            <td>401, 404 (No quiz yet)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/users/me/recommendations</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ matches: [ { careerId, compatibilityScore, readinessScore } ] }</code></td>
+            <td>401, 404</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/users/me/careers/:slug/simulate</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ adjustments: [ { skillId, level } ] }</code></td>
+            <td><code>{ career, before, after, persisted: false }</code></td>
+            <td>400, 401, 404</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · REST API CATALOGUE (1)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 13: API CATALOGUE PART 2 -->
+    <section class="page" id="api-2">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>11 · API CATALOGUE (2)</span></div>
+      <span class="section-number">11</span>
+      <div class="eyebrow">REST Interface Specification</div>
+      <h2>Catalog, Assessment, Community &amp; Admin APIs</h2>
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Endpoint Route</th><th>Auth / Role</th><th>Request Body / Params</th><th>Response Data</th><th>Failure Codes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/careers</code></td>
+            <td>Public</td>
+            <td><code>?domain=&amp;skill=&amp;search=&amp;minSalary=&amp;page=1</code></td>
+            <td><code>{ careers: [...], pagination: { total, pages, page } }</code></td>
+            <td>400 (Bad query)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/careers/:slug</code></td>
+            <td>Public</td>
+            <td><code>params: { slug }</code></td>
+            <td><code>{ career: { title, domainId, requiredSkills, salary, tools } }</code></td>
+            <td>404 (Not found)</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/quiz-questions</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ quiz: { version, title, questions: [ { key, prompt, options } ] } }</code></td>
+            <td>401, 404</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/quiz-attempts</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ quizId }</code> (optional)</td>
+            <td><code>{ attempt: { _id, status: 'in_progress', answers: [] } }</code></td>
+            <td>401, 404</td>
+          </tr>
+          <tr>
+            <td><code>PATCH</code></td>
+            <td><code>/api/quiz-attempts/:id/answers</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ questionKey, optionKey }</code></td>
+            <td><code>{ attempt: { _id, answers: [...] } }</code></td>
+            <td>400, 401, 404</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/quiz-attempts/:id/complete</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ attempt, passport, recommendations }</code></td>
+            <td>400 (Incomplete), 401</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/users/me/bookmarks</code></td>
+            <td><code>requireAuth</code></td>
+            <td>None</td>
+            <td><code>{ bookmarks: [ { itemType, itemId, note, createdAt } ] }</code></td>
+            <td>401</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/users/me/bookmarks</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ itemType, itemId, note }</code></td>
+            <td><code>{ bookmark: { ... } }</code></td>
+            <td>400, 401, 409 (Exists)</td>
+          </tr>
+          <tr>
+            <td><code>DELETE</code></td>
+            <td><code>/api/users/me/bookmarks/:id</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>params: { id }</code></td>
+            <td><code>{ message: "Bookmark removed" }</code></td>
+            <td>401, 404</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/resources</code></td>
+            <td>Public</td>
+            <td><code>?audience=&amp;category=&amp;page=1</code></td>
+            <td><code>{ resources: [ { title, slug, file, pageCount, views } ] }</code></td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/resources/:id/download</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>params: { id }</code></td>
+            <td>Streams PDF file asset &amp; increments download counter</td>
+            <td>401, 404</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/media/:id/rating</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ rating: 1..5 }</code></td>
+            <td><code>{ mediaRating: { rating }, averageRating, ratingCount }</code></td>
+            <td>400, 401, 404</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/stories</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ authorName, careerId, narrative, consent }</code></td>
+            <td><code>{ story: { status: 'pending', ... } }</code></td>
+            <td>400, 401</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/feedback</code></td>
+            <td><code>requireAuth</code></td>
+            <td><code>{ category, message, rating, allowContact }</code></td>
+            <td><code>{ feedback: { status: 'new', ... } }</code></td>
+            <td>400, 401</td>
+          </tr>
+          <tr>
+            <td><code>POST</code></td>
+            <td><code>/api/assistant/respond</code></td>
+            <td>Optional Auth</td>
+            <td><code>{ message, currentScreen, screenContext }</code></td>
+            <td><code>{ reply, intent, suggestedNavigation, actionExecuted }</code></td>
+            <td>400</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/admin/users</code></td>
+            <td><code>requireRole('admin')</code></td>
+            <td><code>?role=&amp;status=&amp;search=&amp;page=1</code></td>
+            <td><code>{ users: [...], pagination: { total, pages } }</code></td>
+            <td>401, 403</td>
+          </tr>
+          <tr>
+            <td><code>PATCH</code></td>
+            <td><code>/api/admin/careers/:id/status/:status</code></td>
+            <td><code>requireRole('staff')</code></td>
+            <td><code>params: { id, status: 'draft'|'published'|'archived' }</code></td>
+            <td><code>{ career: { ...updatedCareer } }</code></td>
+            <td>401, 403, 404</td>
+          </tr>
+          <tr>
+            <td><code>GET</code></td>
+            <td><code>/api/admin/audit-logs</code></td>
+            <td><code>requireRole('admin')</code></td>
+            <td><code>?action=&amp;actorId=&amp;page=1</code></td>
+            <td><code>{ logs: [ { actorId, action, target, ip, timestamp } ] }</code></td>
+            <td>401, 403</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · REST API CATALOGUE (2)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 14 (NEW 11A): GRAPHICAL DATABASE ERD -->
+    <section class="page" id="erd">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>11A · DATABASE ERD</span></div>
+      <span class="section-number">11A</span>
+      <div class="eyebrow">Visual Data Architecture</div>
+      <h2>Graphical Entity Relationship Diagram (ERD)</h2>
+      <p class="small muted">The visual ERD maps the structural relationships, foreign keys, embedded schemas, and cardinality across all 27 Mongoose models.</p>
+
+      <!-- Graphical ERD Clusters Layout -->
+      <div class="grid-3" style="gap:2.5mm;">
+        <!-- Cluster 1: Identity & Profiles -->
+        <div class="erd-cluster">
+          <div class="erd-cluster-title">Identity &amp; Profile</div>
+          
+          <div class="erd-card">
+            <div class="erd-card-header"><span>User</span><span class="small muted">1:1 &amp; 1:N Parent</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              email: String (Unique)<br>
+              passwordHash: String<br>
+              role: Enum (user/staff/admin)<br>
+              stage: Enum (student/grad/pro)<br>
+              status: Enum (active/pending)
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>UserProfile</span><span class="small muted">1:1 to User</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> userId &rarr; User (Unique)<br>
+              headline: String<br>
+              education: [EducationSchema]<br>
+              skills: [{ skillId, selfRating }]<br>
+              resume: { url, size, mimeType }
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>Session &amp; Token</span><span class="small muted">1:N to User</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> userId &rarr; User<br>
+              tokenHash: String (SHA-256)<br>
+              expiresAt: Date (TTL Index)<br>
+              revokedAt: Date (Nullable)
+            </div>
+          </div>
+        </div>
+
+        <!-- Cluster 2: Occupational & Content Catalog -->
+        <div class="erd-cluster">
+          <div class="erd-cluster-title">Careers &amp; Taxonomy</div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>Domain &amp; Skill</span><span class="small muted">Taxonomy</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              slug: String (Unique)<br>
+              name: String<br>
+              category: Enum (tech/soft/analyt)<br>
+              aliases: [String] (Deduplicated)
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>Career</span><span class="small muted">BLS Sourced</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> domainId &rarr; Domain<br>
+              slug: String (Unique)<br>
+              title: String (Text Index)<br>
+              requiredSkills: [{ skillId, level }]<br>
+              salary: { median, entry, top }<br>
+              status: Enum (draft/published)
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>Resource &amp; Media</span><span class="small muted">PDF &amp; Video</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              file: { url, size, pageCount }<br>
+              url: String (YouTube Video ID)<br>
+              averageRating: Number (1..5)<br>
+              views / downloads: Number
+            </div>
+          </div>
+        </div>
+
+        <!-- Cluster 3: Intelligence & Personalization -->
+        <div class="erd-cluster">
+          <div class="erd-cluster-title">Intelligence &amp; Activity</div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>QuizAttempt</span><span class="small muted">1:N to User</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> userId &rarr; User<br>
+              <span class="erd-fk">FK</span> quizId &rarr; Quiz<br>
+              questionSnapshots: [FrozenDoc]<br>
+              answers: [{ questionKey, optionKey }]<br>
+              status: in_progress | completed
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>CareerPassport</span><span class="small muted">1:1 to Attempt</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> sourceAttemptId &rarr; Attempt<br>
+              archetype: String (Mapped)<br>
+              traitScores: [{ key, score }]<br>
+              domainScores: [{ key, score }]<br>
+              completionPercent: Number
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>RecommendationSnapshot</span><span class="small muted">Immutable</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> passportId &rarr; Passport<br>
+              matches: [{ careerId, compat, read }]<br>
+              skillGap: [{ skillId, delta, impact }]<br>
+              algorithmVersion: 'recommendation-v1'
+            </div>
+          </div>
+
+          <div class="erd-card">
+            <div class="erd-card-header"><span>Bookmark &amp; Activity</span><span class="small muted">Polymorphic</span></div>
+            <div class="erd-card-body">
+              <span class="erd-pk">PK</span> _id: ObjectId<br>
+              <span class="erd-fk">FK</span> userId &rarr; User<br>
+              itemType: career|resource|media<br>
+              itemId: ObjectId &rarr; Dynamic Ref<br>
+              note: String (Max 1000 Chars)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cardinality Notation Legend -->
+      <div class="diagram" style="margin-top:2.5mm; padding:2mm 3mm; display:flex; justify-content:space-between; align-items:center; font-size:6.8pt;">
+        <div><strong>Cardinality Legend:</strong> <code>1:1</code> = Exactly One (Mandatory) &nbsp;|&nbsp; <code>1:N</code> = One-to-Many &nbsp;|&nbsp; <code>N:M</code> = Many-to-Many Referenced</div>
+        <div><span class="erd-pk">PK</span> Primary ObjectId &nbsp;|&nbsp; <span class="erd-fk">FK</span> Mongoose Schema Reference &nbsp;|&nbsp; <span class="status pass">Index</span> Covered Field</div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · DATABASE ERD</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 15: DATA ARCHITECTURE - IDENTITY & TAXONOMY -->
+    <section class="page" id="data-1">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>12 · DATA ARCHITECTURE (1)</span></div>
+      <span class="section-number">12</span>
+      <div class="eyebrow">MongoDB Schema Catalogue</div>
+      <h2>Identity, Profile &amp; Taxonomy Schemas</h2>
+      <table>
+        <thead>
+          <tr><th>Model / Collection</th><th>Purpose &amp; Key Fields</th><th>Data Types &amp; Constraints</th><th>Indexes &amp; Lifecycle Invariants</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>User</b><br><code>users</code></td>
+            <td>Master authentication identity.<br><code>name</code>, <code>email</code>, <code>passwordHash</code>, <code>role</code>, <code>stage</code>, <code>status</code>, <code>emailVerified</code>, <code>lastLoginAt</code>, <code>deletedAt</code>.</td>
+            <td><code>email</code>: String, lower, trim, required.<br><code>role</code>: Enum (<code>user</code>, <code>content_editor</code>, <code>support_manager</code>, <code>admin</code>, <code>super_admin</code>).<br><code>stage</code>: Enum (<code>student</code>, <code>graduate</code>, <code>professional</code>).<br><code>status</code>: Enum (<code>active</code>, <code>suspended</code>, <code>pending_verification</code>).</td>
+            <td><strong>Unique:</strong> <code>email</code>.<br><strong>Compound:</strong> <code>{ role: 1, status: 1 }</code>.<br><strong>Invariant:</strong> <code>passwordHash</code> excluded by default in JSON queries via select projection.</td>
+          </tr>
+          <tr>
+            <td><b>Session</b><br><code>sessions</code></td>
+            <td>Opaque server-side session tracking.<br><code>userId</code>, <code>tokenHash</code>, <code>ipAddress</code>, <code>userAgent</code>, <code>expiresAt</code>, <code>revokedAt</code>, <code>lastSeenAt</code>.</td>
+            <td><code>userId</code>: ObjectId &rarr; <code>User</code>, required.<br><code>tokenHash</code>: String, 64-char hex SHA-256.<br><code>expiresAt</code>: Date, required (default +7 days).<br><code>revokedAt</code>: Date (null if active).</td>
+            <td><strong>Unique:</strong> <code>tokenHash</code>.<br><strong>Index:</strong> <code>{ userId: 1, expiresAt: 1 }</code>.<br><strong>TTL Index:</strong> <code>expiresAt</code> (auto-deletes expired sessions after 0s).</td>
+          </tr>
+          <tr>
+            <td><b>VerificationToken</b><br><code>verification_tokens</code></td>
+            <td>Expiring OTP codes and reset tokens.<br><code>userId</code>, <code>tokenHash</code>, <code>purpose</code>, <code>attempts</code>, <code>expiresAt</code>, <code>usedAt</code>.</td>
+            <td><code>userId</code>: ObjectId &rarr; <code>User</code>, required.<br><code>purpose</code>: Enum (<code>email_verification</code>, <code>password_reset</code>).<br><code>attempts</code>: Number (max 5).<br><code>expiresAt</code>: Date (+15 mins).</td>
+            <td><strong>Index:</strong> <code>{ userId: 1, purpose: 1 }</code>.<br><strong>TTL Index:</strong> <code>expiresAt</code> (MongoDB auto-purge).<br><strong>Invariant:</strong> Increments <code>attempts</code> on mismatch; auto-locks at 5.</td>
+          </tr>
+          <tr>
+            <td><b>UserProfile</b><br><code>user_profiles</code></td>
+            <td>Learner context, skills, and assets.<br><code>userId</code>, <code>headline</code>, <code>education[]</code>, <code>skills[]</code>, <code>interests[]</code>, <code>goals</code>, <code>avatarUrl</code>, <code>resume</code>, <code>onboarding</code>.</td>
+            <td><code>userId</code>: ObjectId &rarr; <code>User</code>, required, unique.<br><code>skills[].skillId</code>: ObjectId &rarr; <code>Skill</code>.<br><code>skills[].selfRating</code>: Number (1..10).<br><code>resume</code>: <code>{ url, originalName, size, uploadedAt }</code>.<br><code>onboarding</code>: <code>{ status, currentStep }</code>.</td>
+            <td><strong>Unique:</strong> <code>userId</code>.<br><strong>Index:</strong> <code>{ 'skills.skillId': 1 }</code>.<br><strong>Pre-validate:</strong> Asserts education date chronological ordering and skill ID uniqueness.</td>
+          </tr>
+          <tr>
+            <td><b>Domain</b><br><code>domains</code></td>
+            <td>Occupational taxonomy categories.<br><code>name</code>, <code>slug</code>, <code>description</code>, <code>icon</code>, <code>color</code>, <code>displayOrder</code>, <code>active</code>.</td>
+            <td><code>name</code>: String, required.<br><code>slug</code>: String, required, unique, lowercase.<br><code>displayOrder</code>: Number (default: 0).<br><code>active</code>: Boolean (default: true).</td>
+            <td><strong>Unique:</strong> <code>slug</code>.<br><strong>Index:</strong> <code>{ active: 1, displayOrder: 1 }</code>.<br><strong>Seeded:</strong> 10 canonical domains (Software, Data &amp; AI, Healthcare, etc.).</td>
+          </tr>
+          <tr>
+            <td><b>Skill</b><br><code>skills</code></td>
+            <td>Granular competency catalog.<br><code>name</code>, <code>slug</code>, <code>category</code>, <code>description</code>, <code>aliases[]</code>, <code>active</code>.</td>
+            <td><code>name</code>: String, required.<br><code>slug</code>: String, required, unique.<br><code>category</code>: Enum (<code>technical</code>, <code>analytical</code>, <code>soft_skill</code>, <code>domain_knowledge</code>).<br><code>aliases</code>: [String].</td>
+            <td><strong>Unique:</strong> <code>slug</code>.<br><strong>Text Index:</strong> <code>{ name: 'text', aliases: 'text' }</code>.<br><strong>Invariant:</strong> Aliases lowercased and deduplicated on save.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · DATA ARCHITECTURE (1)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 16: DATA ARCHITECTURE - CAREER INTELLIGENCE -->
+    <section class="page" id="data-2">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>13 · DATA ARCHITECTURE (2)</span></div>
+      <span class="section-number">13</span>
+      <div class="eyebrow">MongoDB Schema Catalogue</div>
+      <h2>Career Intelligence &amp; Assessment Schemas</h2>
+      <table>
+        <thead>
+          <tr><th>Model / Collection</th><th>Purpose &amp; Key Fields</th><th>Data Types &amp; Constraints</th><th>Indexes &amp; Invariants</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Career</b><br><code>careers</code></td>
+            <td>Occupational profile with BLS data.<br><code>title</code>, <code>slug</code>, <code>domainId</code>, <code>summary</code>, <code>responsibilities[]</code>, <code>requiredSkills[]</code>, <code>salary</code>, <code>jobOutlook</code>, <code>tools[]</code>, <code>traits[]</code>, <code>status</code>.</td>
+            <td><code>domainId</code>: ObjectId &rarr; <code>Domain</code>, required.<br><code>requiredSkills</code>: <code>[ { skillId: ObjectId, requiredLevel: 1..10, importance: 'critical'|'important'|'nice_to_have' } ]</code>.<br><code>salary</code>: <code>{ median, entry, top, currency, year: 2024, geography: 'US' }</code>.<br><code>status</code>: Enum (<code>draft</code>, <code>published</code>, <code>archived</code>).</td>
+            <td><strong>Unique:</strong> <code>slug</code>.<br><strong>Text Index:</strong> <code>{ title: 'text', summary: 'text', tools: 'text' }</code>.<br><strong>Compound:</strong> <code>{ status: 1, domainId: 1, 'salary.median': 1 }</code>.<br><strong>Invariant:</strong> Verified against 15 BLS occupational profiles.</td>
+          </tr>
+          <tr>
+            <td><b>Quiz &amp; QuizQuestion</b><br><code>quizzes</code><br><code>quiz_questions</code></td>
+            <td>Versioned psychometric quiz &amp; items.<br><code>title</code>, <code>version</code>, <code>status</code>, <code>questions[]</code>.<br>Question: <code>key</code>, <code>prompt</code>, <code>category</code>, <code>options[]</code> (with hidden <code>trait</code> &amp; <code>domainWeights</code>).</td>
+            <td><code>version</code>: String, required, unique (e.g. <code>v1.0</code>).<br><code>status</code>: Enum (<code>draft</code>, <code>published</code>, <code>archived</code>).<br><code>options[].trait</code>: Enum (<code>creative</code>, <code>analytical</code>, <code>people</code>, <code>technical</code>, <code>communication</code>, <code>empathy</code>, <code>organization</code>).</td>
+            <td><strong>Unique:</strong> <code>version</code>.<br><strong>Index:</strong> <code>{ status: 1, version: 1 }</code>.<br><strong>Security:</strong> Public API strips <code>trait</code> and <code>domainWeights</code> to prevent client-side answer reverse-engineering.</td>
+          </tr>
+          <tr>
+            <td><b>QuizAttempt</b><br><code>quiz_attempts</code></td>
+            <td>Learner assessment execution.<br><code>userId</code>, <code>quizVersionId</code>, <code>questionSnapshots[]</code>, <code>answers[]</code>, <code>status</code>, <code>startedAt</code>, <code>completedAt</code>.</td>
+            <td><code>userId</code>: ObjectId &rarr; <code>User</code>, required.<br><code>answers</code>: <code>[ { questionKey, optionKey, answeredAt } ]</code>.<br><code>status</code>: Enum (<code>in_progress</code>, <code>completed</code>, <code>abandoned</code>).<br><code>questionSnapshots</code>: Frozen copy of questions at attempt start.</td>
+            <td><strong>Index:</strong> <code>{ userId: 1, status: 1, startedAt: -1 }</code>.<br><strong>Invariant:</strong> Immutable question snapshot guarantees historical score explainability even if quiz changes.</td>
+          </tr>
+          <tr>
+            <td><b>CareerPassport</b><br><code>career_passports</code></td>
+            <td>Durable competency passport.<br><code>userId</code>, <code>sourceAttemptId</code>, <code>archetype</code>, <code>traitScores[]</code>, <code>domainScores[]</code>, <code>skills[]</code>, <code>completionPercent</code>, <code>algorithmVersion</code>.</td>
+            <td><code>userId</code>: ObjectId &rarr; <code>User</code>, required.<br><code>sourceAttemptId</code>: ObjectId &rarr; <code>QuizAttempt</code>, unique.<br><code>archetype</code>: String (e.g. <code>Insight Explorer</code>).<br><code>completionPercent</code>: Number (0..100).<br><code>algorithmVersion</code>: String (<code>passport-v1</code>).</td>
+            <td><strong>Unique:</strong> <code>sourceAttemptId</code>.<br><strong>Index:</strong> <code>{ userId: 1, calculatedAt: -1 }</code>.<br><strong>Deterministic:</strong> Trait &amp; domain scores normalized to 0–100 scale based on attempt answers.</td>
+          </tr>
+          <tr>
+            <td><b>RecommendationSnapshot</b><br><code>recommendation_snapshots</code></td>
+            <td>Immutable ranked career matches.<br><code>userId</code>, <code>passportId</code>, <code>sourceAttemptId</code>, <code>matches[]</code>, <code>algorithmVersion</code>, <code>calculatedAt</code>.</td>
+            <td><code>matches</code>: <code>[ { careerId, compatibilityScore, readinessScore, confidence, components[], reasons[], skillGap[] } ]</code>.<br><code>algorithmVersion</code>: String (<code>recommendation-v1</code>).</td>
+            <td><strong>Unique:</strong> <code>passportId</code>.<br><strong>Index:</strong> <code>{ userId: 1, calculatedAt: -1 }</code>.<br><strong>Invariant:</strong> Contains top 10 ranked careers with complete mathematical factor breakdowns.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · DATA ARCHITECTURE (2)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 17: DATA ARCHITECTURE - SUPPORTING & COMMUNITY -->
+    <section class="page" id="data-3">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>14 · DATA ARCHITECTURE (3)</span></div>
+      <span class="section-number">14</span>
+      <div class="eyebrow">MongoDB Schema Catalogue</div>
+      <h2>Personalization, Content, Community &amp; Governance</h2>
+      <table>
+        <thead>
+          <tr><th>Model / Collection</th><th>Purpose &amp; Key Fields</th><th>Data Types &amp; Constraints</th><th>Indexes &amp; Lifecycle Rules</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Bookmark</b><br><code>bookmarks</code></td>
+            <td>Polymorphic saved items &amp; private notes.<br><code>userId</code>, <code>itemType</code>, <code>itemId</code>, <code>itemModel</code>, <code>note</code>, <code>tags[]</code>.</td>
+            <td><code>itemType</code>: Enum (<code>career</code>, <code>resource</code>, <code>media</code>, <code>story</code>).<br><code>itemModel</code>: Derived enum (<code>Career</code>, <code>Resource</code>, <code>Multimedia</code>, <code>SuccessStory</code>).<br><code>note</code>: String (max 1000 chars).</td>
+            <td><strong>Compound Unique:</strong> <code>{ userId: 1, itemType: 1, itemId: 1 }</code>.<br><strong>Index:</strong> <code>{ userId: 1, createdAt: -1 }</code>.<br><strong>Invariant:</strong> Prevents duplicate bookmarks per item.</td>
+          </tr>
+          <tr>
+            <td><b>RecentlyViewed</b><br><code>recently_viewed</code></td>
+            <td>Activity trail for dashboard return.<br><code>userId</code>, <code>itemType</code>, <code>itemId</code>, <code>itemModel</code>, <code>viewedAt</code>.</td>
+            <td><code>itemType</code>: Enum (<code>career</code>, <code>resource</code>, <code>media</code>, <code>story</code>).<br><code>viewedAt</code>: Date (default: <code>Date.now</code>).</td>
+            <td><strong>Index:</strong> <code>{ userId: 1, viewedAt: -1 }</code>.<br><strong>Upsert Rule:</strong> Re-viewing an item touches <code>viewedAt</code> rather than creating redundant documents.</td>
+          </tr>
+          <tr>
+            <td><b>SavedFilter &amp; Comparison</b><br><code>saved_filters</code><br><code>comparisons</code></td>
+            <td>Named career filters and comparison sets.<br><code>userId</code>, <code>name</code>, <code>filters</code> (domain, skills, salary, demand).<br>Comparison: <code>userId</code>, <code>careerIds[]</code> (2..5 items).</td>
+            <td><code>filters</code>: <code>{ domainId, skills[], minSalary, demand }</code>.<br><code>careerIds</code>: Array of ObjectId &rarr; <code>Career</code> (length 2..5).</td>
+            <td><strong>Index:</strong> <code>{ userId: 1, createdAt: -1 }</code>.<br><strong>Validation:</strong> Comparison pre-save hook enforces minimum 2 and maximum 5 careers.</td>
+          </tr>
+          <tr>
+            <td><b>Resource</b><br><code>resources</code></td>
+            <td>Original PDF guides and workbooks.<br><code>title</code>, <code>slug</code>, <code>category</code>, <code>audience</code>, <code>file</code>, <code>pageCount</code>, <code>views</code>, <code>downloads</code>, <code>status</code>.</td>
+            <td><code>file</code>: <code>{ url, originalName, size, mimeType }</code>.<br><code>audience</code>: Enum (<code>student</code>, <code>graduate</code>, <code>professional</code>, <code>all</code>).<br><code>status</code>: Enum (<code>draft</code>, <code>published</code>, <code>archived</code>).</td>
+            <td><strong>Unique:</strong> <code>slug</code>.<br><strong>Compound:</strong> <code>{ status: 1, audience: 1 }</code>.<br><strong>Counters:</strong> Atomic <code>$inc</code> operations on <code>views</code> and <code>downloads</code>.</td>
+          </tr>
+          <tr>
+            <td><b>Multimedia &amp; Rating</b><br><code>multimedia</code><br><code>media_ratings</code></td>
+            <td>Expert video media and ratings.<br><code>title</code>, <code>slug</code>, <code>type</code>, <code>url</code>, <code>publisher</code>, <code>averageRating</code>, <code>ratingCount</code>.<br>Rating: <code>userId</code>, <code>mediaId</code>, <code>rating</code> (1..5).</td>
+            <td><code>type</code>: Enum (<code>video</code>, <code>audio</code>, <code>explainer</code>).<br><code>publisher</code>: String (e.g. <code>Google Career Certificates</code>).<br><code>rating</code>: Number (integer 1..5).</td>
+            <td><strong>Unique:</strong> <code>slug</code>.<br><strong>Compound Unique:</strong> <code>{ userId: 1, mediaId: 1 }</code>.<br><strong>Pre-save:</strong> Media rating triggers recalculation of <code>averageRating</code>.</td>
+          </tr>
+          <tr>
+            <td><b>SuccessStory</b><br><code>success_stories</code></td>
+            <td>Community transition stories.<br><code>userId</code>, <code>authorName</code>, <code>careerId</code>, <code>domainId</code>, <code>timeline</code>, <code>narrative</code>, <code>status</code>, <code>isDemo</code>.</td>
+            <td><code>status</code>: Enum (<code>pending</code>, <code>approved</code>, <code>changes_requested</code>, <code>rejected</code>).<br><code>narrative</code>: <code>{ challenges, turningPoint, outcome, advice }</code>.</td>
+            <td><strong>Index:</strong> <code>{ status: 1, domainId: 1, isFeatured: 1 }</code>.<br><strong>Moderation:</strong> Public endpoint only serves <code>status: 'approved'</code> records.</td>
+          </tr>
+          <tr>
+            <td><b>Feedback &amp; Notification</b><br><code>feedback</code><br><code>notifications</code></td>
+            <td>User feedback tickets and notifications.<br><code>userId</code>, <code>category</code>, <code>message</code>, <code>status</code>, <code>response</code>.<br>Notification: <code>userId</code>, <code>type</code>, <code>title</code>, <code>body</code>, <code>read</code>.</td>
+            <td><code>category</code>: Enum (<code>bug</code>, <code>feature</code>, <code>career_data</code>, <code>other</code>).<br><code>status</code>: Enum (<code>new</code>, <code>in_progress</code>, <code>resolved</code>, <code>closed</code>).<br><code>read</code>: Boolean (default: false).</td>
+            <td><strong>Index:</strong> <code>{ userId: 1, read: 1, createdAt: -1 }</code>.<br><strong>Index:</strong> <code>{ status: 1, createdAt: -1 }</code>.<br><strong>Lifecycle:</strong> Staff response triggers automatic <code>Notification</code> creation.</td>
+          </tr>
+          <tr>
+            <td><b>Settings &amp; AuditLog</b><br><code>settings</code><br><code>audit_logs</code></td>
+            <td>System config &amp; governance audit.<br><code>key</code>, <code>maintenanceMode</code>, <code>allowRegistration</code>.<br>AuditLog: <code>actorId</code>, <code>action</code>, <code>target</code>, <code>details</code>, <code>ipAddress</code>.</td>
+            <td><code>key</code>: String, unique (singleton: <code>system_settings</code>).<br><code>actorId</code>: ObjectId &rarr; <code>User</code>.<br><code>action</code>: String (e.g. <code>user.role_change</code>).</td>
+            <td><strong>Unique:</strong> <code>key</code>.<br><strong>Compound:</strong> <code>{ action: 1, createdAt: -1 }</code>.<br><strong>Append-Only:</strong> Audit logs are strictly immutable for compliance.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · DATA ARCHITECTURE (3)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 18: AUTHENTICATION & SESSION LIFECYCLE -->
+    <section class="page" id="auth-lifecycle">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>15 · AUTHENTICATION</span></div>
+      <span class="section-number">15</span>
+      <div class="eyebrow">Identity &amp; Access Control</div>
+      <h2>End-to-End Authentication &amp; Session Lifecycle</h2>
+      <div class="flow">
+        <div class="flow-step">
+          <b>1</b><strong>Registration &amp; Password Hashing:</strong> User submits name, email, password, and stage. Backend normalizes email to lowercase, verifies uniqueness, hashes password with Bcrypt (cost 12), and creates a <code>pending_verification</code> user document.
+        </div>
+        <div class="flow-step">
+          <b>2</b><strong>Cryptographic OTP Generation &amp; Delivery:</strong> <code>auth.service.js</code> generates a 6-digit numeric OTP via <code>crypto.randomInt(100000, 999999)</code>, computes SHA-256 hash, stores in <code>VerificationToken</code> (+15 min TTL), and dispatches email via Resend (or console in dev).
+        </div>
+        <div class="flow-step">
+          <b>3</b><strong>OTP Verification &amp; Account Activation:</strong> User enters OTP; server verifies token hash, confirms attempts &lt; 5, marks <code>emailVerified: true</code>, updates user status to <code>active</code>, and burns the token.
+        </div>
+        <div class="flow-step">
+          <b>4</b><strong>Login &amp; Secure Session Creation:</strong> On valid credential check, server generates a high-entropy 32-byte session token via <code>crypto.randomBytes(32).toString('hex')</code>, stores SHA-256 hash in <code>Session</code> (+7 day TTL), and writes raw token to an <code>HttpOnly</code> cookie.
+        </div>
+        <div class="flow-step">
+          <b>5</b><strong>Authenticated Request &amp; RBAC Resolution:</strong> <code>requireAuth</code> middleware extracts session cookie, hashes value, looks up active non-revoked session, loads <code>User</code>, and <code>requireRole</code> enforces role permissions (e.g. <code>staff</code>, <code>admin</code>).
+        </div>
+        <div class="flow-step">
+          <b>6</b><strong>Session Termination &amp; Multi-Session Revocation:</strong> Logout revokes the calling session token. Password reset generates a single-use SHA-256 reset token, updates password hash, and invalidates all active sessions for that user.
+        </div>
+      </div>
+      <h3>Authentication Security Matrix &amp; Environment Behaviors</h3>
+      <table>
+        <thead>
+          <tr><th>Security Concern</th><th>Development Implementation</th><th>Production Implementation</th><th>Source Code Evidence</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Cookie Security Flags</b></td>
+            <td><code>HttpOnly: true</code>, <code>SameSite: 'lax'</code>, <code>Secure: false</code></td>
+            <td><code>HttpOnly: true</code>, <code>SameSite: 'strict'</code> (or <code>'none'</code> if cross-domain), <code>Secure: true</code></td>
+            <td><code>session.service.js</code> checks <code>NODE_ENV === 'production'</code></td>
+          </tr>
+          <tr>
+            <td><b>CORS Protection</b></td>
+            <td>Allows <code>http://localhost:5173</code> with <code>credentials: true</code></td>
+            <td>Strict allowlist matching exact configured origins in <code>FRONTEND_ORIGINS</code></td>
+            <td><code>app.js</code> dynamic CORS origin validator</td>
+          </tr>
+          <tr>
+            <td><b>Brute-Force Rate Limiting</b></td>
+            <td>Relaxed window for local test automation</td>
+            <td><code>express-rate-limit</code>: 10 attempts per 15 minutes per IP on auth routes</td>
+            <td><code>rateLimit.middleware.js</code> (<code>authRateLimiter</code>)</td>
+          </tr>
+          <tr>
+            <td><b>Password Storage</b></td>
+            <td>Bcrypt salt rounds 12 (deterministic test speed)</td>
+            <td>Bcrypt salt rounds 12 (adaptive cryptographic cost)</td>
+            <td><code>auth.service.js</code> (<code>bcrypt.hash(password, 12)</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · AUTHENTICATION LIFECYCLE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 19: CAREER INTELLIGENCE & SCORING ENGINE -->
+    <section class="page" id="intelligence">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>16 · CAREER INTELLIGENCE</span></div>
+      <span class="section-number">16</span>
+      <div class="eyebrow">Deterministic Algorithms</div>
+      <h2>Scoring Mathematical Formulas &amp; Snapshot Rules</h2>
+      <p class="small muted">PathSeeker employs 100% deterministic, explainable mathematics (Algorithm: <code>passport-v1</code> and <code>recommendation-v1</code>) without non-reproducible black-box heuristics.</p>
+      <div class="grid-2">
+        <div class="card accent">
+          <h3>Passport-v1 Scoring Formulas</h3>
+          <div class="formula">
+TraitScore(t) = round( (Count(t) / MaxTraitCount) * 100 )<br>
+DomainScore(d) = round( (TotalWeight(d) / MaxDomainWeight) * 100 )<br>
+CompletionPercent = round( (EvidenceSignals / 7) * 100 )
+          </div>
+          <p class="small muted"><strong>7 Evidence Signals:</strong> Headline, Education entries, Skills list, Interests, Primary goal, Completed onboarding, Fully answered assessment.</p>
+        </div>
+        <div class="card">
+          <h3>Recommendation-v1 Formulas</h3>
+          <div class="formula">
+TraitAlignment = mean( TraitScore(career.traits) )<br>
+Compatibility = round( (TraitAlign * 0.55) + (Interests * 0.25) + (SkillAffinity * 0.20) )<br>
+Readiness = round( ( &sum; min(1, userSkill / reqLevel) * weight ) / &sum; weight * 100 )<br>
+Confidence = round( 55 + min(40, evidenceCount * 4) )
+          </div>
+          <p class="small muted"><strong>Weights:</strong> Nice-to-have = 1, Important = 2, Critical = 3.</p>
+        </div>
+      </div>
+      <h3>Psychometric Archetype Mapping (Based on Top Normalized Trait)</h3>
+      <table>
+        <thead>
+          <tr><th>Primary Trait</th><th>Assigned Archetype</th><th>Psychometric Definition &amp; Ideal Career Context</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Creative</b></td><td><b>Imaginative Builder</b></td><td>Generative, visual, and design-oriented problem solving (UX Designer, Game Developer).</td></tr>
+          <tr><td><b>Analytical</b></td><td><b>Insight Explorer</b></td><td>Empirical data modeling, pattern recognition, and logic (Data Scientist, Financial Analyst).</td></tr>
+          <tr><td><b>People</b></td><td><b>Collaborative Leader</b></td><td>Interpersonal alignment, group motivation, and facilitation (Product Manager, HR Specialist).</td></tr>
+          <tr><td><b>Technical</b></td><td><b>Practical Innovator</b></td><td>Applied systems engineering, tool execution, and architecture (DevOps, Cloud Engineer).</td></tr>
+          <tr><td><b>Communication</b></td><td><b>Clear Connector</b></td><td>Structured narrative, technical writing, and stakeholder alignment (Technical Writer, PR).</td></tr>
+          <tr><td><b>Empathy</b></td><td><b>Thoughtful Builder</b></td><td>User-centered advocacy, accessibility, and human care (Healthcare Informatics, Counselor).</td></tr>
+          <tr><td><b>Organization</b></td><td><b>Structured Strategist</b></td><td>Operational discipline, roadmapping, and milestone delivery (Operations Lead, IT Director).</td></tr>
+        </tbody>
+      </table>
+      <h3>Skill Gap Analysis &amp; Simulator Safety</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Skill Gap Mathematical Delta</h4>
+          <p class="small muted">For each career prerequisite: <code>Difference = max(0, requiredLevel - currentLevel)</code>.<br>
+          <code>ReadinessImpact = clamp( (Difference / requiredLevel) * weight * 20 )</code>.<br>
+          Gaps are sorted by highest <code>ReadinessImpact</code> first to prioritize immediate learning needs.</p>
+        </div>
+        <div class="card soft">
+          <h4>Stateless Simulator Guarantee</h4>
+          <p class="small muted">The interactive skill simulator accepts temporary level overrides, executes <code>scoreCareer()</code> in memory, and returns <code>{ before, after, persisted: false }</code>.<br>
+          <strong>Safety Invariant:</strong> It never mutates the underlying <code>UserProfile</code>, <code>CareerPassport</code>, or <code>RecommendationSnapshot</code>.</p>
+        </div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · CAREER INTELLIGENCE ENGINE</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 20: PRODUCT WORKFLOWS & ADMIN -->
+    <section class="page" id="workflows">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>17 · WORKFLOWS &amp; ADMIN</span></div>
+      <span class="section-number">17</span>
+      <div class="eyebrow">Subsystem Orchestration</div>
+      <h2>Content Workflows &amp; Admin Control Plane</h2>
+      <div class="grid-2">
+        <div class="card accent">
+          <h3>Original PDF Resource Workflow</h3>
+          <ul>
+            <li>6 original downloadable career workbooks (51 pages total).</li>
+            <li>In-browser canvas preview with direct attachment download.</li>
+            <li>Tracks audience tags, page count, and real-time view/download counters.</li>
+            <li>Curated relationships directly link workbooks to target careers.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Expert Multimedia Subsystem</h3>
+          <ul>
+            <li>6 official Google Career Certificates expert video records.</li>
+            <li>Embedded via privacy-enhanced YouTube player with direct source links.</li>
+            <li>Includes learning objectives, key notes, and captions guidance.</li>
+            <li>Authenticated 1–5 star rating system with atomic average recalculation.</li>
+          </ul>
+        </div>
+      </div>
+      <h3>Success Story Moderation State Machine</h3>
+      <div class="diagram architecture" style="grid-template-columns: 1fr 6mm 1fr 6mm 1fr 6mm 1fr;">
+        <div class="node"><strong>Learner Draft</strong><span class="small muted">Narrative &amp; consent</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="node"><strong>Pending Review</strong><span class="small muted">Staff queue</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="node"><strong>Changes / Reject</strong><span class="small muted">Feedback loop</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="node"><strong>Approved / Public</strong><span class="small muted">Featured in Hub</span></div>
+      </div>
+      <h3>Administrative Control Plane Workspaces</h3>
+      <table>
+        <thead>
+          <tr><th>Admin Module</th><th>Access Level</th><th>Capabilities &amp; Governance Rules</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>User Governance</b></td><td><code>admin</code> / <code>super_admin</code></td><td>Search, filter by status/role, promote/demote user roles, suspend/activate accounts. Generates immutable <code>AuditLog</code>.</td></tr>
+          <tr><td><b>Career Bank Management</b></td><td><code>staff</code> (all)</td><td>Create, edit, and delete occupational profiles; manage required skills and salaries; transition publication states.</td></tr>
+          <tr><td><b>Quiz Builder</b></td><td><code>staff</code> (all)</td><td>Create and reorder questions, preview scoring weights, publish immutable new quiz versions (e.g. <code>v1.1</code>), archive old versions.</td></tr>
+          <tr><td><b>Resource &amp; Media CRUD</b></td><td><code>staff</code> (all)</td><td>Upload and update PDF workbooks; attach metadata, video URLs, and learning objectives; toggle publication.</td></tr>
+          <tr><td><b>Story &amp; Feedback Triage</b></td><td><code>staff</code> (all)</td><td>Approve/reject stories with moderation notes; assign feedback tickets, write internal notes, send learner responses.</td></tr>
+          <tr><td><b>System Settings &amp; Logs</b></td><td><code>admin</code> / <code>super_admin</code></td><td>Toggle site-wide maintenance mode and registration; inspect paginated immutable security audit logs.</td></tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · WORKFLOWS &amp; ADMIN</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 21: NAVI ASSISTANT & ACCESSIBILITY -->
+    <section class="page" id="navi">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>18 · NAVI &amp; ACCESSIBILITY</span></div>
+      <span class="section-number">18</span>
+      <div class="eyebrow">Conversational UX &amp; Inclusion</div>
+      <h2>Navi Guidance Agent &amp; Inclusive Design</h2>
+      <div class="grid-2">
+        <div class="card accent">
+          <h3>Deterministic Navi Architecture</h3>
+          <p>Navi is PathSeeker's character-driven guidance assistant. Unlike hallucination-prone external chatbots, the default backend assistant is <strong>100% deterministic</strong>, classifying learner queries into grounded intent categories with safe route navigation.</p>
+        </div>
+        <div class="card">
+          <h3>Optional External Voice Mode</h3>
+          <p>Frontend integrates an optional Vapi WebSocket client. When voice mode is toggled, it streams conversational audio. If voice credentials or microphone permissions are unavailable, Navi falls back cleanly to text mode without blocking UX.</p>
+        </div>
+      </div>
+      <h3>Navi Intent Classification &amp; Action Contract</h3>
+      <table>
+        <thead>
+          <tr><th>Intent Class</th><th>Sample Learner Query</th><th>Executed System Action</th><th>Auth Rule</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Navigation</b></td><td>"Take me to the career quiz"</td><td>Returns action <code>{ type: 'navigate', path: '/app/quiz' }</code>.</td><td>Public/Learner</td></tr>
+          <tr><td><b>Career Search</b></td><td>"Find cloud engineering jobs"</td><td>Executes grounded search query against <code>Career</code> collection.</td><td>Public</td></tr>
+          <tr><td><b>Product Help</b></td><td>"How does the simulator work?"</td><td>Returns grounded explanation of non-persistent skill simulation.</td><td>Public</td></tr>
+          <tr><td><b>Profile Mutation</b></td><td>"Add Python to my skills"</td><td>Extracts skill, validates existence, appends to <code>UserProfile</code>.</td><td><code>requireAuth</code></td></tr>
+          <tr><td><b>Fallback</b></td><td>"What is the capital of France?"</td><td>Gracefully redirects learner to supported career topics.</td><td>Public</td></tr>
+        </tbody>
+      </table>
+      <h3>Accessibility (WCAG 2.1 AA) Implementation</h3>
+      <div class="grid-4">
+        <div class="card">
+          <h4>Font Scaling</h4>
+          <p class="small muted">CSS variable <code>--app-font-scale</code> adjusts UI text smoothly from 85% to 130% without layout breakage.</p>
+        </div>
+        <div class="card">
+          <h4>Theme Sync</h4>
+          <p class="small muted">Supports explicit Dark, Light, and System OS preference modes with persistent <code>localStorage</code> sync.</p>
+        </div>
+        <div class="card">
+          <h4>Reduced Motion</h4>
+          <p class="small muted">Honors <code>prefers-reduced-motion</code>, suppressing transitions and animations across cards and dialogs.</p>
+        </div>
+        <div class="card">
+          <h4>Keyboard Safe</h4>
+          <p class="small muted">Visible focus rings, logical tab indices, skip-to-content links, and Escape-key dismiss on modal dialogs.</p>
+        </div>
+      </div>
+      <div class="callout danger"><b>Safety Boundary Disclaimer:</b> Navi is designed solely for educational navigation and career exploration. It is not an automated employment recruiter, licensed psychological counselor, or mental-health diagnostic tool.</div>
+      <div class="page-footer"><span>PATHSEEKER · NAVI &amp; ACCESSIBILITY</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 22: SECURITY THREAT MODEL & ERROR CONTRACTS -->
+    <section class="page" id="security">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>19 · SECURITY &amp; ERRORS</span></div>
+      <span class="section-number">19</span>
+      <div class="eyebrow">Threat Model &amp; Error Contracts</div>
+      <h2>Threat-Informed Security Matrix &amp; Error Standards</h2>
+      <table>
+        <thead>
+          <tr><th>Threat Category</th><th>Attack Surface</th><th>Preventive Control in Source</th><th>Detection &amp; Recovery</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Credential Compromise</b></td><td><code>/api/auth/login</code></td><td>Bcrypt hashing (cost 12), rate limiting, generic invalid credential error message.</td><td>Revoke all sessions on password reset; audit login timestamps.</td></tr>
+          <tr><td><b>Session Hijacking</b></td><td>HttpOnly Cookies</td><td>32-byte high-entropy token, SHA-256 hash stored at rest, SameSite flag, 7-day TTL.</td><td>Immediate server-side token revocation on logout; TTL index cleanup.</td></tr>
+          <tr><td><b>Privilege Escalation</b></td><td><code>/api/admin/*</code></td><td><code>requireRole</code> middleware checks authenticated user role from fresh database query.</td><td>403 Forbidden event logged with actor ID and client IP.</td></tr>
+          <tr><td><b>Brute-Force Abuse</b></td><td>OTP &amp; Auth routes</td><td><code>authRateLimiter</code> (10 req/15m) + 5-attempt ceiling on OTP verification tokens.</td><td>429 Too Many Requests response; temporary IP cooldown window.</td></tr>
+          <tr><td><b>NoSQL Injection</b></td><td>REST parameters</td><td>Mongoose schema strict typing, Zod schema validation, object ID casting checks.</td><td>Mongoose CastError caught by global error middleware (returns 400).</td></tr>
+          <tr><td><b>Cross-Origin Exploitation</b></td><td>Browser API calls</td><td>CORS middleware enforces strict origin allowlist from <code>FRONTEND_ORIGINS</code> env.</td><td>Non-allowlisted origins rejected during preflight OPTIONS check.</td></tr>
+          <tr><td><b>Malicious File Upload</b></td><td>Avatar / Resume upload</td><td><code>uploadSingleFile</code> enforces 5MB limit, whitelist MIME types (PDF, JPEG, PNG).</td><td>Multer rejects invalid files before disk persistence; cleans temp files.</td></tr>
+          <tr><td><b>Score Manipulation</b></td><td>Quiz completion</td><td>Server owns question weights and scoring logic; client only submits option keys.</td><td>Immutable quiz snapshot prevents retroactive manipulation.</td></tr>
+        </tbody>
+      </table>
+      <h3>Standardized REST Error Envelope</h3>
+      <div class="grid-2">
+        <div>
+          <pre><code>// Standard Safe Error Payload
+{
+  "error": {
+    "message": "Invalid verification code or code expired.",
+    "code": "INVALID_OTP",
+    "status": 400,
+    "details": [],
+    "requestId": "3628dd8e-ba17-4753-af5f-bf850e319326"
+  }
+}</code></pre>
+        </div>
+        <div>
+          <h4>HTTP Status Semantics</h4>
+          <ul>
+            <li><code>400 Bad Request</code> — Malformed input, Zod validation failure, invalid OTP.</li>
+            <li><code>401 Unauthorized</code> — Missing or expired session cookie.</li>
+            <li><code>403 Forbidden</code> — Insufficient role permissions for target resource.</li>
+            <li><code>404 Not Found</code> — Requested career slug or resource ID does not exist.</li>
+            <li><code>409 Conflict</code> — Duplicate email registration or existing bookmark.</li>
+            <li><code>429 Too Many Requests</code> — Exceeded rate limit thresholds.</li>
+            <li><code>500 / 503 Server Error</code> — Unhandled exception or database offline.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · SECURITY &amp; ERROR CONTRACTS</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 23: FORMAL TEST CASES (1) -->
+    <section class="page" id="tests-1">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>20 · TEST CASES (1)</span></div>
+      <span class="section-number">20</span>
+      <div class="eyebrow">Quality Verification</div>
+      <h2>Formal Test Case Specification (Auth, Quiz, Intelligence)</h2>
+      <table>
+        <thead>
+          <tr><th>Test ID</th><th>SRS ID</th><th>Module</th><th>Test Data / Preconditions</th><th>Execution Steps &amp; Expected Result</th><th>Status &amp; Evidence</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>TC-AUTH-01</b></td>
+            <td>FR-01</td>
+            <td>Auth Service</td>
+            <td><code>{ name, email: "new@user.com", password: "Password123!", stage: "student" }</code></td>
+            <td>Submit registration. Assert user is created with <code>pending_verification</code>, password hashed, 6-digit OTP created.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-AUTH-02</b></td>
+            <td>FR-01</td>
+            <td>Auth Service</td>
+            <td>Duplicate email registration.</td>
+            <td>Submit existing email. Assert API returns 409 Conflict with code <code>EMAIL_EXISTS</code>.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-AUTH-03</b></td>
+            <td>FR-01</td>
+            <td>Auth Service</td>
+            <td>Malformed OTP (empty or invalid string).</td>
+            <td>POST <code>/api/auth/verify-email</code>. Assert 400 Bad Request returned before database access.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>app.smoke.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-AUTH-04</b></td>
+            <td>FR-01</td>
+            <td>Auth Service</td>
+            <td>Valid login credentials.</td>
+            <td>POST <code>/api/auth/login</code>. Assert 200 OK, returns user DTO, sets HttpOnly session cookie.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>app.smoke.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-AUTH-05</b></td>
+            <td>FR-01</td>
+            <td>Session Service</td>
+            <td>Expired session token.</td>
+            <td>Query protected route with expired token. Assert 401 Unauthorized and cookie clearance.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-QUIZ-01</b></td>
+            <td>FR-04</td>
+            <td>Quiz Service</td>
+            <td>Published quiz (Quiz v1).</td>
+            <td>GET <code>/api/quiz-questions</code>. Assert 200 OK, returns questions with hidden weights stripped.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>seeds.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-QUIZ-02</b></td>
+            <td>FR-04</td>
+            <td>Quiz Attempt</td>
+            <td>Create attempt &amp; answer questions.</td>
+            <td>PATCH <code>/api/quiz-attempts/:id/answers</code>. Assert answers append and question snapshot is frozen.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.milestone2.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-QUIZ-03</b></td>
+            <td>FR-04</td>
+            <td>Quiz Attempt</td>
+            <td>Submit completed attempt.</td>
+            <td>POST <code>/api/quiz-attempts/:id/complete</code>. Assert <code>completedAt</code> stamped, triggers Passport generation.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.milestone2.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-INTEL-01</b></td>
+            <td>FR-11</td>
+            <td>Scoring Engine</td>
+            <td>Analytical answers + Python skill.</td>
+            <td>Calculate passport. Assert <code>archetype: "Insight Explorer"</code> and <code>completionPercent: 100</code>.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>career-intelligence.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-INTEL-02</b></td>
+            <td>FR-11</td>
+            <td>Scoring Engine</td>
+            <td>Deterministic repeatability.</td>
+            <td>Execute calculation 100 times on identical data. Assert scores and archetype remain identical.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>career-intelligence.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-INTEL-03</b></td>
+            <td>FR-11</td>
+            <td>Simulator</td>
+            <td>Skill override adjustments.</td>
+            <td>POST <code>/api/users/me/careers/:slug/simulate</code>. Assert readiness increases and <code>persisted: false</code>.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>career-intelligence.test.js</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · FORMAL TEST CASES (1)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 24: FORMAL TEST CASES (2) -->
+    <section class="page" id="tests-2">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>21 · TEST CASES (2)</span></div>
+      <span class="section-number">21</span>
+      <div class="eyebrow">Quality Verification</div>
+      <h2>Formal Test Case Specification (Personalization, Security, UI)</h2>
+      <table>
+        <thead>
+          <tr><th>Test ID</th><th>SRS ID</th><th>Module</th><th>Test Data / Preconditions</th><th>Execution Steps &amp; Expected Result</th><th>Status &amp; Evidence</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>TC-PERS-01</b></td>
+            <td>FR-09</td>
+            <td>Bookmark Service</td>
+            <td>Career ID + private note.</td>
+            <td>POST <code>/api/users/me/bookmarks</code>. Assert bookmark created with derived <code>itemModel: 'Career'</code>.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.milestone2.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-PERS-02</b></td>
+            <td>FR-09</td>
+            <td>Comparison</td>
+            <td>1 single career ID.</td>
+            <td>POST <code>/api/users/me/comparisons</code> with 1 career. Assert Mongoose validation rejects (&lt;2 items).</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.milestone2.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-PERS-03</b></td>
+            <td>FR-09</td>
+            <td>Comparison</td>
+            <td>3 valid career IDs.</td>
+            <td>POST <code>/api/users/me/comparisons</code>. Assert comparison saved successfully.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>models.milestone2.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-CONT-01</b></td>
+            <td>FR-07</td>
+            <td>Resource Service</td>
+            <td>Original PDF guides.</td>
+            <td>Verify seeded resources. Assert all 6 PDF files exist on disk and total 51 valid renderable pages.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>seeds.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-CONT-02</b></td>
+            <td>FR-05</td>
+            <td>Media Service</td>
+            <td>Expert YouTube videos.</td>
+            <td>Verify multimedia seeds. Assert 6 Google Career Certificates records with valid video IDs.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>seeds.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-SEC-01</b></td>
+            <td>FR-10</td>
+            <td>RBAC Middleware</td>
+            <td>Unauthenticated request to <code>/api/admin/*</code>.</td>
+            <td>GET <code>/api/admin/careers</code> without cookie. Assert 401 Unauthorized returned.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>ported-features.smoke.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-SEC-02</b></td>
+            <td>FR-10</td>
+            <td>RBAC Middleware</td>
+            <td>Learner role requesting admin route.</td>
+            <td>GET <code>/api/admin/users</code> with role <code>user</code>. Assert 403 Forbidden returned.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>ported-features.smoke.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-SEC-03</b></td>
+            <td>NFR-05</td>
+            <td>Health Probe</td>
+            <td>Database offline simulation.</td>
+            <td>GET <code>/api/health/db</code> while DB disconnected. Assert 503 Service Unavailable returned.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>app.smoke.test.js</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-UI-01</b></td>
+            <td>FR-01</td>
+            <td>Router Component</td>
+            <td>Direct URL navigation to <code>/login</code>.</td>
+            <td>Render router with <code>/login</code> path. Assert Login page renders with accessible form elements.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>RouterApp.test.jsx</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-UI-02</b></td>
+            <td>FR-12</td>
+            <td>Navi Assistant</td>
+            <td>Typed guidance query in widget.</td>
+            <td>Enter "How to explore careers". Assert Navi returns matching intent and navigation button.</td>
+            <td><span class="status pass">VERIFIED</span><br><code>NaviAssistant.test.jsx</code></td>
+          </tr>
+          <tr>
+            <td><b>TC-UI-03</b></td>
+            <td>NFR-02</td>
+            <td>Accessibility</td>
+            <td>Font scale slider mutation.</td>
+            <td>Change font scale to 120%. Assert root CSS variable <code>--app-font-scale</code> updates to <code>1.2</code>.</td>
+            <td><span class="status pass">VERIFIED</span><br>Manual &amp; Component Check</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Summary of Automated Quality Evidence</h3>
+      <div class="grid-4">
+        <div class="card dark"><div class="metric">36 / 36</div><p class="small">Backend Automated Tests (Node Test Runner)</p></div>
+        <div class="card dark"><div class="metric">11 / 11</div><p class="small">Frontend Unit Tests (Vitest &amp; Testing Library)</p></div>
+        <div class="card dark"><div class="metric">0</div><p class="small">ESLint Syntax &amp; Rule Violations</p></div>
+        <div class="card dark"><div class="metric">51 / 51</div><p class="small">Rendered PDF Workbook Pages</p></div>
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · FORMAL TEST CASES (2)</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 25: INSTALLATION RUNBOOK & DEPLOYMENT -->
+    <section class="page" id="installation">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>22 · INSTALLATION &amp; DEPLOYMENT</span></div>
+      <span class="section-number">22</span>
+      <div class="eyebrow">Evaluator Runbook</div>
+      <h2>Installation Guide, Environment &amp; Deployment</h2>
+      <h3>Local Reproducible Setup Sequence</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <b>1</b><strong>Prerequisites:</strong> Ensure Node.js 20.x LTS or higher, npm 10.x+, and MongoDB 7.0+ (local daemon or Atlas URI) are available.
+        </div>
+        <div class="flow-step">
+          <b>2</b><strong>Backend Configuration &amp; Seeding:</strong> Navigate to <code>Project/backend1</code>. Copy <code>.env.example</code> to <code>.env</code>. Run <code>npm install</code>, then execute <code>npm run seed</code> to populate the database with canonical careers, quizzes, and demo personas.
+        </div>
+        <div class="flow-step">
+          <b>3</b><strong>Start Backend Server:</strong> In <code>Project/backend1</code>, run <code>npm start</code>. Verify API readiness at <code>http://localhost:4000/api/health</code> (status: <code>ok</code>) and <code>/api/health/db</code> (status: <code>ready</code>).
+        </div>
+        <div class="flow-step">
+          <b>4</b><strong>Frontend Configuration &amp; Startup:</strong> Navigate to <code>Project/frontend</code>. Copy <code>.env.example</code> to <code>.env</code> (default: <code>VITE_API_URL=/api</code>). Run <code>npm install</code>, then <code>npm run dev</code>. Open <code>http://localhost:5173</code> in your browser.
+        </div>
+        <div class="flow-step">
+          <b>5</b><strong>Automated Verification:</strong> Run <code>npm test</code> in <code>Project/backend1</code> (36 tests pass) and <code>npm test -- --run</code> in <code>Project/frontend</code> (11 tests pass).
+        </div>
+      </div>
+      <h3>Environment Configuration Matrix</h3>
+      <table>
+        <thead>
+          <tr><th>Variable Name</th><th>Target</th><th>Classification</th><th>Purpose &amp; Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>MONGODB_URI</code></td><td>Backend</td><td>Required</td><td>MongoDB connection string (e.g. <code>mongodb://localhost:27017</code> or Atlas URI).</td></tr>
+          <tr><td><code>MONGODB_DB_NAME</code></td><td>Backend</td><td>Required</td><td>Target database name (default: <code>pathseeker</code>).</td></tr>
+          <tr><td><code>PORT</code></td><td>Backend</td><td>Optional</td><td>Express HTTP listener port (default: <code>4000</code>).</td></tr>
+          <tr><td><code>FRONTEND_ORIGINS</code></td><td>Backend</td><td>Production</td><td>Comma-separated CORS allowlist (e.g. <code>https://pathseeker.vercel.app</code>).</td></tr>
+          <tr><td><code>SESSION_SECRET</code></td><td>Backend</td><td>Production</td><td>High-entropy secret key for cryptographic cookie signing.</td></tr>
+          <tr><td><code>RESEND_API_KEY</code></td><td>Backend</td><td>External / Optional</td><td>Resend API key for live transactional emails (falls back to console in dev).</td></tr>
+          <tr><td><code>VITE_API_URL</code></td><td>Frontend</td><td>Required</td><td>API base URL (default: <code>/api</code> for Vite proxy, or full URL in production).</td></tr>
+          <tr><td><code>VITE_VAPI_PUBLIC_KEY</code></td><td>Frontend</td><td>External / Optional</td><td>Vapi client key for optional voice agent functionality.</td></tr>
+        </tbody>
+      </table>
+      <h3>Demonstration Personas for Evaluation</h3>
+      <table>
+        <thead>
+          <tr><th>Persona</th><th>Name</th><th>Email</th><th>Password</th><th>Role / Stage</th><th>Location &amp; Profile Summary</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Super Admin</b></td><td><b>Sarah Malik</b></td><td><code>admin@pathseeker.local</code></td><td><code>PathSeeker-Demo-2026!</code></td><td><code>super_admin</code></td><td>Master administrator account with full governance, catalog curation, and audit log inspection.</td></tr>
+          <tr><td><b>Student</b></td><td><b>Alex Morgan</b></td><td><code>demo.student@pathseeker.local</code></td><td><code>PathSeeker-Demo-2026!</code></td><td><code>user</code> (student)</td><td>Undergraduate Psychology student (Karachi) exploring people-centered technology careers.</td></tr>
+          <tr><td><b>Graduate</b></td><td><b>Zara Noor</b></td><td><code>demo.graduate@pathseeker.local</code></td><td><code>PathSeeker-Demo-2026!</code></td><td><code>user</code> (graduate)</td><td>CS graduate (Lahore) building practical skills (React/JS) and closing career readiness gaps.</td></tr>
+          <tr><td><b>Professional</b></td><td><b>Daniel Kim</b></td><td><code>demo.professional@pathseeker.local</code></td><td><code>PathSeeker-Demo-2026!</code></td><td><code>user</code> (professional)</td><td>Finance professional (Islamabad) transitioning to Data Analysis and evaluating remote roles.</td></tr>
+        </tbody>
+      </table>
+      <div class="page-footer"><span>PATHSEEKER · INSTALLATION &amp; DEPLOYMENT</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 26: SRS TRACEABILITY MATRIX -->
+    <section class="page" id="traceability">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>23 · SRS TRACEABILITY</span></div>
+      <span class="section-number">23</span>
+      <div class="eyebrow">Authoritative Implementation Audit</div>
+      <h2>Complete SRS Traceability Matrix</h2>
+      <table>
+        <thead>
+          <tr><th>SRS ID</th><th>Requirement Title</th><th>Frontend Module</th><th>Backend Module</th><th>Data Model</th><th>API Endpoint</th><th>Verified Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>FR-01</b></td><td>Auth &amp; User Mgmt</td><td><code>AuthContext</code>, <code>LoginPage</code></td><td><code>auth.service.js</code></td><td><code>User</code>, <code>Session</code></td><td><code>/api/auth/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-02</b></td><td>Personalized Dashboard</td><td><code>DashboardPage.jsx</code></td><td><code>dashboard.service.js</code></td><td><code>UserProfile</code></td><td><code>/api/users/me/dashboard</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-03</b></td><td>Career Bank &amp; Search</td><td><code>CareersPage.jsx</code></td><td><code>catalog.service.js</code></td><td><code>Career</code>, <code>Domain</code></td><td><code>/api/careers/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-04</b></td><td>Psychometric Quiz</td><td><code>QuizPage.jsx</code></td><td><code>quiz.service.js</code></td><td><code>QuizAttempt</code></td><td><code>/api/quiz-attempts/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-05</b></td><td>Multimedia Center</td><td><code>MediaPage.jsx</code></td><td><code>content.service.js</code></td><td><code>Multimedia</code></td><td><code>/api/media/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-06</b></td><td>Success Stories Hub</td><td><code>SuccessStoriesPage.jsx</code></td><td><code>admin.service.js</code></td><td><code>SuccessStory</code></td><td><code>/api/stories/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-07</b></td><td>Resource Library (PDF)</td><td><code>ResourcesPage.jsx</code></td><td><code>content.service.js</code></td><td><code>Resource</code></td><td><code>/api/resources/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-08</b></td><td>Feedback &amp; Alerts</td><td><code>FeedbackPage.jsx</code></td><td><code>notification.service.js</code></td><td><code>Feedback</code></td><td><code>/api/feedback/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-09</b></td><td>Bookmarks &amp; Compare</td><td><code>SavedPage.jsx</code></td><td><code>personalization.service.js</code></td><td><code>Bookmark</code></td><td><code>/api/users/me/bookmarks</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-10</b></td><td>Admin Control Panel</td><td><code>/admin/*</code></td><td><code>admin.service.js</code></td><td><code>AuditLog</code>, <code>Settings</code></td><td><code>/api/admin/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-11</b></td><td>Career Intelligence</td><td><code>PassportPage.jsx</code></td><td><code>careerIntelligence.service.js</code></td><td><code>CareerPassport</code></td><td><code>/api/users/me/passport</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>FR-12</b></td><td>Accessibility &amp; Navi</td><td><code>AccessibilityContext</code></td><td><code>assistant.service.js</code></td><td><code>UserProfile</code></td><td><code>/api/assistant/respond</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>NFR-01</b></td><td>Safety &amp; Content</td><td><code>VideoEmbed.jsx</code></td><td><code>content.service.js</code></td><td><code>Resource</code></td><td>Asset endpoints</td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>NFR-02</b></td><td>WCAG Accessibility</td><td><code>AccessibilityProvider</code></td><td>Theme / CSS layers</td><td><code>UserProfile</code></td><td>Client preferences</td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>NFR-04</b></td><td>Security &amp; Privacy</td><td><code>apiClient.js</code></td><td><code>auth.middleware.js</code></td><td><code>Session</code></td><td>All routes</td><td><span class="status pass">VERIFIED</span></td></tr>
+          <tr><td><b>NFR-05</b></td><td>High Availability</td><td>Error boundaries</td><td><code>server.js</code></td><td>Database</td><td><code>/api/health/*</code></td><td><span class="status pass">VERIFIED</span></td></tr>
+        </tbody>
+      </table>
+      <div class="callout accent" style="margin-top:3mm">
+        <b>Traceability Audit Result:</b> Every functional requirement (FR-01 through FR-12) and quality constraint has been mapped directly to production modules, routes, schemas, and verified test cases.
+      </div>
+      <div class="page-footer"><span>PATHSEEKER · REQUIREMENTS TRACEABILITY MATRIX</span><span class="page-number">PAGE </span></div>
+    </section>
+
+    <!-- PAGE 27: LIMITATIONS, CLOSEOUT & APPROVAL -->
+    <section class="page" id="closeout">
+      <div class="page-header"><span class="brand">Path<span>Seeker</span></span><span>24 · CLOSEOUT &amp; APPROVAL</span></div>
+      <span class="section-number">24</span>
+      <div class="eyebrow">Formal Project Sign-Off</div>
+      <h2>Limitations, Authority &amp; Approval Record</h2>
+      <h3>Requirements Exception &amp; Limitations Register</h3>
+      <table>
+        <thead>
+          <tr><th>Area / Requirement</th><th>Expected Scope</th><th>Current Implementation State</th><th>Evaluator Impact &amp; Next Step</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Assessment Formats</b></td>
+            <td>Multiple question formats.</td>
+            <td>8 multiple-choice questions seeded (Quiz v1); schema supports Likert/ranking.</td>
+            <td>Core flow verified; add slider variants in subsequent release.</td>
+          </tr>
+          <tr>
+            <td><b>Transactional Email</b></td>
+            <td>Live email delivery.</td>
+            <td>Console email provider in dev; live Resend API configured for production.</td>
+            <td>Zero evaluation blocker; OTPs logged directly to server console.</td>
+          </tr>
+          <tr>
+            <td><b>Voice Guidance (Navi)</b></td>
+            <td>Bidirectional audio.</td>
+            <td>Deterministic text Navi built-in; optional Vapi voice provider integrated.</td>
+            <td>Text guidance 100% operational; voice toggles with active provider key.</td>
+          </tr>
+          <tr>
+            <td><b>Occupational Geography</b></td>
+            <td>Global pay datasets.</td>
+            <td>U.S. Bureau of Labor Statistics (BLS 2024–2034) reference benchmark.</td>
+            <td>Authoritative data baseline; localized datasets recommended for future scope.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Implementation Completeness Statement</h3>
+      <div class="card accent" style="margin-top:2.5mm">
+        <p><strong>Authoritative Engineering Sign-Off:</strong> PathSeeker has been fully designed, implemented, and benchmarked against the Aptech TechWiz SRS. All 12 Functional Requirements and Quality Attributes are backed by concrete source code, deterministic algorithms, 27 Mongoose schemas, 36 passed backend tests, 11 passed frontend tests, 0 lint errors, and 51 renderable PDF pages. The platform is ready for evaluator assessment and deployment.</p>
+      </div>
+      <div class="grid-3" style="margin-top:3mm">
+        <div class="card">
+          <span class="small muted">LEAD SOFTWARE ENGINEER</span>
+          <h4 style="margin-top:2mm">Mirza Abdullah Baig</h4>
+          <p class="small">StackVerse Project Lead<br>Student ID: 1600671</p>
+        </div>
+        <div class="card">
+          <span class="small muted">TECHNICAL REVIEW</span>
+          <h4 style="margin-top:2mm">Baseline Verified</h4>
+          <p class="small">36/36 Backend Passed<br>11/11 Frontend Passed</p>
+        </div>
+        <div class="card accent">
+          <span class="small muted">COMPETITION BASELINE</span>
+          <h4 style="margin-top:2mm">Aptech TechWiz</h4>
+          <p class="small">Status: Ready for Evaluation<br>Date: 27 August 2026</p>
+        </div>
+      </div>
+      <div class="page-footer"><span>END OF TECHNICAL SPECIFICATION · DOCUMENT PS-DOC-002</span><span class="page-number">PAGE </span></div>
+    </section>
+
+  </main>
+  <script>
+    function saveEditedCopy(filename) {
+      const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  </script>
+</body>
+</html>
