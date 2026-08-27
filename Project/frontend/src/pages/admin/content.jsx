@@ -34,6 +34,14 @@ export default function ContentAdmin({ navigate }) {
       queryClient.invalidateQueries({ queryKey: ['admin', 'media'] })
     },
   })
+  const statusMutation = useMutation({
+    mutationFn: ({ item, status }) => item.isMedia ? adminApi.setMediaStatus(item._id, status) : adminApi.setResourceStatus(item._id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'resources'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'media'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    },
+  })
 
   if (resourcesQuery.isLoading || mediaQuery.isLoading) return <PageSkeleton />
   if (resourcesQuery.error) return <ErrorState message={resourcesQuery.error.message} onRetry={resourcesQuery.refetch} />
@@ -49,7 +57,8 @@ export default function ContentAdmin({ navigate }) {
       tags: m.tags?.join(', ') || 'Learning',
       author: m.publisherName || 'PathSeeker Editorial',
       date: new Date(m.createdAt).toLocaleDateString(),
-      status: m.active ? 'Published' : 'Draft',
+      status: m.status ? m.status[0].toUpperCase() + m.status.slice(1) : m.active ? 'Published' : 'Draft',
+      currentStatus: m.status || (m.active ? 'published' : 'draft'),
       isMedia: true,
     })),
     ...resources.map((r) => ({
@@ -59,7 +68,8 @@ export default function ContentAdmin({ navigate }) {
       tags: r.tags?.join(', ') || 'All careers',
       author: r.authorName || 'PathSeeker Editorial',
       date: new Date(r.createdAt).toLocaleDateString(),
-      status: r.active ? 'Published' : 'Draft',
+      status: r.status ? r.status[0].toUpperCase() + r.status.slice(1) : r.active ? 'Published' : 'Draft',
+      currentStatus: r.status || (r.active ? 'published' : 'draft'),
       isMedia: false,
     })),
   ]
@@ -77,6 +87,7 @@ export default function ContentAdmin({ navigate }) {
     item.status,
     <div key={item._id} className="page-action-row">
       <button className="button ghost small" onClick={() => navigate('admin-content-editor', item._id)}>Edit</button>
+      <button className="button ghost small" disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ item, status: item.currentStatus === 'published' ? 'archived' : item.currentStatus === 'archived' ? 'draft' : 'published' })}>{item.currentStatus === 'published' ? 'Archive' : item.currentStatus === 'archived' ? 'Restore' : 'Publish'}</button>
       <button
         className="button ghost small"
         style={{ padding: '2px 8px', fontSize: '11px', color: 'var(--rose, #c05c5c)' }}

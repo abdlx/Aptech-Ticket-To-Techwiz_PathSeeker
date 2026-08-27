@@ -23,6 +23,13 @@ export default function CareersAdmin({ navigate }) {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.careers() })
     },
   })
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }) => adminApi.setCareerStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.careers() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.stats() })
+    },
+  })
 
   if (query.isLoading) return <PageSkeleton />
   if (query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
@@ -92,7 +99,7 @@ export default function CareersAdmin({ navigate }) {
               </span>
               <span>
                 <small>Growth</small>
-                <strong>+{career.growthRatePercent || 12}%</strong>
+                <strong>{career.growthRatePercent == null ? '—' : `${career.growthRatePercent > 0 ? '+' : ''}${career.growthRatePercent}%`}</strong>
               </span>
               <span>
                 <small>Skills</small>
@@ -101,6 +108,9 @@ export default function CareersAdmin({ navigate }) {
             </div>
             <button onClick={() => navigate('admin-career-editor', career.slug || career._id)}>
               <Icon name="edit" /> Edit profile
+            </button>
+            <button disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ id: career._id, status: career.status === 'published' ? 'archived' : career.status === 'archived' ? 'draft' : 'published' })}>
+              <Icon name="check" /> {career.status === 'published' ? 'Archive' : career.status === 'archived' ? 'Restore draft' : 'Publish'}
             </button>
           </article>
         ))}

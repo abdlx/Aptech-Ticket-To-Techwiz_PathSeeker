@@ -15,14 +15,22 @@ export default function AdminFeedbackAnalytics({ navigate }) {
   if (query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
 
   const analytics = query.data?.data?.analytics || {}
-  const totalFeedback = analytics.totalCount || 12
-  const resolutionRate = analytics.resolutionRate != null ? `${analytics.resolutionRate}%` : '91%'
-  const avgResponseTime = analytics.avgResponseHours ? `${analytics.avgResponseHours}h` : '4.2h'
+  const totalFeedback = analytics.totalCount || 0
+  const resolutionRate = `${analytics.resolutionRate || 0}%`
+  const avgResponseTime = `${analytics.avgResponseHours || 0}h`
+  const sentimentTotal = Object.values(analytics.sentiment || {}).reduce((sum, value) => sum + value, 0)
+  const sentimentPercent = (tone) => sentimentTotal ? Math.round(((analytics.sentiment?.[tone] || 0) / sentimentTotal) * 100) : 0
   const sentiments = [
-    ['Positive', 62, 'mint'],
-    ['Neutral', 25, 'blue'],
-    ['Negative', 13, 'rose'],
+    ['Positive', sentimentPercent('positive'), 'mint'],
+    ['Neutral', sentimentPercent('neutral'), 'blue'],
+    ['Negative', sentimentPercent('negative'), 'rose'],
   ]
+  const categoryTotal = (analytics.byCategory || []).reduce((sum, item) => sum + item.count, 0)
+  const categories = (analytics.byCategory || []).map((item) => [
+    item._id?.replaceAll('_', ' ') || 'Other',
+    categoryTotal ? Math.round((item.count / categoryTotal) * 100) : 0,
+    item._id === 'bug' ? 'settings' : item._id === 'career_question' ? 'book' : 'sparkles',
+  ])
 
   return (
     <div className="admin-stack">
@@ -79,7 +87,7 @@ export default function AdminFeedbackAnalytics({ navigate }) {
               <Icon name="star" />
             </span>
           </div>
-          <strong>4.8</strong>
+          <strong>{analytics.averageRating || 0}</strong>
           <p>Experience rating</p>
           <small>Average satisfaction</small>
         </article>
@@ -106,11 +114,7 @@ export default function AdminFeedbackAnalytics({ navigate }) {
         <section className="panel response-panel">
           <span className="eyebrow">Categories</span>
           <h2>What people are sending</h2>
-          {[
-            ['Ideas & Suggestions', 52, 'sparkles'],
-            ['Bug Reports', 28, 'settings'],
-            ['Career Questions', 20, 'book'],
-          ].map(([label, value, icon]) => (
+          {categories.map(([label, value, icon]) => (
             <div key={label}>
               <span>
                 <Icon name={icon} />

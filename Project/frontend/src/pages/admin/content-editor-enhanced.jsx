@@ -10,7 +10,7 @@ import { adminApi } from '../../services/adminApi'
 const emptyForm = {
   kind: 'media', title: '', description: '', type: 'video', url: '', externalUrl: '',
   thumbnailUrl: '', publisherName: '', transcript: '', tags: '', pageCount: '',
-  authorName: 'PathSeeker Editorial', version: '1.0', status: 'draft',
+  authorName: 'PathSeeker Editorial', version: '1.0', status: 'draft', fileAsset: null,
 }
 const csv = (value) => value.split(',').map((item) => item.trim()).filter(Boolean)
 
@@ -18,7 +18,7 @@ function fromMedia(item) {
   return { ...emptyForm, kind: 'media', title: item.title || '', description: item.description || '', type: item.type || 'video', url: item.url || '', externalUrl: item.externalUrl || '', thumbnailUrl: item.thumbnailUrl || '', publisherName: item.publisherName || '', transcript: item.transcript || '', tags: (item.tags || []).join(', '), status: item.status || (item.active ? 'published' : 'draft') }
 }
 function fromResource(item) {
-  return { ...emptyForm, kind: 'resource', title: item.title || '', description: item.description || '', type: item.type || 'pdf', url: item.file?.url || '', tags: (item.tags || []).join(', '), pageCount: item.pageCount ?? '', authorName: item.authorName || 'PathSeeker Editorial', version: item.version || '1.0', status: item.status || (item.active ? 'published' : 'draft') }
+  return { ...emptyForm, kind: 'resource', title: item.title || '', description: item.description || '', type: item.type || 'pdf', url: item.file?.url || '', fileAsset: item.file || null, tags: (item.tags || []).join(', '), pageCount: item.pageCount ?? '', authorName: item.authorName || 'PathSeeker Editorial', version: item.version || '1.0', status: item.status || (item.active ? 'published' : 'draft') }
 }
 
 export default function AdminContentEditorEnhanced({ navigate }) {
@@ -28,6 +28,15 @@ export default function AdminContentEditorEnhanced({ navigate }) {
   const isNew = identifier === 'new'
   const [draft, setDraft] = useState(null)
   const [notice, setNotice] = useState('')
+  const uploadMutation = useMutation({
+    mutationFn: (file) => adminApi.uploadFile(file),
+    onSuccess: (result) => {
+      const asset = result.data.asset
+      setDraft({ ...form, url: asset.url, fileAsset: asset })
+      setNotice('File uploaded. Save the content record to persist this asset.')
+    },
+    onError: (error) => setNotice(error.message),
+  })
 
   const resourcesQuery = useQuery({ queryKey: ['admin', 'resources', 'editor'], queryFn: ({ signal }) => adminApi.getResources({ limit: 100 }, { signal }), enabled: !isNew })
   const mediaQuery = useQuery({ queryKey: ['admin', 'media', 'editor'], queryFn: ({ signal }) => adminApi.getMedia({ limit: 100 }, { signal }), enabled: !isNew })
@@ -43,7 +52,8 @@ export default function AdminContentEditorEnhanced({ navigate }) {
         return isNew ? adminApi.createMedia(payload) : adminApi.updateMedia(existing._id, payload)
       }
       const payload = { title: form.title.trim(), description: form.description.trim(), type: form.type, tags: csv(form.tags), pageCount: form.pageCount === '' ? undefined : Number(form.pageCount), authorName: form.authorName.trim(), version: form.version.trim(), originalContent: true, status }
-      if (isNew) payload.file = { url: form.url.trim(), mimeType: 'application/pdf', originalName: form.url.split('/').at(-1) || 'resource.pdf' }
+      if (form.fileAsset) payload.file = form.fileAsset
+      else if (isNew) payload.file = { url: form.url.trim(), mimeType: 'application/pdf', originalName: form.url.split('/').at(-1) || 'resource.pdf' }
       return isNew ? adminApi.createResource(payload) : adminApi.updateResource(existing._id, payload)
     },
     onSuccess: () => {
@@ -74,6 +84,7 @@ export default function AdminContentEditorEnhanced({ navigate }) {
       {notice && <p className="form-error" role="alert">{notice}</p>}
       <section className="panel admin-editor-form connected-admin-form">
         <div className="editor-section"><h2>Content details</h2><div className="form-grid"><Field label="Content family"><select value={form.kind} onChange={(event) => setDraft({ ...emptyForm, kind: event.target.value, type: event.target.value === 'media' ? 'video' : 'pdf' })} disabled={!isNew}><option value="media">Expert media</option><option value="resource">Downloadable document</option></select></Field><Field label="Format"><select value={form.type} onChange={set('type')}>{isMedia ? <><option value="video">Video</option><option value="audio">Audio</option><option value="animation">Animation</option></> : <><option value="pdf">PDF guide</option><option value="checklist">Checklist</option><option value="infographic">Infographic</option><option value="template">Template</option></>}</select></Field><Field label="Title"><input value={form.title} onChange={set('title')} required /></Field><Field label="Tags (comma separated)"><input value={form.tags} onChange={set('tags')} /></Field><Field label="Description"><textarea value={form.description} onChange={set('description')} /></Field><Field label={isMedia ? 'Embed or media URL' : isNew ? 'Public HTTPS file URL' : 'Current file (read only)'}><input type={isMedia || isNew ? 'url' : 'text'} value={form.url} onChange={set('url')} readOnly={!isMedia && !isNew} required /></Field></div></div>
+        <div className="editor-section"><h2>Managed upload</h2><Field label="Upload a file to the backend"><input type="file" onChange={(event) => event.target.files?.[0] && uploadMutation.mutate(event.target.files[0])} disabled={uploadMutation.isPending} /></Field><small>{uploadMutation.isPending ? 'Uploading…' : 'The returned asset URL is inserted into the source field above.'}</small></div>
         {isMedia ? <div className="editor-section"><h2>Publisher and accessibility</h2><div className="form-grid"><Field label="Original watch URL"><input type="url" value={form.externalUrl} onChange={set('externalUrl')} /></Field><Field label="Thumbnail URL"><input type="url" value={form.thumbnailUrl} onChange={set('thumbnailUrl')} /></Field><Field label="Publisher"><input value={form.publisherName} onChange={set('publisherName')} /></Field><Field label="Transcript or learning notes"><textarea rows="8" value={form.transcript} onChange={set('transcript')} /></Field></div></div> : <div className="editor-section"><h2>Document metadata</h2><div className="form-grid"><Field label="Page count"><input type="number" min="0" value={form.pageCount} onChange={set('pageCount')} /></Field><Field label="Author"><input value={form.authorName} onChange={set('authorName')} /></Field><Field label="Version"><input value={form.version} onChange={set('version')} /></Field></div></div>}
       </section>
     </div>

@@ -575,7 +575,13 @@ export async function listAllFeedback({ status, category, page, limit, skip }) {
   if (category) filter.category = category
 
   const [feedback, total] = await Promise.all([
-    Feedback.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('userId', 'name email'),
+    Feedback.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('userId', 'name email stage')
+      .populate('assignee', 'name email role')
+      .lean(),
     Feedback.countDocuments(filter),
   ])
   return { feedback, meta: buildPaginationMeta({ page, limit, total }) }

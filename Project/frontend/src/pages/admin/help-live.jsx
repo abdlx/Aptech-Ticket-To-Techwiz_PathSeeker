@@ -24,7 +24,7 @@ export default function AdminHelpPage() {
     mutationFn: (payload) => selectedId === 'new' ? adminApi.createHelpArticle(payload) : adminApi.updateHelpArticle(selectedId, payload),
     onSuccess: (result) => { setSelectedId(result.data.article._id); refresh() },
   })
-  const remove = useMutation({ mutationFn: adminApi.deleteHelpArticle, onSuccess: () => { setSelectedId('new'); refresh() } })
+  const remove = useMutation({ mutationFn: (id) => adminApi.deleteHelpArticle(id), onSuccess: () => { setSelectedId('new'); refresh() } })
   if (query.isLoading) return <PageSkeleton />
   if (query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
   const set = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.type === 'checkbox' ? event.target.checked : event.target.value }))

@@ -13,6 +13,7 @@ export default function FeedbackAdmin({ navigate }) {
   const [tab, setTab] = useState('open')
   const [selectedId, setSelectedId] = useState(null)
   const [replyText, setReplyText] = useState('')
+  const [internalNotes, setInternalNotes] = useState('')
 
   const query = useQuery({
     queryKey: queryKeys.admin.feedback({ status: tab === 'all' ? '' : tab }),
@@ -22,6 +23,7 @@ export default function FeedbackAdmin({ navigate }) {
         { signal },
       ),
   })
+  const assigneesQuery = useQuery({ queryKey: ['admin', 'feedback', 'assignees'], queryFn: ({ signal }) => adminApi.getFeedbackAssignees({ signal }) })
 
   const respondMutation = useMutation({
     mutationFn: ({ id, response, status }) =>
@@ -31,12 +33,21 @@ export default function FeedbackAdmin({ navigate }) {
       setReplyText('')
     },
   })
+  const triageMutation = useMutation({
+    mutationFn: ({ id, payload }) => adminApi.updateFeedback(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'feedback'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] })
+      setInternalNotes('')
+    },
+  })
 
   if (query.isLoading) return <PageSkeleton />
   if (query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
 
   const feedbackList = query.data?.data?.feedback || []
   const activeItem = feedbackList.find((f) => f._id === selectedId) || feedbackList[0]
+  const assignees = assigneesQuery.data?.data?.users || []
 
   const handleResolve = (status = 'resolved') => {
     if (!activeItem) return
@@ -157,6 +168,13 @@ export default function FeedbackAdmin({ navigate }) {
                 <strong>{activeItem.status}</strong>
               </span>
             </div>
+
+            <div className="form-grid">
+              <label>Status<select value={activeItem.status} onChange={(event) => triageMutation.mutate({ id: activeItem._id, payload: { status: event.target.value } })}><option value="open">Open</option><option value="in_review">In review</option><option value="resolved">Resolved</option></select></label>
+              <label>Assignee<select value={activeItem.assignee?._id || activeItem.assignee || ''} onChange={(event) => triageMutation.mutate({ id: activeItem._id, payload: { assignee: event.target.value || null } })}><option value="">Unassigned</option>{assignees.map((user) => <option key={user._id} value={user._id}>{user.name} · {user.role.replaceAll('_', ' ')}</option>)}</select></label>
+            </div>
+            <label>Internal notes<textarea rows={2} placeholder={activeItem.internalNotes || 'Visible only to staff'} value={internalNotes} onChange={(event) => setInternalNotes(event.target.value)} /></label>
+            <div className="feedback-actions"><button className="button soft" disabled={!internalNotes.trim() || triageMutation.isPending} onClick={() => triageMutation.mutate({ id: activeItem._id, payload: { internalNotes } })}>Save internal note</button></div>
 
             <label>
               Staff response / Resolution note
