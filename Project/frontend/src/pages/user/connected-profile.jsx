@@ -6,6 +6,7 @@ import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
 import { exportToPdf } from '../../lib/pdfExport'
 import { useAuth } from '../../providers/AuthProvider'
+import { careersApi } from '../../services/careersApi'
 import { profileApi } from '../../services/profileApi'
 import { useAccessibilityStore } from '../../stores/appStores'
 
@@ -34,6 +35,14 @@ export default function ConnectedProfilePage() {
     queryFn: ({ signal }) => profileApi.get({ signal }),
     staleTime: 60_000,
   })
+
+  const catalogSkillsQuery = useQuery({
+    queryKey: ['skills', 'catalog'],
+    queryFn: ({ signal }) => careersApi.skills({}, { signal }),
+    staleTime: 300_000,
+  })
+
+  const catalogSkills = catalogSkillsQuery.data?.data?.skills || []
 
   const updateMutation = useMutation({
     mutationFn: (payload) => profileApi.update(payload),
@@ -115,29 +124,79 @@ export default function ConnectedProfilePage() {
   // Handlers for Skills & Interests
   const handleAddSkill = (e) => {
     e.preventDefault()
-    const name = newSkillText.trim()
-    if (!name) return
-    // Simulated skill ID or label
-    const newSkill = {
-      skillId: name.toLowerCase().replace(/\s+/g, '-'),
-      selfRating: Number(newSkillRating),
-      experienceMonths: 12,
-      source: 'self_reported',
-      customName: name,
+    const input = newSkillText.trim()
+    if (!input) return
+    const inputLower = input.toLowerCase()
+
+    // Match with catalog skills by exact ID, name, slug, or alias
+    const matchedSkill = catalogSkills.find(
+      (s) =>
+        s._id === input ||
+        s.name.toLowerCase() === inputLower ||
+        s.slug.toLowerCase() === inputLower ||
+        s.aliases?.some((a) => a.toLowerCase() === inputLower)
+    )
+
+    if (!matchedSkill) {
+      setToast({
+        type: 'error',
+        message: `"${input}" was not found in the skills catalog. Please select an available skill from the suggestion list.`,
+      })
+      return
     }
-    const updatedSkills = [...(profile.skills || []), newSkill]
+
+    const existingIndex = (profile.skills || []).findIndex((s) => {
+      const id = typeof s.skillId === 'object' && s.skillId?._id ? s.skillId._id : s.skillId
+      return String(id) === String(matchedSkill._id)
+    })
+
+    if (existingIndex >= 0) {
+      setToast({
+        type: 'info',
+        message: `"${matchedSkill.name}" is already in your skills list.`,
+      })
+      return
+    }
+
+    const updatedSkills = [
+      ...(profile.skills || []).map((s) => ({
+        skillId: typeof s.skillId === 'object' && s.skillId?._id ? s.skillId._id : s.skillId,
+        selfRating: Number(s.selfRating) || 5,
+        experienceMonths: Number(s.experienceMonths) || 0,
+        source: s.source || 'self_reported',
+      })),
+      {
+        skillId: matchedSkill._id,
+        selfRating: Number(newSkillRating) || 7,
+        experienceMonths: 12,
+        source: 'self_reported',
+      },
+    ]
+
     updateMutation.mutate({ skills: updatedSkills })
     setNewSkillText('')
     setNewSkillRating(7)
   }
 
   const handleUpdateSkillRating = (index, rating) => {
-    const updatedSkills = (profile.skills || []).map((s, i) => i === index ? { ...s, selfRating: Number(rating) } : s)
+    const updatedSkills = (profile.skills || []).map((s, i) => ({
+      skillId: typeof s.skillId === 'object' && s.skillId?._id ? s.skillId._id : s.skillId,
+      selfRating: i === index ? Number(rating) : Number(s.selfRating) || 5,
+      experienceMonths: Number(s.experienceMonths) || 0,
+      source: s.source || 'self_reported',
+    }))
     updateMutation.mutate({ skills: updatedSkills })
   }
 
   const handleRemoveSkill = (index) => {
-    const updatedSkills = profile.skills.filter((_, i) => i !== index)
+    const updatedSkills = (profile.skills || [])
+      .filter((_, i) => i !== index)
+      .map((s) => ({
+        skillId: typeof s.skillId === 'object' && s.skillId?._id ? s.skillId._id : s.skillId,
+        selfRating: Number(s.selfRating) || 5,
+        experienceMonths: Number(s.experienceMonths) || 0,
+        source: s.source || 'self_reported',
+      }))
     updateMutation.mutate({ skills: updatedSkills })
   }
 
@@ -488,10 +547,18 @@ export default function ConnectedProfilePage() {
                 <div className="add-inline-row">
                   <input
                     type="text"
-                    placeholder="Add a new skill (e.g. JavaScript, Public Speaking, UI Design)..."
+                    list="catalog-skills-list"
+                    placeholder="Search or select a skill (e.g. Python, UI Design, React, Communication)..."
                     value={newSkillText}
                     onChange={(e) => setNewSkillText(e.target.value)}
                   />
+                  <datalist id="catalog-skills-list">
+                    {catalogSkills.map((s) => (
+                      <option key={s._id} value={s.name}>
+                        {s.category ? `Category: ${s.category}` : ''}
+                      </option>
+                    ))}
+                  </datalist>
                   <button type="button" className="button soft" onClick={handleAddSkill}>
                     <Icon name="plus" /> Add Skill
                   </button>

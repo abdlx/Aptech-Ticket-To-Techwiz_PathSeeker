@@ -167,7 +167,13 @@ export default function CareerBankEnhancedPage({ navigate }) {
       <section>
         <div className="results-bar"><p><strong>{meta?.total || careers.length} careers</strong> matching your filters</p><button className="button ghost small" onClick={() => navigate('compare')}>Compare careers</button></div>
         {careers.length ? <div className="career-grid bank-grid">{careers.map((career) => <CareerCard key={career.id} career={career} navigate={navigate} saved={bookmarkedIds.has(career._id)} toggleSaved={() => bookmarkMutation.mutate(career)} />)}</div> : <EmptyState title="No matching careers" message="Try a broader keyword or clear one of the filters." />}
-        {meta?.pages > 1 && <div className="pagination-row"><button className="button ghost small" disabled={Number(filters.page) <= 1} onClick={() => update('page', Number(filters.page) - 1)}>Previous</button><span>Page {meta.page} of {meta.pages}</span><button className="button ghost small" disabled={Number(filters.page) >= meta.pages} onClick={() => update('page', Number(filters.page) + 1)}>Next</button></div>}
+        {(meta?.totalPages > 1 || meta?.pages > 1) && (
+          <div className="pagination-row">
+            <button className="button ghost small" disabled={Number(filters.page) <= 1} onClick={() => update('page', Number(filters.page) - 1)}>Previous</button>
+            <span>Page {meta.page} of {meta.totalPages || meta.pages}</span>
+            <button className="button ghost small" disabled={Number(filters.page) >= (meta.totalPages || meta.pages)} onClick={() => update('page', Number(filters.page) + 1)}>Next</button>
+          </div>
+        )}
       </section>
     </div>
   )

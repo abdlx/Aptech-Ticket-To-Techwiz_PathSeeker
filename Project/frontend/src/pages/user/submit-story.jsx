@@ -15,6 +15,8 @@ export default function SubmitStoryPage({ navigate }) {
   const [challenge, setChallenge] = useState('')
   const [turningPoint, setTurningPoint] = useState('')
   const [outcome, setOutcome] = useState('')
+  const [consent, setConsent] = useState(true)
+  const [publicApproval, setPublicApproval] = useState(true)
 
   const domainsQuery = useQuery({
     queryKey: ['domains', 'list'],
@@ -45,6 +47,10 @@ export default function SubmitStoryPage({ navigate }) {
       authorName: authorName.trim() || 'Anonymous Explorer',
       domainId: selectedDomainId,
       storyText: combinedStoryText,
+      challenges: challenge,
+      educationPath: turningPoint,
+      outcome: outcome,
+      consent: consent === true,
     })
   }
 
@@ -158,10 +164,19 @@ export default function SubmitStoryPage({ navigate }) {
                 </div>
               </div>
               <label className="check-row">
-                <input type="checkbox" defaultChecked required /> I confirm this is my story and PathSeeker may review and publish it.
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  required
+                /> I confirm this is my story and PathSeeker may review and publish it.
               </label>
               <label className="check-row">
-                <input type="checkbox" defaultChecked /> I approve displaying my name and career transition publicly.
+                <input
+                  type="checkbox"
+                  checked={publicApproval}
+                  onChange={(e) => setPublicApproval(e.target.checked)}
+                /> I approve displaying my name and career transition publicly.
               </label>
               {submitMutation.error && (
                 <p style={{ color: 'var(--rose, #c05c5c)', fontSize: '11px' }}>
