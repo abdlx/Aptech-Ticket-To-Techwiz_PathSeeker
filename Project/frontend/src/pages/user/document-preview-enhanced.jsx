@@ -8,8 +8,10 @@ import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
 import { contentApi } from '../../services/contentApi'
 import { personalizationApi } from '../../services/personalizationApi'
+import { useAuth } from '../../providers/AuthProvider'
 
 export default function DocumentPreviewEnhancedPage({ navigate, resourceId }) {
+  const auth = useAuth()
   const [notice, setNotice] = useState('')
   const query = useQuery({
     queryKey: queryKeys.resources.detail(resourceId),
@@ -29,6 +31,8 @@ export default function DocumentPreviewEnhancedPage({ navigate, resourceId }) {
     onError: () => setNotice('The document opened, but the download counter could not be updated.'),
   })
 
+  const isStaff = ['content_editor', 'support_manager', 'admin', 'super_admin'].includes(auth.user?.role)
+
   if (query.isLoading) return <PageSkeleton />
   if (query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
 
@@ -40,7 +44,18 @@ export default function DocumentPreviewEnhancedPage({ navigate, resourceId }) {
 
   return (
     <div className="page-stack">
-      <Breadcrumbs items={[{ label: 'Resources', to: 'resources' }, { label: resource.title }]} navigate={navigate} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <Breadcrumbs items={[{ label: 'Resources', to: 'resources' }, { label: resource.title }]} navigate={navigate} />
+        {isStaff && (
+          <button
+            className="button soft small"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            onClick={() => navigate('admin-content')}
+          >
+            <Icon name="settings" size={14} /> Back to Admin Content
+          </button>
+        )}
+      </div>
       <Back navigate={navigate} to="resources">Back to resources</Back>
       <PageTitle eyebrow={`${resource.type} - Original PathSeeker material`} title={resource.title} copy={resource.description} actions={<button className="button primary" onClick={handleDownload}><Icon name="download" /> Download PDF</button>} />
       {notice && <p className="inline-notice" role="status">{notice}</p>}

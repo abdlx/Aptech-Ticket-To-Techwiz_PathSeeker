@@ -21,11 +21,12 @@ function fromResource(item) {
   return { ...emptyForm, kind: 'resource', title: item.title || '', description: item.description || '', type: item.type || 'pdf', url: item.file?.url || '', fileAsset: item.file || null, tags: (item.tags || []).join(', '), pageCount: item.pageCount ?? '', authorName: item.authorName || 'PathSeeker Editorial', version: item.version || '1.0', status: item.status || (item.active ? 'published' : 'draft') }
 }
 
-export default function AdminContentEditorEnhanced({ navigate }) {
+export default function AdminContentEditorEnhanced({ navigate, contentId }) {
   const queryClient = useQueryClient()
   const location = useLocation()
-  const identifier = decodeURIComponent(location.pathname.split('/').filter(Boolean).at(-1) || 'new')
-  const isNew = identifier === 'new'
+  const searchParams = new URLSearchParams(window.location.search)
+  const identifier = contentId || searchParams.get('career') || searchParams.get('id') || decodeURIComponent(location.pathname.split('/').filter(Boolean).at(-1) || 'new')
+  const isNew = !identifier || identifier === 'new'
   const [draft, setDraft] = useState(null)
   const [notice, setNotice] = useState('')
   const uploadMutation = useMutation({
@@ -80,8 +81,41 @@ export default function AdminContentEditorEnhanced({ navigate }) {
 
   return (
     <div className="admin-stack">
-      <Head eyebrow="Learning library - Connected editor" title={isNew ? 'Add content' : `Edit ${existing.title}`} copy="Publish attributed expert media or maintain downloadable career resources through the live content API."><button className="button ghost" onClick={() => navigate('admin-content')}>Cancel</button><button className="button soft" onClick={() => submit(isNew ? 'draft' : form.status)} disabled={mutation.isPending}>{isNew ? 'Save draft' : 'Save changes'}</button><button className="button primary" onClick={() => submit('published')} disabled={mutation.isPending}><Icon name="check" /> {mutation.isPending ? 'Saving...' : 'Publish content'}</button></Head>
+      <Head eyebrow="Learning library - Connected editor" title={isNew ? 'Add content' : `Edit ${existing?.title || 'content'}`} copy="Publish attributed expert media or maintain downloadable career resources through the live content API.">
+        <button className="button ghost" onClick={() => navigate('admin-content')}>Cancel</button>
+        {existing && (
+          <button
+            className="button soft"
+            style={{ color: 'var(--blue, #3b82f6)' }}
+            onClick={() => navigate(isMedia ? 'media-detail' : 'document-preview', existing._id)}
+          >
+            ▶ Student View
+          </button>
+        )}
+        <button className="button soft" onClick={() => submit(isNew ? 'draft' : form.status)} disabled={mutation.isPending}>{isNew ? 'Save draft' : 'Save changes'}</button>
+        <button className="button primary" onClick={() => submit('published')} disabled={mutation.isPending}><Icon name="check" /> {mutation.isPending ? 'Saving...' : 'Publish content'}</button>
+      </Head>
       {notice && <p className="form-error" role="alert">{notice}</p>}
+      
+      {/* Live Stream Preview for Admin */}
+      {isMedia && form.url && (
+        <section className="panel" style={{ padding: '16px', background: 'var(--surface-sunken, #0f172a)', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <span className="eyebrow" style={{ color: 'var(--blue, #38bdf8)' }}>Live Stream Preview</span>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted, #94a3b8)' }}>Streams exactly as a student sees it</span>
+          </div>
+          <div style={{ position: 'relative', paddingTop: '56.25%', background: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+            <iframe
+              src={form.url}
+              title={form.title || 'Video preview'}
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+        </section>
+      )}
+
       <section className="panel admin-editor-form connected-admin-form">
         <div className="editor-section"><h2>Content details</h2><div className="form-grid"><Field label="Content family"><select value={form.kind} onChange={(event) => setDraft({ ...emptyForm, kind: event.target.value, type: event.target.value === 'media' ? 'video' : 'pdf' })} disabled={!isNew}><option value="media">Expert media</option><option value="resource">Downloadable document</option></select></Field><Field label="Format"><select value={form.type} onChange={set('type')}>{isMedia ? <><option value="video">Video</option><option value="audio">Audio</option><option value="animation">Animation</option></> : <><option value="pdf">PDF guide</option><option value="checklist">Checklist</option><option value="infographic">Infographic</option><option value="template">Template</option></>}</select></Field><Field label="Title"><input value={form.title} onChange={set('title')} required /></Field><Field label="Tags (comma separated)"><input value={form.tags} onChange={set('tags')} /></Field><Field label="Description"><textarea value={form.description} onChange={set('description')} /></Field><Field label={isMedia ? 'Embed or media URL' : isNew ? 'Public HTTPS file URL' : 'Current file (read only)'}><input type={isMedia || isNew ? 'url' : 'text'} value={form.url} onChange={set('url')} readOnly={!isMedia && !isNew} required /></Field></div></div>
         <div className="editor-section"><h2>Managed upload</h2><Field label="Upload a file to the backend"><input type="file" onChange={(event) => event.target.files?.[0] && uploadMutation.mutate(event.target.files[0])} disabled={uploadMutation.isPending} /></Field><small>{uploadMutation.isPending ? 'Uploading…' : 'The returned asset URL is inserted into the source field above.'}</small></div>

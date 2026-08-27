@@ -7,42 +7,58 @@ import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
 import { contentApi } from '../../services/contentApi'
 import { personalizationApi } from '../../services/personalizationApi'
+import { useAuth } from '../../providers/AuthProvider'
 
 export default function MediaDetailEnhancedPage({ navigate, mediaId }) {
+  const auth = useAuth()
   const queryClient = useQueryClient()
   const [showNotes, setShowNotes] = useState(true)
   const [userRating, setUserRating] = useState(0)
   const [notice, setNotice] = useState('')
 
+  const allMediaQuery = useQuery({
+    queryKey: queryKeys.media.list(),
+    queryFn: ({ signal }) => contentApi.getMedia({}, { signal }),
+    staleTime: 60_000,
+  })
+
+  const effectiveMediaId = mediaId || allMediaQuery.data?.data?.media?.[0]?._id
+
   const query = useQuery({
-    queryKey: queryKeys.media.detail(mediaId),
-    queryFn: ({ signal }) => contentApi.getMediaById(mediaId, { signal }), enabled: Boolean(mediaId),
+    queryKey: queryKeys.media.detail(effectiveMediaId),
+    queryFn: ({ signal }) => contentApi.getMediaById(effectiveMediaId, { signal }),
+    enabled: Boolean(effectiveMediaId),
   })
   const relatedQuery = useQuery({
-    queryKey: ['media', 'related', mediaId],
-    queryFn: ({ signal }) => contentApi.getRelatedMedia(mediaId, { signal }), enabled: Boolean(mediaId),
+    queryKey: ['media', 'related', effectiveMediaId],
+    queryFn: ({ signal }) => contentApi.getRelatedMedia(effectiveMediaId, { signal }),
+    enabled: Boolean(effectiveMediaId),
   })
   const resourcesQuery = useQuery({
     queryKey: queryKeys.resources.list(),
-    queryFn: ({ signal }) => contentApi.getResources({}, { signal }), staleTime: 60_000,
+    queryFn: ({ signal }) => contentApi.getResources({}, { signal }),
+    staleTime: 60_000,
   })
-  const media = query.data?.data?.media
+  const media = query.data?.data?.media || allMediaQuery.data?.data?.media?.find((m) => m._id === effectiveMediaId)
 
   useEffect(() => {
     if (media?._id) personalizationApi.recordRecentlyViewed({ itemType: 'media', itemId: media._id }).catch(() => {})
   }, [media?._id])
 
   const rateMutation = useMutation({
-    mutationFn: (value) => contentApi.rateMedia(mediaId, value),
+    mutationFn: (value) => contentApi.rateMedia(effectiveMediaId, value),
     onSuccess: () => {
       setNotice('Thanks - your rating was saved.')
-      queryClient.invalidateQueries({ queryKey: queryKeys.media.detail(mediaId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.media.detail(effectiveMediaId) })
     },
     onError: (error) => setNotice(error.message),
   })
 
-  if (query.isLoading) return <PageSkeleton />
-  if (query.error) return <ErrorState message={query.error.message} onRetry={query.refetch} />
+  const isStaff = ['content_editor', 'support_manager', 'admin', 'super_admin'].includes(auth.user?.role)
+
+  if (query.isLoading || (!media && allMediaQuery.isLoading)) return <PageSkeleton />
+  if (query.error && !media) return <ErrorState message={query.error.message} onRetry={query.refetch} />
+  if (!media) return <ErrorState title="Media not found" message="Please choose a video from the library." onRetry={allMediaQuery.refetch} />
 
   const isVideo = media.type === 'video'
   const notes = (media.transcript || '').split('\n').filter(Boolean).map((line) => {
@@ -54,7 +70,18 @@ export default function MediaDetailEnhancedPage({ navigate, mediaId }) {
 
   return (
     <div className="page-stack">
-      <Breadcrumbs items={[{ label: 'Resources', to: 'resources' }, { label: media.title }]} navigate={navigate} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <Breadcrumbs items={[{ label: 'Resources', to: 'resources' }, { label: media.title }]} navigate={navigate} />
+        {isStaff && (
+          <button
+            className="button soft small"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            onClick={() => navigate('admin-content')}
+          >
+            <Icon name="settings" size={14} /> Back to Admin Content
+          </button>
+        )}
+      </div>
       <Back navigate={navigate} to="resources">Back to resources</Back>
       <div className="media-layout">
         <main>

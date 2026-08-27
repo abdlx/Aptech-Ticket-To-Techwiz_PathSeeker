@@ -86,6 +86,25 @@ export default function ContentAdmin({ navigate }) {
     item.date,
     item.status,
     <div key={item._id} className="page-action-row">
+      {item.isMedia ? (
+        <button
+          className="button soft small"
+          style={{ padding: '2px 8px', fontSize: '11px', color: 'var(--blue, #3b82f6)' }}
+          title="Play and stream video with student UI"
+          onClick={() => navigate('media-detail', item._id)}
+        >
+          ▶ Stream
+        </button>
+      ) : (
+        <button
+          className="button soft small"
+          style={{ padding: '2px 8px', fontSize: '11px', color: 'var(--mint, #10b981)' }}
+          title="Open document viewer with student UI"
+          onClick={() => navigate('document-preview', item._id)}
+        >
+          📄 View PDF
+        </button>
+      )}
       <button className="button ghost small" onClick={() => navigate('admin-content-editor', item._id)}>Edit</button>
       <button className="button ghost small" disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ item, status: item.currentStatus === 'published' ? 'archived' : item.currentStatus === 'archived' ? 'draft' : 'published' })}>{item.currentStatus === 'published' ? 'Archive' : item.currentStatus === 'archived' ? 'Restore' : 'Publish'}</button>
       <button

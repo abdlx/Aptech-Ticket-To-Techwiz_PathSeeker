@@ -84,9 +84,9 @@ function App() {
   else if (screen === 'recently-viewed') page = <RecentlyViewedPage navigate={navigate} />
   else if (screen === 'compare') page = <CompareCareersPage navigate={navigate} />
   else if (screen === 'saved-filters') page = <SavedFiltersPage navigate={navigate} />
-  else if (screen === 'media-detail') page = <MediaDetailPage navigate={navigate} />
-  else if (screen === 'document-preview') page = <DocumentPreviewPage navigate={navigate} />
-  else if (screen === 'story-detail') page = <StoryDetailPage navigate={navigate} />
+  else if (screen === 'media-detail') page = <MediaDetailPage navigate={navigate} mediaId={careerId} />
+  else if (screen === 'document-preview') page = <DocumentPreviewPage navigate={navigate} resourceId={careerId} />
+  else if (screen === 'story-detail') page = <StoryDetailPage navigate={navigate} storyId={careerId} />
   else if (screen === 'submit-story') page = <SubmitStoryPage navigate={navigate} />
   else if (screen === 'help') page = <HelpCenterPage navigate={navigate} />
   else page = <DashboardPage navigate={navigate} onVoice={() => setVoiceOpen(true)} />
