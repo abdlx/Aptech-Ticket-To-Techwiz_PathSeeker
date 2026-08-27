@@ -151,7 +151,9 @@ export default function NaviDialog({ onClose, context, navigate }) {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume()
       }
-    } catch (_) {}
+    } catch {
+      // Speech synthesis was unavailable or could not be resumed.
+    }
 
     const utterance = new SpeechSynthesisUtterance(text)
     activeUtteranceRef.current = utterance
@@ -180,7 +182,7 @@ export default function NaviDialog({ onClose, context, navigate }) {
 
     try {
       window.speechSynthesis.speak(utterance)
-    } catch (_) {
+    } catch {
       clearUtterance()
     }
   }, [getBestVoice, naviMuted])
@@ -328,7 +330,11 @@ export default function NaviDialog({ onClose, context, navigate }) {
       setMode('none')
       setState('idle')
       if (vapiRef.current) {
-        try { vapiRef.current.stop().catch(() => undefined) } catch (_) {}
+        try {
+          vapiRef.current.stop().catch(() => undefined)
+        } catch {
+          // Ignore failure when stopping disconnected instance
+        }
       }
     }
 
@@ -417,7 +423,11 @@ export default function NaviDialog({ onClose, context, navigate }) {
         setMode('none')
         setState('idle')
         if (vapiRef.current) {
-          try { vapiRef.current.stop().catch(() => undefined) } catch (_) {}
+          try {
+            vapiRef.current.stop().catch(() => undefined)
+          } catch {
+            // Ignore failure when stopping disconnected instance
+          }
         }
       }
     }, 6500)
