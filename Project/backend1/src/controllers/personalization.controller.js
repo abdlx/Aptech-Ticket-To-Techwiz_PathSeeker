@@ -58,7 +58,7 @@ export const getSavedFilters = asyncHandler(async (req, res) => {
 })
 
 export const createSavedFilter = asyncHandler(async (req, res) => {
-  const { name, domainIds, salaryMin, demand, alerts } = req.body
+  const { name, domainIds, skillIds, salaryMin, demand, alerts } = req.body
   if (!isNonEmptyString(name, { min: 2, max: 150 })) {
     throw new AppError(400, 'name must be between 2 and 150 characters.', 'VALIDATION_ERROR')
   }
@@ -69,6 +69,7 @@ export const createSavedFilter = asyncHandler(async (req, res) => {
   const savedFilter = await personalizationService.createSavedFilter(req.user.id, {
     name,
     domainIds,
+    skillIds,
     salaryMin,
     demand,
     alerts,

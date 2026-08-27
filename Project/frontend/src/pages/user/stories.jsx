@@ -67,7 +67,7 @@ export default function StoriesPage({ navigate }) {
             </div>
             <div className="story-tags">
               <span>{featured.domainId?.name || 'Transition'}</span>
-              <span>Verified story</span>
+              <span>{featured.isDemo ? 'Illustrative demo journey' : 'Community story'}</span>
             </div>
           </div>
         </button>
@@ -87,7 +87,7 @@ export default function StoriesPage({ navigate }) {
                     <span className="portrait mint">{initials}</span>
                     <span>
                       <strong>{story.authorName}</strong>
-                      <small>{story.domainId?.name || 'Career Explorer'}</small>
+                      <small>{story.domainId?.name || 'Career Explorer'}{story.isDemo ? ' · Demo journey' : ''}</small>
                     </span>
                   </div>
                   <button className="card-link" onClick={() => navigate('story-detail', story._id)}>

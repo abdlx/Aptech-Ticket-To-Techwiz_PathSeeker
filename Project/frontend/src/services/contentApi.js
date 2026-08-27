@@ -11,12 +11,18 @@ export const contentApi = {
   recordDownload: (id, options = {}) =>
     apiRequest(`${endpoints.resources}/${id}/download`, { method: 'POST', ...options }),
 
+  recordResourceView: (id, options = {}) =>
+    apiRequest(`${endpoints.resources}/${id}/view`, { method: 'POST', ...options }),
+
   // Media
   getMedia: (params = {}, options = {}) =>
     apiRequest(endpoints.media, { query: params, ...options }),
 
   getMediaById: (id, options = {}) =>
     apiRequest(`${endpoints.media}/${id}`, options),
+
+  getRelatedMedia: (id, options = {}) =>
+    apiRequest(`${endpoints.media}/${id}/related`, options),
 
   rateMedia: (id, value, options = {}) =>
     apiRequest(`${endpoints.media}/${id}/ratings`, { method: 'POST', body: { value }, ...options }),

@@ -37,6 +37,20 @@ export const skillIds = Object.freeze({
   teaching: deterministicId('1', 28),
   networkSecurity: deterministicId('1', 29),
   machineLearning: deterministicId('1', 30),
+  statistics: deterministicId('1', 31),
+  dataVisualization: deterministicId('1', 32),
+  cloudInfrastructure: deterministicId('1', 33),
+  devOps: deterministicId('1', 34),
+  softwareTesting: deterministicId('1', 35),
+  testAutomation: deterministicId('1', 36),
+  riskManagement: deterministicId('1', 37),
+  patientCare: deterministicId('1', 38),
+  clinicalPractice: deterministicId('1', 39),
+  engineeringDesign: deterministicId('1', 40),
+  cad: deterministicId('1', 41),
+  instructionalDesign: deterministicId('1', 42),
+  learningAssessment: deterministicId('1', 43),
+  stakeholderManagement: deterministicId('1', 44),
 })
 
 export const domainIds = Object.freeze({
@@ -72,6 +86,15 @@ export const careerIds = Object.freeze({
   digitalMarketer: deterministicId('5', 4),
   cybersecurityAnalyst: deterministicId('5', 5),
   productManager: deterministicId('5', 6),
+  dataScientist: deterministicId('5', 7),
+  projectManager: deterministicId('5', 8),
+  financialAnalyst: deterministicId('5', 9),
+  registeredNurse: deterministicId('5', 10),
+  mechanicalEngineer: deterministicId('5', 11),
+  learningDesigner: deterministicId('5', 12),
+  qaEngineer: deterministicId('5', 13),
+  businessAnalyst: deterministicId('5', 14),
+  cloudEngineer: deterministicId('5', 15),
 })
 
 export const quizQuestionIds = Object.freeze({

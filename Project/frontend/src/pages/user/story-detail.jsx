@@ -39,7 +39,7 @@ export default function StoryDetailPage({ navigate, storyId }) {
           <h1>{author}’s Career Transition</h1>
           <p>{author} · {domain}</p>
           <div className="story-tags">
-            <span>Verified journey</span>
+            <span>{story?.isDemo ? 'Illustrative demo journey' : 'Community story'}</span>
             <span>{domain}</span>
           </div>
         </div>

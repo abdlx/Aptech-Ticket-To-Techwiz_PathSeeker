@@ -14,11 +14,11 @@ const ForgotPasswordPage = lazy(() => authFlows().then((module) => ({ default: m
 const VerifyEmailPage = lazy(() => authFlows().then((module) => ({ default: module.VerifyEmailFlow })))
 const ResetPasswordPage = lazy(() => authFlows().then((module) => ({ default: module.ResetPasswordFlow }))); const AdminLoginPage = lazy(() => authFlows().then((module) => ({ default: module.AdminLoginFlow })))
 const DashboardPage = lazy(() => import('./pages/user/dashboard')); const QuizPage = lazy(() => import('./pages/user/quiz')); const RecommendationsPage = lazy(() => import('./pages/user/recommendations'))
-const CareerBankPage = lazy(() => import('./pages/user/connected-career-bank')); const CareerDetailPage = lazy(() => import('./pages/user/connected-career-detail')); const ResourcesPage = lazy(() => import('./pages/user/resources'))
+const CareerBankPage = lazy(() => import('./pages/user/career-bank-enhanced')); const CareerDetailPage = lazy(() => import('./pages/user/career-detail-enhanced')); const ResourcesPage = lazy(() => import('./pages/user/resources'))
 const SavedPage = lazy(() => import('./pages/user/saved')); const StoriesPage = lazy(() => import('./pages/user/stories')); const ProfilePage = lazy(() => import('./pages/user/connected-profile')); const FeedbackPage = lazy(() => import('./pages/user/feedback'))
 const NotificationsPage = lazy(() => import('./pages/user/notifications')); const QuizHistoryPage = lazy(() => import('./pages/user/quiz-history')); const QuizResultDetailPage = lazy(() => import('./pages/user/quiz-result-detail'))
-const RecentlyViewedPage = lazy(() => import('./pages/user/recently-viewed')); const CompareCareersPage = lazy(() => import('./pages/user/compare-careers')); const SavedFiltersPage = lazy(() => import('./pages/user/saved-filters'))
-const MediaDetailPage = lazy(() => import('./pages/user/media-detail')); const DocumentPreviewPage = lazy(() => import('./pages/user/document-preview')); const StoryDetailPage = lazy(() => import('./pages/user/story-detail'))
+const RecentlyViewedPage = lazy(() => import('./pages/user/recently-viewed')); const CompareCareersPage = lazy(() => import('./pages/user/compare-careers-enhanced')); const SavedFiltersPage = lazy(() => import('./pages/user/saved-filters'))
+const MediaDetailPage = lazy(() => import('./pages/user/media-detail-enhanced')); const DocumentPreviewPage = lazy(() => import('./pages/user/document-preview-enhanced')); const StoryDetailPage = lazy(() => import('./pages/user/story-detail'))
 const SubmitStoryPage = lazy(() => import('./pages/user/submit-story')); const HelpCenterPage = lazy(() => import('./pages/user/help-center')); const AdminPage = lazy(() => import('./pages/admin/layout'))
 
 const screenPaths = {

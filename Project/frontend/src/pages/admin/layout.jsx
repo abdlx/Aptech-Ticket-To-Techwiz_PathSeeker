@@ -11,8 +11,8 @@ import AdminFeedbackAnalytics from './feedback-analytics'
 import AdminSettingsPage from './settings'
 import AdminHelpPage from './help'
 import AdminUserEditor from './user-editor'
-import AdminCareerEditor from './career-editor'
-import AdminContentEditor from './content-editor'
+import AdminCareerEditor from './career-editor-enhanced'
+import AdminContentEditor from './content-editor-enhanced'
 import AdminStoryReview from './story-review'
 import adminNav from './navigation'
 import { authApi } from '../../services/authApi'
@@ -37,11 +37,11 @@ export default function AdminPage({ screen, navigate }) {
         <div className="admin-content">
           {screen === 'admin' && <AdminOverview navigate={navigate} />}
           {screen === 'admin-users' && <UsersAdmin />}
-          {screen === 'admin-careers' && <CareersAdmin />}
-          {screen === 'admin-content' && <ContentAdmin />}
-          {screen === 'admin-quiz' && <QuizAdmin />}
+          {screen === 'admin-careers' && <CareersAdmin navigate={navigate} />}
+          {screen === 'admin-content' && <ContentAdmin navigate={navigate} />}
+          {screen === 'admin-quiz' && <QuizAdmin navigate={navigate} />}
           {screen === 'admin-stories' && <StoriesAdmin />}
-          {screen === 'admin-feedback' && <FeedbackAdmin />}
+          {screen === 'admin-feedback' && <FeedbackAdmin navigate={navigate} />}
           {screen === 'admin-feedback-analytics' && <AdminFeedbackAnalytics navigate={navigate} />}
           {screen === 'admin-settings' && <AdminSettingsPage navigate={navigate} />}
           {screen === 'admin-help' && <AdminHelpPage navigate={navigate} />}

@@ -6,7 +6,7 @@ import AdminTable from '../../components/admin/AdminTable'
 import { ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { adminApi } from '../../services/adminApi'
 
-export default function ContentAdmin() {
+export default function ContentAdmin({ navigate }) {
   const queryClient = useQueryClient()
   const [formatFilter, setFormatFilter] = useState('All')
   const [search, setSearch] = useState('')
@@ -47,7 +47,7 @@ export default function ContentAdmin() {
       title: m.title,
       type: m.type === 'video' ? 'Video' : 'Podcast',
       tags: m.tags?.join(', ') || 'Learning',
-      author: 'PathSeeker Faculty',
+      author: m.publisherName || 'PathSeeker Editorial',
       date: new Date(m.createdAt).toLocaleDateString(),
       status: m.active ? 'Published' : 'Draft',
       isMedia: true,
@@ -57,7 +57,7 @@ export default function ContentAdmin() {
       title: r.title,
       type: r.type?.toUpperCase() || 'DOCUMENT',
       tags: r.tags?.join(', ') || 'All careers',
-      author: 'PathSeeker Editorial',
+      author: r.authorName || 'PathSeeker Editorial',
       date: new Date(r.createdAt).toLocaleDateString(),
       status: r.active ? 'Published' : 'Draft',
       isMedia: false,
@@ -75,19 +75,19 @@ export default function ContentAdmin() {
     item.author,
     item.date,
     item.status,
-    <button
-      key={item._id}
-      className="button ghost small"
-      style={{ padding: '2px 8px', fontSize: '11px', color: 'var(--rose, #c05c5c)' }}
-      onClick={() => {
-        if (window.confirm(`Delete "${item.title}"?`)) {
-          if (item.isMedia) deleteMediaMutation.mutate(item._id)
-          else deleteResourceMutation.mutate(item._id)
-        }
-      }}
-    >
-      Delete
-    </button>,
+    <div key={item._id} className="page-action-row">
+      <button className="button ghost small" onClick={() => navigate('admin-content-editor', item._id)}>Edit</button>
+      <button
+        className="button ghost small"
+        style={{ padding: '2px 8px', fontSize: '11px', color: 'var(--rose, #c05c5c)' }}
+        onClick={() => {
+          if (window.confirm(`Delete "${item.title}"?`)) {
+            if (item.isMedia) deleteMediaMutation.mutate(item._id)
+            else deleteResourceMutation.mutate(item._id)
+          }
+        }}
+      >Delete</button>
+    </div>,
   ])
 
   return (
@@ -96,7 +96,9 @@ export default function ContentAdmin() {
         eyebrow="Learning library"
         title="Content management"
         description="Manage expert videos, podcasts, courses, and downloadable documents."
-      />
+      >
+        <button className="button primary" onClick={() => navigate('admin-content-editor', 'new')}><Icon name="plus" /> Add content</button>
+      </PageHead>
 
       <div className="content-summary">
         <button className={formatFilter === 'All' ? 'active' : ''} onClick={() => setFormatFilter('All')}>

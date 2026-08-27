@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Icon from '../../components/Icon'
 import Breadcrumbs from '../../components/common/Breadcrumbs'
 import PageTitle from '../../components/common/PageTitle'
@@ -10,6 +11,7 @@ import { personalizationApi } from '../../services/personalizationApi'
 
 export default function SavedFiltersPage({ navigate }) {
   const queryClient = useQueryClient()
+  const routeNavigate = useNavigate()
   const [editing, setEditing] = useState(null)
 
   const savedFiltersQuery = useQuery({
@@ -91,6 +93,17 @@ export default function SavedFiltersPage({ navigate }) {
         {filters.length > 0 ? (
           filters.map((filter) => {
             const domainNames = (filter.domainIds || []).map((d) => (typeof d === 'object' ? d.name : d)).filter(Boolean)
+            const skillNames = (filter.skillIds || []).map((s) => (typeof s === 'object' ? s.name : s)).filter(Boolean)
+            const applyFilter = () => {
+              const query = new URLSearchParams()
+              const domain = filter.domainIds?.[0]
+              const skill = filter.skillIds?.[0]
+              if (domain) query.set('domain', typeof domain === 'object' ? domain.slug : domain)
+              if (skill) query.set('skill', typeof skill === 'object' ? skill.slug : skill)
+              if (filter.salaryMin) query.set('salaryMin', filter.salaryMin)
+              if (filter.demand && filter.demand !== 'any') query.set('demand', filter.demand)
+              routeNavigate(`/app/careers?${query.toString()}`)
+            }
             return (
               <article className="panel" key={filter._id}>
                 <div>
@@ -105,7 +118,7 @@ export default function SavedFiltersPage({ navigate }) {
                     <Icon name="close" />
                   </button>
                 </div>
-                <h3>{filter.name}</h3>
+                <h3>{filter.name}{skillNames.length ? ` - ${skillNames.join(' + ')}` : ''}</h3>
                 <p>
                   {domainNames.length ? domainNames.join(' + ') : 'All domains'} ·{' '}
                   {filter.salaryMin ? `$${filter.salaryMin.toLocaleString()}+` : 'Any salary'} ·{' '}
@@ -115,7 +128,7 @@ export default function SavedFiltersPage({ navigate }) {
                   <Icon name="bell" /> Alerts {filter.alerts ? 'on' : 'off'}
                 </span>
                 <div>
-                  <button className="button soft small" onClick={() => navigate('careers')}>
+                  <button className="button soft small" onClick={applyFilter}>
                     Apply in Career Bank
                   </button>
                 </div>

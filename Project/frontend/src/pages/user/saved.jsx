@@ -6,6 +6,7 @@ import CareerCard from '../../components/user/CareerCard'
 import { EmptyState, ErrorState, PageSkeleton } from '../../components/common/RouteStates'
 import { queryKeys } from '../../lib/queryKeys'
 import { personalizationApi } from '../../services/personalizationApi'
+import { exportToPdf } from '../../lib/pdfExport'
 
 export default function SavedPage({ navigate }) {
   const queryClient = useQueryClient()
@@ -46,6 +47,15 @@ export default function SavedPage({ navigate }) {
     updateNoteMutation.mutate({ id, note: noteText })
   }
 
+  const handleShare = async () => {
+    const shareData = { title: 'My PathSeeker career collection', text: `I saved ${bookmarks.length} career resources in PathSeeker.`, url: window.location.href }
+    if (navigator.share) {
+      await navigator.share(shareData).catch(() => {})
+      return
+    }
+    window.location.href = `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(`${shareData.text}\n${shareData.url}`)}`
+  }
+
   return (
     <div className="saved-page page-stack">
       <section className="page-intro">
@@ -54,6 +64,7 @@ export default function SavedPage({ navigate }) {
           <h1>Saved ideas & notes</h1>
           <p>Everything you want to revisit, organized in one calm place.</p>
         </div>
+        <div className="page-action-row"><button className="button soft" onClick={() => exportToPdf('My PathSeeker Collection')}><Icon name="download" /> Export / print</button><button className="button primary" onClick={handleShare}><Icon name="arrow" /> Share collection</button></div>
       </section>
 
       <div className="tab-row">
@@ -172,7 +183,7 @@ export default function SavedPage({ navigate }) {
                     <p>{res.description || res.tags?.join(', ')}</p>
                     <button
                       className="card-link"
-                      onClick={() => navigate(res.type === 'video' ? 'media-detail' : 'document-preview', res._id)}
+                      onClick={() => navigate(b.itemType === 'media' ? 'media-detail' : 'document-preview', res._id)}
                     >
                       Open resource <Icon name="arrow" />
                     </button>

@@ -6,8 +6,15 @@ const { Schema } = mongoose
 const multimediaSchema = new Schema(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
+    description: { type: String, trim: true, maxlength: 1_500 },
     type: { type: String, required: true, enum: MULTIMEDIA_TYPES },
     url: { type: String, required: true, trim: true, maxlength: 2_000 },
+    externalUrl: { type: String, trim: true, maxlength: 2_000 },
+    thumbnailUrl: { type: String, trim: true, maxlength: 2_000 },
+    publisherName: { type: String, trim: true, maxlength: 200 },
+    publisherUrl: { type: String, trim: true, maxlength: 2_000 },
+    durationLabel: { type: String, trim: true, maxlength: 30 },
+    learningObjectives: { type: [{ type: String, trim: true, maxlength: 300 }], default: [] },
     transcript: { type: String, trim: true, maxlength: 20_000 },
     tags: { type: [{ type: String, trim: true, maxlength: 60 }], default: [] },
     relatedCareerIds: { type: [{ type: Schema.Types.ObjectId, ref: 'Career' }], default: [] },

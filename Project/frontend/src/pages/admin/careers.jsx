@@ -42,7 +42,7 @@ export default function CareersAdmin({ navigate }) {
         <button className="button soft" onClick={() => exportToPdf('PathSeeker Career Bank')}>
           <Icon name="download" /> Export catalog
         </button>
-        <button className="button primary" onClick={() => navigate('admin-career-editor')}>
+        <button className="button primary" onClick={() => navigate('admin-career-editor', 'new')}>
           <Icon name="plus" /> New career profile
         </button>
       </PageHead>

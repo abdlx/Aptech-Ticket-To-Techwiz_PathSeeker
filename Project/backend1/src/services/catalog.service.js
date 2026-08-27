@@ -28,7 +28,7 @@ async function resolveSlugsToIds(Model, slugsParam) {
 
 const SORTS = {
   relevance: { title: 1 },
-  salary: { 'expectedSalary.max': -1 },
+  salary: { 'expectedSalary.median': -1 },
   growth: { growthRatePercent: -1 },
 }
 
@@ -39,7 +39,7 @@ export async function listCareers({ q, domain, skill, demand, salaryMin, sort = 
   const skillIds = await resolveSlugsToIds(Skill, skill)
   if (skill) filter['requiredSkills.skillId'] = { $in: skillIds }
   if (demand) filter.demand = demand
-  if (salaryMin) filter['expectedSalary.max'] = { $gte: Number(salaryMin) }
+  if (salaryMin) filter['expectedSalary.median'] = { $gte: Number(salaryMin) }
   if (q) filter.$text = { $search: q }
 
   const sortSpec = q && sort === 'relevance' ? { score: { $meta: 'textScore' } } : SORTS[sort] || SORTS.relevance
@@ -146,7 +146,12 @@ export async function getRelatedContent(slug, limit = 6) {
       .sort({ ratingAvg: -1, createdAt: -1 })
       .limit(limit)
       .lean(),
-    Resource.find({ ...publishedContent, ...(tags.length ? { tags: { $in: tags } } : {}) })
+    Resource.find({
+      $and: [
+        publishedContent,
+        { $or: [{ relatedCareerIds: career._id }, ...(tags.length ? [{ tags: { $in: tags } }] : [])] },
+      ],
+    })
       .sort({ downloadCount: -1, createdAt: -1 })
       .limit(limit)
       .lean(),

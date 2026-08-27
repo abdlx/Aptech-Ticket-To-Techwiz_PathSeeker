@@ -100,7 +100,10 @@ export async function clearRecentlyViewed(userId) {
 // ---------------------------------------------------------------------------
 
 export async function listSavedFilters(userId) {
-  return SavedFilter.find({ userId }).sort({ createdAt: -1 })
+  return SavedFilter.find({ userId })
+    .sort({ createdAt: -1 })
+    .populate('domainIds', 'name slug')
+    .populate('skillIds', 'name slug')
 }
 
 export async function createSavedFilter(userId, { name, domainIds, skillIds, salaryMin, demand, alerts }) {
@@ -255,7 +258,12 @@ export async function getRecommendedContent(userId, limit = 6) {
       .sort({ ratingAvg: -1, createdAt: -1 })
       .limit(limit)
       .lean(),
-    Resource.find({ active: true, ...(tags.length ? { tags: { $in: tags } } : {}) })
+    Resource.find({
+      active: true,
+      ...(careerIds.length || tags.length
+        ? { $or: [...(careerIds.length ? [{ relatedCareerIds: { $in: careerIds } }] : []), ...(tags.length ? [{ tags: { $in: tags } }] : [])] }
+        : {}),
+    })
       .sort({ downloadCount: -1, createdAt: -1 })
       .limit(limit)
       .lean(),

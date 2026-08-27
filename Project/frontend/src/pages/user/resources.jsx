@@ -11,6 +11,7 @@ export default function ResourcesPage({ navigate }) {
   const queryClient = useQueryClient()
   const [tab, setTab] = useState('All')
   const [search, setSearch] = useState('')
+  const [notice, setNotice] = useState('')
 
   const resourcesQuery = useQuery({
     queryKey: queryKeys.resources.list(),
@@ -28,11 +29,16 @@ export default function ResourcesPage({ navigate }) {
     mutationFn: ({ itemType, itemId }) => personalizationApi.addBookmark({ itemType, itemId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bookmarks.list() })
+      setNotice('Saved to your resource collection.')
     },
+    onError: (error) => setNotice(error.status === 409 ? 'This resource is already saved.' : error.message),
   })
 
   if (resourcesQuery.isLoading || mediaQuery.isLoading) return <PageSkeleton />
-  if (resourcesQuery.error) return <ErrorState message={resourcesQuery.error.message} onRetry={resourcesQuery.refetch} />
+  if (resourcesQuery.error || mediaQuery.error) {
+    const failedQuery = resourcesQuery.error ? resourcesQuery : mediaQuery
+    return <ErrorState message={failedQuery.error.message} onRetry={failedQuery.refetch} />
+  }
 
   const rawResources = resourcesQuery.data?.data?.resources || []
   const rawMedia = mediaQuery.data?.data?.media || []
@@ -47,7 +53,9 @@ export default function ResourcesPage({ navigate }) {
       icon: m.type === 'video' ? 'play' : 'headphones',
       tone: m.type === 'video' ? 'blue' : 'lavender',
       isMedia: true,
-      description: m.tags?.join(' · '),
+      thumbnailUrl: m.thumbnailUrl,
+      publisherName: m.publisherName,
+      description: m.description || m.tags?.join(' · '),
     })),
     ...rawResources.map((r) => ({
       _id: r._id,
@@ -94,7 +102,7 @@ export default function ResourcesPage({ navigate }) {
       </section>
 
       <div className="tab-row">
-        {['All', 'Videos', 'Podcasts', 'Documents'].map((item) => (
+        {['All', 'Videos', 'Documents'].map((item) => (
           <button
             className={tab === item ? 'active' : ''}
             key={item}
@@ -105,9 +113,11 @@ export default function ResourcesPage({ navigate }) {
         ))}
       </div>
 
+      {notice && <p className="inline-notice" role="status">{notice}</p>}
+
       {featuredMedia && (
         <section className="featured-resource">
-          <div className="feature-art">
+          <div className="feature-art" style={featuredMedia.thumbnailUrl ? { backgroundImage: `linear-gradient(135deg, rgba(18, 31, 51, .28), rgba(18, 31, 51, .72)), url(${featuredMedia.thumbnailUrl})` } : undefined}>
             <span className="resource-type">Featured {featuredMedia.type}</span>
             <div className="feature-play" onClick={() => navigate('media-detail', featuredMedia._id)}>
               <Icon name="play" />
@@ -117,7 +127,8 @@ export default function ResourcesPage({ navigate }) {
           <div>
             <span className="eyebrow">Recommended expert content</span>
             <h2>{featuredMedia.title}</h2>
-            <p>{featuredMedia.tags?.join(' · ') || 'Practical exploration into core career disciplines and real day-to-day work.'}</p>
+            <p>{featuredMedia.description || featuredMedia.tags?.join(' · ') || 'Practical exploration into core career disciplines and real day-to-day work.'}</p>
+            <small>Published by {featuredMedia.publisherName || 'an independent expert publisher'}</small>
             <button className="button primary" onClick={() => navigate('media-detail', featuredMedia._id)}>
               Watch & read transcript <Icon name="arrow" />
             </button>
@@ -131,8 +142,8 @@ export default function ResourcesPage({ navigate }) {
           <div className="resource-grid">
             {filtered.map((resource) => (
               <article key={resource._id} className="resource-card">
-                <div className={`resource-cover ${resource.tone}`}>
-                  <Icon name={resource.icon} size={32} />
+                <div className={`resource-cover ${resource.tone}`} style={resource.thumbnailUrl ? { backgroundImage: `linear-gradient(rgba(16, 32, 50, .24), rgba(16, 32, 50, .64)), url(${resource.thumbnailUrl})` } : undefined}>
+                  {!resource.thumbnailUrl && <Icon name={resource.icon} size={32} />}
                   <span>{resource.type}</span>
                   <button
                     onClick={() => bookmarkMutation.mutate({ itemType: resource.isMedia ? 'media' : 'resource', itemId: resource._id })}

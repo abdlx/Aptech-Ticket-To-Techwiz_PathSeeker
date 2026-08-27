@@ -16,6 +16,7 @@ const salarySchema = new Schema(
   {
     min: { type: Number, min: 0 },
     max: { type: Number, min: 0 },
+    median: { type: Number, min: 0 },
     currency: { type: String, trim: true, uppercase: true, minlength: 3, maxlength: 3, default: 'USD' },
   },
   { _id: false },
@@ -59,6 +60,14 @@ const careerSchema = new Schema(
       maxMonths: { type: Number, min: 0, max: 240 },
     },
     expectedSalary: { type: salarySchema, default: () => ({}) },
+    dataSource: {
+      name: { type: String, trim: true, maxlength: 200 },
+      occupationLabel: { type: String, trim: true, maxlength: 200 },
+      url: { type: String, trim: true, maxlength: 2_000 },
+      geography: { type: String, trim: true, maxlength: 100 },
+      salaryYear: { type: Number, min: 2000, max: 2200 },
+      outlookPeriod: { type: String, trim: true, maxlength: 50 },
+    },
     demand: { type: String, enum: CAREER_DEMAND_LEVELS, default: 'medium' },
     growthRatePercent: { type: Number, min: -100, max: 1_000 },
     iconKey: { type: String, trim: true, maxlength: 50 },
