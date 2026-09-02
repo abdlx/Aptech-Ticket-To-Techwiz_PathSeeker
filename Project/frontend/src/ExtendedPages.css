@@ -721,6 +721,35 @@ textarea {
   color: rgba(255, 255, 255, .84);
 }
 
+/* Welcome hero glass cards need their own dark surface; inherited white text on the light glass was unreadable. */
+[data-theme='dark'] .welcome-visual .floating-card {
+  color: var(--ink);
+  border-color: rgba(132, 173, 147, .42);
+  background: rgba(20, 40, 31, .94);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, .38);
+}
+
+[data-theme='dark'] .hero-chat strong,
+[data-theme='dark'] .match-card strong {
+  color: var(--ink);
+}
+
+[data-theme='dark'] .hero-chat p,
+[data-theme='dark'] .match-card small {
+  color: var(--muted);
+}
+
+[data-theme='dark'] .match-score {
+  color: #d8f7e2;
+  border-color: #69b783;
+  background: #214a33;
+}
+
+[data-theme='dark'] .navi-dot {
+  border: 1px solid rgba(132, 173, 147, .38);
+  background: #dce8dd;
+}
+
 @media (max-width: 900px) {
   .story-detail-hero,
   .story-detail-layout {
