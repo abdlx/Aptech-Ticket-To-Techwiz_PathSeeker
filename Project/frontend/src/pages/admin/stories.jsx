@@ -23,6 +23,7 @@ export default function StoriesAdmin({ navigate }) {
     mutationFn: (id) => adminApi.approveStory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'stories'] })
+      queryClient.invalidateQueries({ queryKey: ['stories'] })
     },
   })
 
@@ -30,6 +31,7 @@ export default function StoriesAdmin({ navigate }) {
     mutationFn: (id) => adminApi.rejectStory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'stories'] })
+      queryClient.invalidateQueries({ queryKey: ['stories'] })
     },
   })
 
@@ -55,14 +57,12 @@ export default function StoriesAdmin({ navigate }) {
         <span key={s._id} style={{ display: 'inline-flex', gap: '6px' }}>
           <button
             className="button primary small"
-            style={{ padding: '2px 8px', fontSize: '11px' }}
             onClick={() => approveMutation.mutate(s._id)}
           >
             Approve
           </button>
           <button
             className="button ghost small"
-            style={{ padding: '2px 8px', fontSize: '11px' }}
             onClick={() => rejectMutation.mutate(s._id)}
           >
             Reject

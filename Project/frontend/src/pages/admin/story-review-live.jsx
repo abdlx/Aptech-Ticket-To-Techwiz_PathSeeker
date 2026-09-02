@@ -17,6 +17,7 @@ export default function AdminStoryReview({ navigate, storyId }) {
   const finish = () => {
     queryClient.invalidateQueries({ queryKey: ['admin', 'stories'] })
     queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    queryClient.invalidateQueries({ queryKey: ['stories'] })
     query.refetch()
   }
   const update = useMutation({ mutationFn: (payload) => adminApi.updateStory(storyId, payload), onSuccess: finish })

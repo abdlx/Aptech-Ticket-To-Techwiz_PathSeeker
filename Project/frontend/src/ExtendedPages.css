@@ -256,3 +256,512 @@
   .career-hero-actions { width:100%;justify-content:flex-start; }
 }
 
+/* Readability and rhythm pass: keep dense screens compact without dropping below legible UI sizes. */
+.page-content {
+  padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1rem, 3vw, 2.5rem) clamp(4.5rem, 7vw, 6rem);
+}
+
+.admin-content {
+  padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2.5vw, 2rem) clamp(4.5rem, 7vw, 6rem);
+}
+
+.page-stack,
+.admin-stack {
+  gap: clamp(1.25rem, 2vw, 2rem);
+}
+
+.section-head,
+.admin-page-head,
+.resources-intro,
+.results-bar {
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.career-card,
+.resource-card,
+.story-grid article,
+.quiz-card,
+.feedback-card,
+.settings-content,
+.profile-hero {
+  padding: clamp(1.125rem, 2vw, 1.5rem);
+}
+
+.button,
+button,
+input,
+select,
+textarea {
+  font-size: max(.8125rem, 1em);
+}
+
+.button.small {
+  min-height: 2.25rem;
+  padding: .5rem .75rem;
+  font-size: var(--text-xs);
+  line-height: 1.25;
+}
+
+.eyebrow,
+.nav-label,
+.match-pill,
+.resource-type,
+.topbar-overline,
+.option-letter,
+.filter-count,
+.admin-table th,
+.feedback-inbox > button em,
+.voice-mode-status,
+.voice-message strong,
+.voice-message time,
+.voice-privacy {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.global-search,
+.voice-pill,
+.user-chip small,
+.passport-progress p,
+.passport-progress button,
+.career-card > p,
+.career-meta > span,
+.skill-row span,
+.momentum-score small,
+.journey-steps small,
+.journey-steps button,
+.resource-art > span,
+.resource-feature p,
+.resource-feature small,
+.next-resource small,
+.quiz-top > button,
+.quiz-top > div,
+.quiz-navi button small,
+.trait-row span,
+.results-badge small,
+.result-main .career-meta small,
+.career-title-block p,
+.story-grid small,
+.passport-sections small,
+.toggle-row small,
+.privacy-list small,
+.admin-page-head p,
+.admin-kpis small,
+.admin-table td,
+.story-admin-cards p,
+.inbox-tabs button,
+.feedback-inbox > button small,
+.feedback-inbox time,
+.feedback-detail small,
+.feedback-detail .rating span,
+.feedback-meta small,
+.feedback-detail label,
+.resource-disclaimer,
+.real-document-preview > p {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.career-card h3,
+.resource-feature h3,
+.next-resource strong,
+.journey-steps strong,
+.quiz-options strong,
+.quiz-navi button strong,
+.results-badge strong,
+.results-bar p,
+.results-bar label,
+.results-bar select,
+.story-grid strong,
+.profile-hero p,
+.admin-table td strong,
+.feedback-inbox > button strong,
+.feedback-detail strong,
+.feedback-detail blockquote {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+/* Remaining dense dashboard/admin labels share one accessible floor. */
+:is(
+  .admin-kpis article > small,
+  .admin-sidebar nav button em,
+  .admin-table footer span,
+  .admin-workspace small,
+  .admin-sidebar-bottom small,
+  .career-admin-grid article small,
+  .activity-row small,
+  .activity-row time,
+  .donut small,
+  .notes-preview small,
+  .question-list > button small,
+  .question-list > div p,
+  .roadmap-line em,
+  .roadmap-line small,
+  .status,
+  .table-user small,
+  .tab-row button span,
+  .admin-career-list small,
+  .admin-career-list em,
+  .admin-search kbd,
+  .admin-section-head > button,
+  .admin-section-head select,
+  .admin-table footer button,
+  .answer-editor > button,
+  .answer-editor > div > span,
+  .answer-editor input,
+  .answer-editor select,
+  .audience-card li,
+  .career-admin-grid > article > p,
+  .career-admin-grid article > button,
+  .chart-legend,
+  .content-summary small,
+  .expert-card p,
+  .expert-video small,
+  .intro-stat small,
+  .notes-grid small,
+  .profile-hero > div:nth-child(2) > div span,
+  .question-list > button > span,
+  .question-list > button strong,
+  .resource-cover > span,
+  .snapshot-grid p,
+  .snapshot-grid small,
+  .story-collage small,
+  .story-person small,
+  .story-tags span,
+  .story-video small,
+  .teacher small,
+  .trend-up,
+  .admin-search input,
+  .admin-workspace strong,
+  .admin-sidebar-bottom strong,
+  .answer-editor > span,
+  .career-admin-grid article strong,
+  .feature-art small,
+  .feedback-types button,
+  .fit-card button,
+  .expert-card > button,
+  .fit-card li,
+  .form-grid label,
+  .feedback-card > label,
+  .question-editor > label,
+  .global-search kbd,
+  .nav-item .nav-badge,
+  .new-note,
+  .notes-preview p,
+  .passport-score p,
+  .passport-sections .incomplete button,
+  .passport-sections strong,
+  .resource-card p,
+  .responsibility-list small,
+  .roadmap-line strong,
+  .skills-map > div:first-child > div,
+  .story-grid .portrait,
+  .table-user strong,
+  .tool-grid strong,
+  .voice-hint,
+  .voice-mode-switch button,
+  .voice-text-fallback label
+) {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+:is(
+  .admin-kpis article > p,
+  .admin-sidebar nav button,
+  .admin-sidebar-bottom > button,
+  .auth-trust small,
+  .avatar-stack span,
+  .career-title-block p,
+  .intro-stat span,
+  .journey-steps > div > span,
+  .match-card small,
+  .notes-grid p,
+  .notes-preview strong,
+  .privacy-list strong,
+  .public-header .button,
+  .roadmap-line > div > span,
+  .settings-nav button,
+  .story-person > span,
+  .tab-row button,
+  .teacher > span,
+  .teacher strong,
+  .avatar.small,
+  .career-search button,
+  .divider span,
+  .hero-chat,
+  .momentum-score span,
+  .password-rules,
+  .progress-ring small,
+  .quiz-tip p,
+  .responsibility-list strong,
+  .sidebar-card-body p,
+  .skills-map > div > strong,
+  .story-person strong,
+  .toggle-row strong,
+  .trust-strip span,
+  .voice-context,
+  .voice-error,
+  .voice-message p,
+  .voice-text-fallback input
+) {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.feedback-card textarea,
+.question-editor input,
+.question-editor textarea {
+  min-height: 2.75rem;
+  padding: .75rem;
+  font-size: var(--text-sm);
+}
+
+.career-card > p,
+.resource-feature p,
+.navi-prompt p,
+.quiz-card > p,
+.result-main p,
+.prose-card > p,
+.story-grid article > p,
+.admin-page-head p {
+  line-height: 1.65;
+}
+
+.filter-chips button,
+.advanced-filter,
+.active-filters span,
+.active-filters > button,
+.results-bar select,
+.admin-filterbar select,
+.admin-filterbar button {
+  min-height: 2.25rem;
+  padding-inline: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.form-grid,
+.settings-form,
+.feedback-form,
+.admin-editor-form,
+.editor-section {
+  gap: var(--space-3);
+}
+
+/* Success-story detail: balanced title, readable narrative, and an uncrowded timeline. */
+.story-detail-hero {
+  min-height: 21rem;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 1fr) minmax(9rem, 13rem);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  overflow: hidden;
+}
+
+.story-detail-hero > div:first-child {
+  min-width: 0;
+}
+
+.story-detail-hero h1 {
+  max-width: 18ch;
+  margin: .75rem 0;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+.story-detail-hero p {
+  margin-bottom: 1.25rem;
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+.story-portrait {
+  width: clamp(8.5rem, 16vw, 11rem);
+  height: clamp(8.5rem, 16vw, 11rem);
+  font-size: clamp(2rem, 5vw, 2.75rem);
+}
+
+.story-detail-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+  gap: clamp(1rem, 2vw, 1.5rem);
+  align-items: start;
+}
+
+.story-article,
+.story-timeline {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.story-article blockquote {
+  margin-bottom: 2rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  color: var(--ink);
+  border-left-width: .25rem;
+  background: var(--cream);
+  font: 600 clamp(1.125rem, 2vw, 1.35rem)/1.65 'Manrope', sans-serif;
+}
+
+.story-article p {
+  max-width: 72ch;
+  color: var(--muted);
+  font-size: var(--text-base);
+  line-height: 1.8;
+}
+
+.story-timeline > div {
+  min-height: 6rem;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: .875rem;
+}
+
+.story-timeline > div > span {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: var(--text-sm);
+}
+
+.story-timeline > div:not(:last-of-type)::after {
+  left: 1.125rem;
+  top: 2.65rem;
+}
+
+.story-timeline p {
+  gap: .375rem;
+  padding-top: .25rem;
+}
+
+.story-timeline strong {
+  color: var(--ink);
+  font-size: var(--text-base);
+  line-height: 1.4;
+}
+
+.story-timeline small {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+/* Dark surfaces use the same semantic colors instead of light-theme greys. */
+[data-theme='dark'] .panel,
+[data-theme='dark'] .career-card,
+[data-theme='dark'] .resource-card,
+[data-theme='dark'] .story-grid article,
+[data-theme='dark'] .settings-content,
+[data-theme='dark'] .settings-nav,
+[data-theme='dark'] .profile-hero,
+[data-theme='dark'] .feedback-card,
+[data-theme='dark'] .quiz-card,
+[data-theme='dark'] .admin-table {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--panel-bg);
+}
+
+[data-theme='dark'] .panel :is(h1, h2, h3, h4, strong, b, dt),
+[data-theme='dark'] .settings-content :is(h1, h2, h3, h4, strong),
+[data-theme='dark'] .admin-table :is(th, strong) {
+  color: var(--ink);
+}
+
+[data-theme='dark'] .panel :is(p, small, dd),
+[data-theme='dark'] .settings-content :is(p, small, label),
+[data-theme='dark'] .admin-table td,
+[data-theme='dark'] .career-card > p,
+[data-theme='dark'] .career-meta > span,
+[data-theme='dark'] .story-grid article > p {
+  color: var(--muted);
+}
+
+[data-theme='dark'] .page-content :where(p, small, label, dt, dd),
+[data-theme='dark'] .admin-content :where(p, small, label, dt, dd) {
+  color: var(--muted);
+}
+
+[data-theme='dark'] .page-content :where(h1, h2, h3, h4),
+[data-theme='dark'] .admin-content :where(h1, h2, h3, h4) {
+  color: var(--ink);
+}
+
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+  color: #91a79a;
+  opacity: 1;
+}
+
+[data-theme='dark'] .story-article blockquote,
+[data-theme='dark'] .momentum-score,
+[data-theme='dark'] .resource-feature,
+[data-theme='dark'] .notes-preview,
+[data-theme='dark'] .responsibility-list > div,
+[data-theme='dark'] .feedback-detail blockquote,
+[data-theme='dark'] .feedback-inbox > button.active {
+  color: var(--ink);
+  border-color: var(--line);
+  background: #173226;
+}
+
+[data-theme='dark'] .story-article p,
+[data-theme='dark'] .story-timeline small {
+  color: #c0d0c6;
+}
+
+[data-theme='dark'] .story-timeline > div:not(:last-of-type)::after {
+  background: var(--line);
+}
+
+[data-theme='dark'] :is(.dashboard-hero, .story-detail-hero) p {
+  color: rgba(255, 255, 255, .84);
+}
+
+@media (max-width: 900px) {
+  .story-detail-hero,
+  .story-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .story-detail-hero {
+    min-height: 0;
+  }
+
+  .story-portrait {
+    justify-self: start;
+    margin-top: .5rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-content,
+  .admin-content {
+    padding: 1.25rem 1rem 6rem;
+  }
+
+  .career-card,
+  .resource-card,
+  .story-grid article,
+  .quiz-card,
+  .feedback-card,
+  .settings-content,
+  .profile-hero {
+    padding: 1.125rem;
+  }
+
+  .mobile-nav button {
+    font-size: var(--text-xs);
+  }
+
+  .story-detail-hero {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .story-detail-hero h1 {
+    font-size: clamp(1.9rem, 9vw, 2.5rem);
+  }
+}
